@@ -1,6 +1,8 @@
 {
   "name": "specpowers-dev",
-  "description": "Development marketplace for SpecPowers spec-driven development workflow",
+  "metadata": {
+    "description": "A curated SpecPowers marketplace providing spec-driven development workflows and skills for AI coding assistants."
+  },
   "owner": {
     "name": "NSObjects",
     "email": ""
