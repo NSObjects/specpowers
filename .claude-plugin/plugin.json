@@ -2,6 +2,12 @@
   "name": "specpowers",
   "description": "Spec-driven development workflow: structured artifacts, TDD, systematic debugging, and behavioral shaping for AI coding assistants",
   "version": "0.1.0",
+  "author": {
+    "name": "NSObjects",
+    "email": "mrqter@gmail.com"
+  },
+  "homepage": "https://github.com/NSObjects/specpowers",
+  "repository": "https://github.com/NSObjects/specpowers",
   "license": "MIT",
   "keywords": [
     "specs",
