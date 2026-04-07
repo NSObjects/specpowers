@@ -2,6 +2,8 @@
 
 Enable specpowers skills in Codex via native skill discovery. Just clone and symlink.
 
+Codex relies on the skill descriptions for discovery. Unlike the Cursor and Claude integrations in this repo, the Codex install does not add a SessionStart hook that injects `using-skills` automatically.
+
 ## Prerequisites
 
 - Git
@@ -26,6 +28,11 @@ Enable specpowers skills in Codex via native skill discovery. Just clone and sym
    ```
 
 3. **Restart Codex** (quit and relaunch the CLI) to discover the skills.
+
+## Discovery Notes
+
+- Codex decides which skills to load from the skill descriptions, so trigger-oriented descriptions matter more than workflow summaries.
+- If you want stronger bootstrap behavior in a project, add the `AGENTS.md` guidance from this repository so the agent falls back to `skills/using-skills/SKILL.md` when it was not auto-loaded.
 
 ## Verify
 

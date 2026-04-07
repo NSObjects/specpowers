@@ -1,6 +1,6 @@
 ---
 name: archiving
-description: "Use when all tasks are complete and the user wants to finalize a change. Merges Delta Specs into main specs and archives the change folder."
+description: "Use when implementation and review are done, the change is accepted, and the user wants to wrap up the current change cleanly."
 ---
 
 # Archiving Changes

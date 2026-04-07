@@ -1,6 +1,6 @@
 ---
 name: proposing
-description: "Use when you know what to build and need to capture intent, scope, and approach. Creates proposal.md as the first artifact of a change."
+description: "Use when a concrete change has been identified and its intent, scope, constraints, or success criteria need to be aligned before writing specs."
 ---
 
 # Proposing Changes

@@ -1,6 +1,6 @@
 ---
 name: using-skills
-description: Use when starting any conversation - establishes how to find and use skills, requiring Skill invocation before ANY response including clarifying questions
+description: Use when starting a new conversation, or whenever the next step is unclear and the agent needs to decide which skills apply before responding
 ---
 
 <SUBAGENT-STOP>

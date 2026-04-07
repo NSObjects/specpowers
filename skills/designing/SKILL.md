@@ -1,6 +1,6 @@
 ---
 name: designing
-description: "Use after specs are confirmed. Creates design.md with technical approach, architecture decisions, and file change plan."
+description: "Use when the expected behavior is agreed and the implementation approach, tradeoffs, or file boundaries still need to be decided before coding."
 ---
 
 # Designing Architecture

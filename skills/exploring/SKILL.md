@@ -1,6 +1,6 @@
 ---
 name: exploring
-description: "Use when requirements are unclear or the user has a vague idea. Explores intent through Socratic dialogue before creating any artifacts."
+description: "Use when the request is vague, requirements are incomplete, or more context is needed before deciding what should be built."
 ---
 
 # Exploring Ideas

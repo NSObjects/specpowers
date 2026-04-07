@@ -1,6 +1,6 @@
 ---
 name: specifying
-description: "Use after proposal is confirmed. Creates structured behavioral specifications with GIVEN/WHEN/THEN scenarios. The spine of the entire workflow — cannot be skipped."
+description: "Use when the change intent is accepted and the expected behavior still needs to be defined precisely with testable scenarios before design or coding."
 ---
 
 # Specifying Behavior

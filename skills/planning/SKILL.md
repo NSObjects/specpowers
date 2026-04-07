@@ -1,6 +1,6 @@
 ---
 name: planning
-description: "Use after design is confirmed. Creates tasks.md with fine-grained TDD tasks, each mapped to specific Spec scenarios."
+description: "Use when the behavior and design are agreed and the work needs to be broken into small test-first tasks for implementation."
 ---
 
 # Planning Tasks

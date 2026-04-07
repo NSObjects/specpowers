@@ -1,6 +1,6 @@
 ---
 name: spec-driven-development
-description: "Use when tasks.md is ready. Executes tasks with TDD discipline, Spec compliance checks, and user-controlled pacing."
+description: "Use when there is an approved implementation plan with concrete tasks and the work should now be executed in the current session."
 ---
 
 # Spec-Driven Development
