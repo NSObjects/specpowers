@@ -69,7 +69,7 @@ AI:  ✅ 任务 3: CSS Variables — 完成
 
 | 平台 | 安装方式 |
 |------|---------|
-| **Claude Code** | `/plugin install specpowers@git+https://github.com/NSObjects/specpowers` |
+| **Claude Code** | Step 1: `/plugin marketplace add NSObjects/specpowers` <br> Step 2: `/plugin install specpowers` |
 | **Cursor** | `/add-plugin https://github.com/NSObjects/specpowers` |
 | **Gemini CLI** | `gemini extensions install https://github.com/NSObjects/specpowers` |
 | **Kiro IDE** | Powers 面板 → Add power from GitHub → `https://github.com/NSObjects/specpowers` |

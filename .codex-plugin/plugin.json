@@ -1,0 +1,44 @@
+{
+  "name": "specpowers",
+  "version": "0.1.0",
+  "description": "Spec-driven development workflow: structured artifacts, TDD, systematic debugging, and behavioral shaping for AI coding assistants.",
+  "author": {
+    "name": "NSObjects",
+    "email": "mrqter@gmail.com",
+    "url": "https://github.com/NSObjects"
+  },
+  "homepage": "https://github.com/NSObjects/specpowers",
+  "repository": "https://github.com/NSObjects/specpowers",
+  "license": "MIT",
+  "keywords": [
+    "specs",
+    "tdd",
+    "artifacts",
+    "workflows",
+    "debugging",
+    "planning"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "SpecPowers",
+    "shortDescription": "Specs, TDD, and workflow discipline for AI coding assistants",
+    "longDescription": "Use SpecPowers to drive feature work through exploring, proposing, specifying, designing, planning, execution, and archiving with mandatory TDD and review checkpoints.",
+    "developerName": "NSObjects",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/NSObjects/specpowers",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "defaultPrompt": [
+      "Start with exploring and turn this feature idea into proposal, spec, design, and tasks",
+      "Execute the next planned task with TDD and code review discipline",
+      "Review this repo and drive the full SpecPowers workflow for a new change"
+    ],
+    "composerIcon": "./.codex-plugin/assets/specpowers-small.svg",
+    "logo": "./.codex-plugin/assets/specpowers.svg",
+    "screenshots": []
+  }
+}

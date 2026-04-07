@@ -69,7 +69,7 @@ AI:  ✅ Task 3: CSS Variables — done
 
 | Platform | Command |
 |----------|---------|
-| **Claude Code** | `/plugin install specpowers@git+https://github.com/NSObjects/specpowers` |
+| **Claude Code** | Step 1: `/plugin marketplace add NSObjects/specpowers` <br> Step 2: `/plugin install specpowers` |
 | **Cursor** | `/add-plugin https://github.com/NSObjects/specpowers` |
 | **Gemini CLI** | `gemini extensions install https://github.com/NSObjects/specpowers` |
 | **Kiro IDE** | Powers panel → Add power from GitHub → `https://github.com/NSObjects/specpowers` |
