@@ -10,7 +10,7 @@ Enable specpowers skills in Codex via native skill discovery. Just clone and sym
 
 1. **Clone the specpowers repository:**
    ```bash
-   git clone <specpowers-repo-url> ~/.codex/specpowers
+   git clone https://github.com/NSObjects/specpowers ~/.codex/specpowers
    ```
 
 2. **Create the skills symlink:**

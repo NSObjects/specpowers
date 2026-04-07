@@ -181,16 +181,16 @@ The AI plays a different role at each stage — and is explicitly constrained to
 Install the plugin directly from the repository or local path:
 
 ```bash
-/plugin install specpowers@git+<specpowers-repo-url>
+/plugin install specpowers@git+https://github.com/NSObjects/specpowers
 ```
-*(Or if running locally: `/plugin install <path-to-specpowers>`)*
+*(Or if running locally: `/plugin install /absolute/path/to/specpowers`)*
 
 ### Cursor
 
 In Cursor Agent chat, load the plugin directly:
 
 ```text
-/add-plugin <path-to-specpowers>
+/add-plugin https://github.com/NSObjects/specpowers
 ```
 
 ### Codex
@@ -198,7 +198,7 @@ In Cursor Agent chat, load the plugin directly:
 Tell Codex:
 
 ```
-Fetch and follow instructions from <specpowers-repo-url>/.codex/INSTALL.md
+Fetch and follow instructions from https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md
 ```
 
 **Detailed docs:** `.codex/INSTALL.md`
@@ -208,7 +208,7 @@ Fetch and follow instructions from <specpowers-repo-url>/.codex/INSTALL.md
 Tell OpenCode:
 
 ```
-Fetch and follow instructions from <specpowers-repo-url>/.opencode/INSTALL.md
+Fetch and follow instructions from https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md
 ```
 
 **Detailed docs:** `.opencode/INSTALL.md`
@@ -216,7 +216,7 @@ Fetch and follow instructions from <specpowers-repo-url>/.opencode/INSTALL.md
 ### Gemini CLI
 
 ```bash
-gemini extensions install <path-to-specpowers>
+gemini extensions install https://github.com/NSObjects/specpowers
 ```
 
 ### Verify Installation

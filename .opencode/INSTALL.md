@@ -10,7 +10,7 @@ Add specpowers to the `plugin` array in your `opencode.json` (global or project-
 
 ```json
 {
-  "plugin": ["specpowers@git+<specpowers-repo-url>"]
+  "plugin": ["specpowers@git+https://github.com/NSObjects/specpowers"]
 }
 ```
 
@@ -35,7 +35,7 @@ To pin a specific version:
 
 ```json
 {
-  "plugin": ["specpowers@git+<specpowers-repo-url>#v0.1.0"]
+  "plugin": ["specpowers@git+https://github.com/NSObjects/specpowers#v0.1.0"]
 }
 ```
 

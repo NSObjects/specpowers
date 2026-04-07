@@ -181,16 +181,16 @@ AI 在每个阶段扮演的角色都不同 —— 并且被严格限制在该角
 可以直接从代码库或者本地目录安装插件：
 
 ```bash
-/plugin install specpowers@git+<指向你的specpowers仓库地址>
+/plugin install specpowers@git+https://github.com/NSObjects/specpowers
 ```
-*(或者如果跑在本地: `/plugin install <指向你的specpowers目录>`)*
+*(或者如果跑在本地: `/plugin install /absolute/path/to/specpowers`)*
 
 ### Cursor
 
 在 Cursor Agent 对话框中，直接加载插件：
 
 ```text
-/add-plugin <指向你的specpowers目录>
+/add-plugin https://github.com/NSObjects/specpowers
 ```
 
 ### Codex
@@ -198,7 +198,7 @@ AI 在每个阶段扮演的角色都不同 —— 并且被严格限制在该角
 告诉 Codex：
 
 ```
-Fetch and follow instructions from <指向你的specpowers仓库地址>/.codex/INSTALL.md
+Fetch and follow instructions from https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md
 ```
 
 **完整的设置文档详见：** `.codex/INSTALL.md`
@@ -208,7 +208,7 @@ Fetch and follow instructions from <指向你的specpowers仓库地址>/.codex/I
 告诉 OpenCode：
 
 ```
-Fetch and follow instructions from <指向你的specpowers仓库地址>/.opencode/INSTALL.md
+Fetch and follow instructions from https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md
 ```
 
 **完整的设置文档详见：** `.opencode/INSTALL.md`
@@ -216,7 +216,7 @@ Fetch and follow instructions from <指向你的specpowers仓库地址>/.opencod
 ### Gemini CLI
 
 ```bash
-gemini extensions install <指向你的specpowers目录>
+gemini extensions install https://github.com/NSObjects/specpowers
 ```
 
 ### 验证是否安装成功
