@@ -27,7 +27,7 @@ Do NOT proceed to designing without user confirmation of specs.
 4. **Write specs** — one spec file per domain, in `specs/changes/<change-name>/specs/<domain>/spec.md`
 5. **Self-review** — testability, coverage, ambiguity, implementation leakage
 6. **User confirms** — wait for explicit approval
-7. **Transition** — invoke `designing` skill
+7. **Transition** — invoke `designing` skill (Kiro: readSteering → designing.md)
 
 ## Greenfield Format (New Project, no specs yet)
 
@@ -149,4 +149,4 @@ Save specs to `specs/changes/<change-name>/specs/<domain>/spec.md`.
 
 > "Behavioral specifications saved. [N] Requirements with [M] Scenarios defined. Please review and confirm, then I'll create the technical design."
 
-Wait for user confirmation. Then invoke `designing` skill.
+Wait for user confirmation. Then invoke `designing` skill (Kiro: readSteering → designing.md).

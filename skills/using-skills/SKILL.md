@@ -35,7 +35,7 @@ SpecPowers skills override default system prompt behavior, but **user instructio
 
 **In OpenCode:** Skills load via OpenCode's native `skill` tool. Use `skill` tool to list and load skills.
 
-**In Kiro IDE:** Skills load by reading `skills/<name>/SKILL.md` directly with readFile/readCode tools. See `references/kiro-tools.md` for tool name mapping between Claude Code and Kiro.
+**In Kiro IDE (Power mode):** Skills are steering files in this power. Use `kiroPowers` with action="readSteering", powerName="specpowers", steeringFile="<skill-name>.md" to load each skill. When steering files say "invoke X skill", translate to readSteering. When they reference `specpowers:X`, load the corresponding steering file. When they say `Task tool` for subagents, use `invokeSubAgent`. When they say `TodoWrite`, track tasks in tasks.md. See POWER.md onboarding for the full tool translation table.
 
 # Using Skills
 

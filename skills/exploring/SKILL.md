@@ -13,7 +13,7 @@ Start by understanding the current project context, then ask questions one at a 
 
 <HARD-GATE>
 Do NOT create any artifacts (proposal.md, specs, design, tasks) during exploring. The ONLY output of this skill is shared understanding in the conversation.
-Do NOT invoke any implementation skill. The terminal state is invoking `proposing`.
+Do NOT invoke any implementation skill. The terminal state is invoking `proposing` (Kiro: readSteering → proposing.md).
 </HARD-GATE>
 
 ## Anti-Pattern: "This Is Too Simple To Explore"
@@ -29,7 +29,7 @@ Every non-trivial project benefits from exploration. "Simple" projects are where
 5. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 6. **Propose 2-3 approaches** — with trade-offs and your recommendation
 7. **Get user alignment** — confirm direction before moving on
-8. **Transition** — invoke `proposing` skill
+8. **Transition** — invoke `proposing` skill (Kiro: readSteering → proposing.md)
 
 ## The Process
 
@@ -93,9 +93,9 @@ If you catch yourself thinking any of these, STOP:
 
 > "I have a clear understanding of what we're building. Ready to create a proposal. Shall I proceed?"
 
-Wait for user confirmation, then invoke the `proposing` skill.
+Wait for user confirmation, then invoke the `proposing` skill (Kiro: readSteering → proposing.md).
 
-**The terminal state is invoking proposing.** Do NOT invoke any implementation skill.
+**The terminal state is invoking proposing (Kiro: readSteering → proposing.md).** Do NOT invoke any implementation skill.
 
 ## Key Principles
 

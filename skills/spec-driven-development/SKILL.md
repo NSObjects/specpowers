@@ -40,7 +40,7 @@ For each unchecked Task in tasks.md:
    - Run test, verify GREEN
    - Follow TDD skill discipline throughout
 4. **Spec compliance self-check:** Verify each Scenario's GIVEN/WHEN/THEN is covered
-5. **Auto code review:** Dispatch `specpowers:code-reviewer` subagent with:
+5. **Auto code review:** Dispatch `specpowers:code-reviewer` subagent (Kiro: `invokeSubAgent` with `general-task-execution`, using prompt from `agents/code-reviewer.md`) with:
    - What was implemented (Task description)
    - Spec Scenarios as acceptance criteria
    - Changed files
@@ -76,7 +76,7 @@ For each unchecked Task in tasks.md:
 Execute all unchecked Tasks continuously:
 
 1. For each Task: build context → TDD → Spec self-check → mark complete
-2. After ALL Tasks: dispatch `specpowers:code-reviewer` subagent for the full changeset
+2. After ALL Tasks: dispatch `specpowers:code-reviewer` subagent (Kiro: `invokeSubAgent` with `general-task-execution`, using prompt from `agents/code-reviewer.md`) for the full changeset
 3. Produce unified report:
 
 ```markdown
@@ -127,7 +127,7 @@ If any check fails, fix before reporting the Task as complete.
 - **NEVER start the next Task without user's explicit "Continue" in Step-by-Step mode**
 - **NEVER execute git commands.** No `git add`, `git commit`, `git push`. Git is the user's domain.
 - **NEVER ignore user feedback.** If user says "this is wrong", stop and fix before continuing.
-- **NEVER skip TDD.** Every Task starts with a failing test. Use `specpowers:test-driven-development` discipline.
+- **NEVER skip TDD.** Every Task starts with a failing test. Use `specpowers:test-driven-development` discipline (Kiro: readSteering → test-driven-development.md).
 - **NEVER modify specs/design/proposal during implementation.** If you discover the spec is wrong, stop and discuss.
 
 ## Red Flags
@@ -144,11 +144,11 @@ If any check fails, fix before reporting the Task as complete.
 ## Integration
 
 **Required skills:**
-- **specpowers:test-driven-development** — Follow TDD for every Task
-- **specpowers:planning** — Creates the task plan this skill executes
-- **specpowers:requesting-code-review** — Auto-dispatched after task completion
+- **specpowers:test-driven-development** — Follow TDD for every Task (Kiro: readSteering → test-driven-development.md)
+- **specpowers:planning** — Creates the task plan this skill executes (Kiro: readSteering → planning.md)
+- **specpowers:requesting-code-review** — Auto-dispatched after task completion (Kiro: readSteering → requesting-code-review.md)
 
 **After all Tasks complete:**
 > "All Tasks complete. You can say 'Archive' to merge Delta Specs into the main specifications."
 
-Then invoke `archiving` skill when user requests it.
+Then invoke `archiving` skill (Kiro: readSteering → archiving.md) when user requests it.

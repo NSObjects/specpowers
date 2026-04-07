@@ -28,7 +28,7 @@ Do NOT proceed to execution without user confirmation.
 7. **Write TDD steps** — failing test → verify red → implement → verify green
 8. **Self-review** — spec coverage, placeholder scan, consistency check, size check
 9. **User confirms** — wait for explicit approval
-10. **Transition** — invoke `spec-driven-development` skill
+10. **Transition** — invoke `spec-driven-development` skill (Kiro: readSteering → spec-driven-development.md)
 
 ## Task Granularity Heuristics
 
@@ -188,4 +188,4 @@ Save to `specs/changes/<change-name>/tasks.md`.
 >
 > Which mode?"
 
-Wait for user choice. Then invoke `spec-driven-development` skill.
+Wait for user choice. Then invoke `spec-driven-development` skill (Kiro: readSteering → spec-driven-development.md).
