@@ -117,7 +117,7 @@ For each unchecked Task in tasks.md:
 ```
 
 7. **Wait for user instruction.** Do NOT proceed until user explicitly says to continue.
-8. **Mark Task as complete** (check the checkbox in tasks.md) when user confirms.
+8. **Mark Task as complete** (check the checkbox in tasks.md `- [ ]` → `- [x]`) when user says "Continue" or confirms.
 
 ## Execution Flow — Fast Mode
 
