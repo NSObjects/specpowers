@@ -73,8 +73,8 @@ AI:  ✅ 任务 3: CSS Variables — 完成
 | **Cursor** | `/add-plugin https://github.com/NSObjects/specpowers` |
 | **Gemini CLI** | `gemini extensions install https://github.com/NSObjects/specpowers` |
 | **Kiro IDE** | Powers 面板 → Add power from GitHub → `https://github.com/NSObjects/specpowers` |
-| **Codex** | 详见 [`.codex/INSTALL.md`](.codex/INSTALL.md) |
-| **OpenCode** | 详见 [`.opencode/INSTALL.md`](.opencode/INSTALL.md) |
+| **Codex** | Fetch and follow instructions from https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md |
+| **OpenCode** | Fetch and follow instructions from https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md |
 
 **验证：** 开一个新会话，说"我想做个 X 功能"。AI 应该从 `exploring` 开始问你问题，而不是直接写代码。
 
