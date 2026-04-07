@@ -73,8 +73,8 @@ AI:  ✅ Task 3: CSS Variables — done
 | **Cursor** | `/add-plugin https://github.com/NSObjects/specpowers` |
 | **Gemini CLI** | `gemini extensions install https://github.com/NSObjects/specpowers` |
 | **Kiro IDE** | Powers panel → Add power from GitHub → `https://github.com/NSObjects/specpowers` |
-| **Codex** | See [`.codex/INSTALL.md`](.codex/INSTALL.md) |
-| **OpenCode** | See [`.opencode/INSTALL.md`](.opencode/INSTALL.md) |
+| **Codex** | Fetch and follow instructions from https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md |
+| **OpenCode** | Fetch and follow instructions from https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md |
 
 **Verify:** Start a new session, say "I want to build X". The agent should start with `exploring` — asking questions, not writing code.
 
