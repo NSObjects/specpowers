@@ -1,0 +1,1 @@
+../skills/specifying/SKILL.md

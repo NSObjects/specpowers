@@ -35,6 +35,8 @@ SpecPowers skills override default system prompt behavior, but **user instructio
 
 **In OpenCode:** Skills load via OpenCode's native `skill` tool. Use `skill` tool to list and load skills.
 
+**In Kiro IDE:** Skills load by reading `skills/<name>/SKILL.md` directly with readFile/readCode tools. See `references/kiro-tools.md` for tool name mapping between Claude Code and Kiro.
+
 # Using Skills
 
 ## The Rule
