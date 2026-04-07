@@ -29,7 +29,7 @@ Do NOT proceed to designing without user confirmation of specs.
 6. **User confirms** — wait for explicit approval
 7. **Transition** — invoke `designing` skill
 
-## Greenfield Format (新项目，无已有 specs)
+## Greenfield Format (New Project, no specs yet)
 
 ```markdown
 # [Domain] Specification
@@ -54,7 +54,7 @@ The system SHALL [observable behavior description].
 - THEN [expected outcome]
 ```
 
-## Brownfield Format (已有项目，Delta 增量)
+## Brownfield Format (Existing Project, Delta Approach)
 
 When `specs/specs/` already contains spec files, use Delta format:
 
