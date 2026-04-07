@@ -116,6 +116,7 @@ AI:  ✅ Task 3: CSS Variables — done
 |-------|---------|
 | `test-driven-development` | RED-GREEN-REFACTOR iron law |
 | `systematic-debugging` | 4-phase root cause analysis |
+| `dispatching-parallel-agents` | Parallel agent dispatch for independent problems |
 | `requesting-code-review` | Code review subagent dispatch |
 | `receiving-code-review` | Handling review feedback |
 | `verification-before-completion` | Evidence before claims |

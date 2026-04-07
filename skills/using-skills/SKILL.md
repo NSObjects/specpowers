@@ -80,7 +80,8 @@ These thoughts mean STOP—you're rationalizing:
 When multiple skills could apply, use this order:
 
 1. **Process skills first** (exploring, proposing, specifying, debugging) - these determine HOW to approach
-2. **Implementation skills second** - these guide execution
+2. **Implementation skills second** (spec-driven-development) - these guide execution
+3. **Utility skills** (dispatching-parallel-agents, requesting-code-review) - these support execution
 
 "Let's build X" → proposing/exploring first, then implementation skills.
 "Fix this bug" → debugging first, then domain-specific skills.

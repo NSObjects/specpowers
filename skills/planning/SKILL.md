@@ -183,8 +183,8 @@ Save to `specs/changes/<change-name>/tasks.md`.
 > "Implementation plan saved. [N] Tasks covering [M] Spec Scenarios.
 >
 > Two execution modes available:
-> 1. **Step-by-Step Mode** (default) — I execute one Task at a time, auto code review, you review + commit after each
-> 2. **Fast Mode** — I execute all Tasks continuously, unified code review, you review everything at the end
+> 1. **Step-by-Step Mode** (default) — one Task at a time, two-stage review, you review + commit after each
+> 2. **Fast Mode** — all Tasks continuously, two-stage review per Task, you review everything at the end
 >
 > Which mode?"
 

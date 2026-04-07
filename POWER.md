@@ -40,6 +40,7 @@ Steering files reference tools from other platforms. Translate them as follows:
 | `specpowers:requesting-code-review` | `readSteering(steeringFile="requesting-code-review.md")` |
 | `specpowers:verification-before-completion` | `readSteering(steeringFile="verification-before-completion.md")` |
 | `specpowers:systematic-debugging` | `readSteering(steeringFile="systematic-debugging.md")` |
+| `specpowers:dispatching-parallel-agents` | `readSteering(steeringFile="dispatching-parallel-agents.md")` |
 | `Task` tool (dispatch subagent) | `invokeSubAgent` with `general-task-execution` agent |
 | `TodoWrite` | Track tasks inline in tasks.md |
 | `Read`, `Write`, `Edit` | Kiro native: `readFile`/`readCode`, `fsWrite`/`fsAppend`, `strReplace` |
@@ -85,3 +86,4 @@ exploring → proposing → specifying → designing → planning → spec-drive
 - When handling code review feedback → `receiving-code-review.md`
 - When forwarding evidence before claims (Verification) → `verification-before-completion.md`
 - When creating or tuning new skills → `writing-skills.md`
+- When dispatching parallel agents for independent problems → `dispatching-parallel-agents.md`

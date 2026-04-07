@@ -116,6 +116,7 @@ AI:  ✅ 任务 3: CSS Variables — 完成
 |------|------|
 | `test-driven-development` | RED-GREEN-REFACTOR 铁律 |
 | `systematic-debugging` | 四阶段根因分析 |
+| `dispatching-parallel-agents` | 独立问题并行代理调度 |
 | `requesting-code-review` | 代码审查子智能体调度 |
 | `receiving-code-review` | 处理审查反馈 |
 | `verification-before-completion` | 拿证据说话 |
