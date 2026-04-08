@@ -76,6 +76,20 @@ AI:  ✅ Task 3: CSS Variables — done
 | **Codex** | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
 | **OpenCode** | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
 
+### Updating
+
+Use your platform's native update path against the same source shown above:
+
+- **Codex:** Follow the update steps in `.codex/INSTALL.md`
+- **OpenCode:** Restart OpenCode; it auto-updates from the configured plugin source
+- **Claude Code / Cursor / Gemini CLI / Kiro IDE:** Refresh or reinstall from the same GitHub source or marketplace entry
+
+Then verify the running installation, not just the files:
+
+- Start a fresh session after updating
+- Ask `I want to build X`; it should begin with `exploring`
+- If you updated review-related prompts, invoke `requesting-code-review` and confirm it runs without missing prompt-file errors
+
 ### Verify
 
 Start a new session and say "I want to build X". The agent should begin with `exploring` — asking questions, not writing code.

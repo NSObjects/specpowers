@@ -76,6 +76,20 @@ AI:  ✅ 任务 3: CSS Variables — 完成
 | **Codex** | 获取并按照说明操作 `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
 | **OpenCode** | 获取并按照说明操作 `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
 
+### 更新
+
+按上面同一平台的来源，走该平台自己的更新路径：
+
+- **Codex：** 按 `.codex/INSTALL.md` 里的更新步骤操作
+- **OpenCode：** 重启 OpenCode，它会从当前配置的插件来源自动更新
+- **Claude Code / Cursor / Gemini CLI / Kiro IDE：** 从同一个 GitHub 来源或 marketplace 条目刷新或重新安装
+
+更新后要验证“运行中的安装”确实已经生效，而不只是文件被替换：
+
+- 更新后开一个新会话
+- 发送 `I want to build X`，应该从 `exploring` 开始
+- 如果这次更新涉及 review 相关提示词，再触发一次 `requesting-code-review`，确认不会出现 prompt 文件缺失错误
+
 ### 验证安装
 
 开一个新会话，说"我想做个 X 功能"。AI 应该从 `exploring` 开始问你问题，而不是直接写代码。
