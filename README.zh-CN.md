@@ -4,8 +4,6 @@
 
 给 AI 编程助手用的规格驱动开发工作流。让你的 AI 先想清楚再动手。
 
-融合了 [OpenSpec](https://github.com/Fission-AI/OpenSpec) 的结构化工件系统与 [Superpowers](https://github.com/obra/superpowers) 的行为塑造引擎。
-
 ## 它做什么
 
 当你让 AI 助手构建功能时，它不会直接写代码，而是：

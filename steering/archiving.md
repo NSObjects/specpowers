@@ -1,1 +1,0 @@
-../skills/archiving/SKILL.md

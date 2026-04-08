@@ -1,1 +1,0 @@
-../skills/designing/SKILL.md
