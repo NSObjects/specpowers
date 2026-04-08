@@ -38,10 +38,13 @@ For each delta spec file in `specs/changes/<change-name>/specs/`:
 
 ### Step 3: Move to Archive
 
-```bash
-# Move change folder to archive with date prefix
+Move the change folder to archive with a date prefix:
+
+```
 specs/changes/<name>/ → specs/changes/archive/YYYY-MM-DD-<name>/
 ```
+
+**Note:** The agent performs this file move directly (not a git operation). The user handles git commit afterward.
 
 Preserve ALL artifacts in the archive: proposal.md, specs/, design.md, tasks.md.
 

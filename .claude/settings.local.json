@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -ri \"openspec\\\\|superpowers\\\\|super-powers\\\\|open-spec\" /Users/lintao/workspace/tools/specpowers/ --include=*.md --include=*.json --include=*.yaml --include=*.yml)",
+      "WebSearch"
+    ]
+  }
+}

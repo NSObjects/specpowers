@@ -39,7 +39,7 @@ Skills reference tools from other platforms. Translate as follows:
 | Skill says | You do in Kiro |
 |---|---|
 | `Skill` tool / invoke skill | Activate the corresponding skill by name |
-| `specpowers:code-reviewer` subagent | `invokeSubAgent(name="general-task-execution")` with prompt from `code-reviewer-prompt.md` in the `requesting-code-review` skill |
+| `specpowers:code-reviewer` subagent | `invokeSubAgent(name="general-task-execution")` with `code-reviewer-prompt.md` in the `requesting-code-review` skill |
 | `specpowers:test-driven-development` | Activate `test-driven-development` skill |
 | `specpowers:planning` | Activate `planning` skill |
 | `specpowers:requesting-code-review` | Activate `requesting-code-review` skill |

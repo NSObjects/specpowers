@@ -7,11 +7,11 @@ Use this template when dispatching a code quality reviewer subagent.
 **Only dispatch after spec compliance review passes.**
 
 ```
-Task tool (specpowers:requesting-code-review):
-  Use the code-reviewer subagent prompt at agents/code-reviewer.md
+Task tool (specpowers:code-reviewer subagent):
+  Use the code-reviewer subagent prompt at ../requesting-code-review/code-reviewer-prompt.md
 
   WHAT_WAS_IMPLEMENTED: [from implementer's report]
-  PLAN_OR_REQUIREMENTS: Task N from [plan-file]
+  SPEC_SCENARIOS: [GIVEN/WHEN/THEN scenarios from the spec that this task covers]
   BASE_SHA: [commit before task]
   HEAD_SHA: [current commit]
   DESCRIPTION: [task summary]

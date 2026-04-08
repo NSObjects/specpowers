@@ -50,8 +50,8 @@ If issues found → fix → re-review. Do NOT proceed to Stage 2 until Stage 1 p
 
 Verify the implementation is well-built (clean, tested, maintainable).
 
-**With subagents:** Dispatch code quality reviewer subagent using `./code-quality-reviewer-prompt.md`.
-**Without subagents:** Dispatch `specpowers:code-reviewer` subagent (Kiro: `invokeSubAgent` with `general-task-execution`, using prompt from `agents/code-reviewer.md`). If subagents unavailable, perform self-review for naming, complexity, duplication, error handling, test quality.
+**With subagents:** Dispatch code quality reviewer subagent using `./code-quality-reviewer-prompt.md` (which delegates to `../requesting-code-review/code-reviewer-prompt.md`).
+**Without subagents:** Self-review for naming, complexity, duplication, error handling, test quality.
 
 If issues found → fix → re-review. Do NOT report Task as complete until Stage 2 passes.
 
@@ -202,7 +202,9 @@ When using subagents, use these templates:
 **Required skills:**
 - **specpowers:test-driven-development** — Follow TDD for every Task (Kiro: readSteering → test-driven-development.md)
 - **specpowers:planning** — Creates the task plan this skill executes (Kiro: readSteering → planning.md)
-- **specpowers:requesting-code-review** — Code review template (Kiro: readSteering → requesting-code-review.md)
+
+**Related skills (ad-hoc use, NOT part of the two-stage review):**
+- **specpowers:requesting-code-review** — For manual reviews outside spec-driven-development (e.g., before merge, when stuck). The two-stage review above is the per-task automated flow; requesting-code-review is for standalone review requests.
 
 **After all Tasks complete:**
 > "All Tasks complete. You can say 'Archive' to merge Delta Specs into the main specifications."

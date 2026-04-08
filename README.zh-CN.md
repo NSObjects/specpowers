@@ -144,6 +144,13 @@ AI 在每个阶段扮演不同的受限角色：
 - **证据优于声明** — 证明能用再往下走
 - **存量优先** — 为已有代码库而生，新项目同样好用
 
+## 致谢
+
+SpecPowers 的设计借鉴了以下两个项目：
+
+- [OpenSpec](https://github.com/Fission-AI/OpenSpec) — 规格驱动工作流的结构化产物体系
+- [Superpowers](https://github.com/obra/superpowers) — AI 编程代理的行为塑造引擎
+
 ## 开源协议
 
 MIT

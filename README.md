@@ -144,6 +144,13 @@ The AI plays a different constrained role at each stage:
 - **Evidence over claims** — prove it works before moving on
 - **Brownfield-first** — built for existing codebases, works great for greenfield too
 
+## Acknowledgments
+
+SpecPowers builds on ideas from two projects:
+
+- [OpenSpec](https://github.com/Fission-AI/OpenSpec) — structured artifact system for spec-driven workflows
+- [Superpowers](https://github.com/obra/superpowers) — behavioral shaping engine for AI coding agents
+
 ## License
 
 MIT

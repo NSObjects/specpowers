@@ -35,11 +35,10 @@ Copy each skill folder from this power's `skills/` directory into the user's wor
 
 Copy each folder with all its contents (SKILL.md and any supporting files like prompt templates, reference docs).
 
-Also copy `agents/code-reviewer.md` into `.kiro/skills/requesting-code-review/code-reviewer-prompt.md`.
-
 ## Step 2: Verify Installation
 
 Confirm that `.kiro/skills/` contains all 15 skill folders, each with a `SKILL.md`. Skills should be visible in the Kiro panel under "Agent Steering & Skills".
+Also confirm `.kiro/skills/requesting-code-review/code-reviewer-prompt.md` exists, since that skill depends on the reviewer prompt template being installed alongside `SKILL.md`.
 
 # When to Load Steering Files
 - When building, creating, implementing features, or resuming work → `specpowers-workflow.md`

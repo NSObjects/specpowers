@@ -20,14 +20,14 @@ Kiro uses `invokeSubAgent` with the `general-task-execution` agent.
 
 When a skill says to dispatch a named agent type:
 
-1. Find the agent's prompt file (e.g., `agents/code-reviewer.md`)
+1. Find the agent's prompt file (e.g., `skills/requesting-code-review/code-reviewer-prompt.md`)
 2. Read the prompt content
 3. Fill any template placeholders (`{BASE_SHA}`, `{WHAT_WAS_IMPLEMENTED}`, etc.)
 4. Use `invokeSubAgent` with `general-task-execution` and the filled content as the prompt
 
 | Skill instruction | Kiro equivalent |
 |-------------------|-----------------|
-| `Task tool (specpowers:code-reviewer)` | `invokeSubAgent(name="general-task-execution", prompt=...)` with `code-reviewer.md` content |
+| `Task tool (specpowers:code-reviewer)` | `invokeSubAgent(name="general-task-execution", prompt=...)` with `code-reviewer-prompt.md` content |
 | `Task tool (general-purpose)` with inline prompt | `invokeSubAgent(name="general-task-execution", prompt=...)` with the same prompt |
 
 ## Steering files
