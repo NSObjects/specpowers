@@ -9,84 +9,50 @@ keywords: ["specpowers", "workflow", "tdd", "spec-driven", "code review", "artif
 
 You now have access to SpecPowers — a spec-driven development workflow for AI coding assistants.
 
-## Step 1: Deploy Skills as Steering Files
+## Step 1: Install Skills
 
-SpecPowers skills need to be installed as workspace steering files so Kiro can auto-load them based on context.
+Copy each skill folder from this power's `skills/` directory into the user's workspace `.kiro/skills/` directory. Each folder contains a `SKILL.md` file that Kiro will auto-discover.
 
-For each `.md` file in this power's `skills/*/SKILL.md`, copy it to the user's `.kiro/steering/` directory with the skill name as filename. When copying, add `inclusion: auto` to the existing YAML frontmatter (after the opening `---`, before `name:`).
+**Skills to install:**
 
-**Skills to deploy:**
-
-| Source | Target |
-|--------|--------|
-| `skills/using-skills/SKILL.md` | `.kiro/steering/using-skills.md` |
-| `skills/exploring/SKILL.md` | `.kiro/steering/exploring.md` |
-| `skills/proposing/SKILL.md` | `.kiro/steering/proposing.md` |
-| `skills/specifying/SKILL.md` | `.kiro/steering/specifying.md` |
-| `skills/designing/SKILL.md` | `.kiro/steering/designing.md` |
-| `skills/planning/SKILL.md` | `.kiro/steering/planning.md` |
-| `skills/spec-driven-development/SKILL.md` | `.kiro/steering/spec-driven-development.md` |
-| `skills/archiving/SKILL.md` | `.kiro/steering/archiving.md` |
-| `skills/test-driven-development/SKILL.md` | `.kiro/steering/test-driven-development.md` |
-| `skills/systematic-debugging/SKILL.md` | `.kiro/steering/systematic-debugging.md` |
-| `skills/requesting-code-review/SKILL.md` | `.kiro/steering/requesting-code-review.md` |
-| `skills/receiving-code-review/SKILL.md` | `.kiro/steering/receiving-code-review.md` |
-| `skills/verification-before-completion/SKILL.md` | `.kiro/steering/verification-before-completion.md` |
-| `skills/dispatching-parallel-agents/SKILL.md` | `.kiro/steering/dispatching-parallel-agents.md` |
-| `skills/writing-skills/SKILL.md` | `.kiro/steering/writing-skills.md` |
-
-**Frontmatter transformation example:**
-
-Source file has:
-```yaml
----
-name: exploring
-description: "Use when the request is vague..."
----
+```
+skills/using-skills/         → .kiro/skills/using-skills/
+skills/exploring/            → .kiro/skills/exploring/
+skills/proposing/            → .kiro/skills/proposing/
+skills/specifying/           → .kiro/skills/specifying/
+skills/designing/            → .kiro/skills/designing/
+skills/planning/             → .kiro/skills/planning/
+skills/spec-driven-development/ → .kiro/skills/spec-driven-development/
+skills/archiving/            → .kiro/skills/archiving/
+skills/test-driven-development/ → .kiro/skills/test-driven-development/
+skills/systematic-debugging/ → .kiro/skills/systematic-debugging/
+skills/requesting-code-review/ → .kiro/skills/requesting-code-review/
+skills/receiving-code-review/ → .kiro/skills/receiving-code-review/
+skills/verification-before-completion/ → .kiro/skills/verification-before-completion/
+skills/dispatching-parallel-agents/ → .kiro/skills/dispatching-parallel-agents/
+skills/writing-skills/       → .kiro/skills/writing-skills/
 ```
 
-Deployed file should have:
-```yaml
+Also copy `agents/code-reviewer.md` to `.kiro/skills/requesting-code-review/code-reviewer-prompt.md` so it is available when dispatching code review subagents.
+
+Copy each skill's supporting files (e.g., `skills/spec-driven-development/implementer-prompt.md`, `skills/spec-driven-development/spec-reviewer-prompt.md`, `skills/spec-driven-development/code-quality-reviewer-prompt.md`, `skills/test-driven-development/testing-anti-patterns.md`, `skills/systematic-debugging/root-cause-tracing.md`, `skills/systematic-debugging/defense-in-depth.md`, `skills/systematic-debugging/condition-based-waiting.md`, `skills/specifying/delta-format-guide.md`) into their respective `.kiro/skills/` folders.
+
+## Step 2: Install Steering
+
+Create a steering file at `.kiro/steering/specpowers-workflow.md` with the following content:
+
+```markdown
 ---
 inclusion: auto
-name: exploring
-description: "Use when the request is vague..."
+name: specpowers-workflow
+description: Use when building, creating, or implementing features, fixing bugs, or when the user asks to start a new change. Guides the spec-driven development workflow.
 ---
-```
 
-Also copy `agents/code-reviewer.md` to `.kiro/steering/code-reviewer-prompt.md` (with `inclusion: manual` frontmatter) so it can be referenced when dispatching code review subagents.
-
-## Step 2: Verify Deployment
-
-After deploying, confirm that `.kiro/steering/` contains all 15 skill files plus the code reviewer prompt. The steering files will now auto-activate based on their descriptions when the user's requests match.
-
-## CRITICAL: How Skills Work in Kiro
-
-The skill files contain instructions written for multiple platforms (Claude Code, Cursor, Codex, etc.). You MUST apply the translation rules below when following them.
-
-### Tool Translation Table
-
-Skill files reference tools from other platforms. Translate them as follows:
-
-| Skill file says | You do in Kiro |
-|---|---|
-| `Skill` tool / invoke skill | Read the corresponding `.kiro/steering/<skill-name>.md` file |
-| `specpowers:code-reviewer` subagent | `invokeSubAgent(name="general-task-execution")` with the prompt from `.kiro/steering/code-reviewer-prompt.md` |
-| `specpowers:test-driven-development` | Read `.kiro/steering/test-driven-development.md` |
-| `specpowers:planning` | Read `.kiro/steering/planning.md` |
-| `specpowers:requesting-code-review` | Read `.kiro/steering/requesting-code-review.md` |
-| `specpowers:verification-before-completion` | Read `.kiro/steering/verification-before-completion.md` |
-| `specpowers:systematic-debugging` | Read `.kiro/steering/systematic-debugging.md` |
-| `specpowers:dispatching-parallel-agents` | Read `.kiro/steering/dispatching-parallel-agents.md` |
-| `Task` tool (dispatch subagent) | `invokeSubAgent` with `general-task-execution` agent |
-| `TodoWrite` | Track tasks inline in tasks.md |
-| `Read`, `Write`, `Edit` | Kiro native: `readFile`/`readCode`, `fsWrite`/`fsAppend`, `strReplace` |
-| `Bash` | `executeBash` |
-| `@filename.md` references | Read the file from the skill's directory in the power |
+# SpecPowers Workflow
 
 ## Core Workflow
 
-When the user asks to build, create, or implement something, follow this chain:
+When the user asks to build, create, or implement something, follow this skill chain in order:
 
 ```
 exploring → proposing → specifying → designing → planning → spec-driven-development → archiving
@@ -96,9 +62,9 @@ exploring → proposing → specifying → designing → planning → spec-drive
 
 **When user asks to build/create/implement something:**
 1. Check if `specs/changes/` has an active change for this topic
-2. If no active change → follow `exploring` steering and then `proposing`
-3. If change exists but missing artifacts → follow the next skill in the chain
-4. If tasks.md exists and has unchecked items → follow `spec-driven-development`
+2. If no active change → activate `exploring` skill, then `proposing`
+3. If change exists but missing artifacts → activate the next skill in the chain
+4. If tasks.md exists and has unchecked items → activate `spec-driven-development`
 
 ## Key Rules
 
@@ -107,3 +73,23 @@ exploring → proposing → specifying → designing → planning → spec-drive
 - **TDD is mandatory.** Every task starts with a failing test.
 - **Auto code review.** Both execution modes dispatch code-reviewer after completion.
 - **Check for active changes** in `specs/changes/` before starting new work.
+
+## Tool Translation
+
+Skills reference tools from other platforms. Translate as follows:
+
+| Skill says | You do in Kiro |
+|---|---|
+| `Skill` tool / invoke skill | Activate the corresponding skill from `.kiro/skills/` |
+| `specpowers:code-reviewer` subagent | `invokeSubAgent(name="general-task-execution")` with prompt from `.kiro/skills/requesting-code-review/code-reviewer-prompt.md` |
+| `Task` tool (dispatch subagent) | `invokeSubAgent` with `general-task-execution` agent |
+| `TodoWrite` | Track tasks inline in tasks.md |
+| `@filename.md` references | Read the file from the skill's directory |
+```
+
+## Step 3: Verify Installation
+
+Confirm that:
+- `.kiro/skills/` contains all 15 skill folders, each with a `SKILL.md`
+- `.kiro/steering/specpowers-workflow.md` exists
+- Skills are visible in the Kiro panel under "Agent Steering & Skills"

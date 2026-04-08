@@ -4,8 +4,6 @@
 
 Spec-driven development workflow for AI coding assistants. Your agent thinks before it codes.
 
-Merges [OpenSpec](https://github.com/Fission-AI/OpenSpec)'s structured artifacts with [Superpowers](https://github.com/obra/superpowers)' behavioral shaping.
-
 ## What It Does
 
 When you ask your AI agent to build something, it doesn't jump into code. Instead:
