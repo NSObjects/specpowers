@@ -43,11 +43,11 @@ flowchart TD
 ```text
 You: "Add dark mode to the app"
 
-AI:  [exploring] "System-auto-detect, manual toggle, or both?"
+AI:  [exploring]  "System-auto-detect, manual toggle, or both?"
 You: "Both"
 
 AI:  [proposing]  → proposal.md    ✓ intent, scope, non-goals
-AI:  [specifying]  → spec.md        ✓ 2 requirements, 4 scenarios
+AI:  [specifying] → spec.md        ✓ 2 requirements, 4 scenarios
 AI:  [designing]  → design.md      ✓ CSS Variables, 3 files
 AI:  [planning]   → tasks.md       ✓ 3 tasks mapped to specs
      "Step-by-Step or Fast Mode?"
@@ -65,6 +65,8 @@ AI:  ✅ Task 3: CSS Variables — done
 
 ## Installation
 
+### Supported Platforms
+
 | Platform | Command |
 |----------|---------|
 | **Claude Code** | Step 1: `/plugin marketplace add NSObjects/specpowers` <br> Step 2: `/plugin install specpowers` |
@@ -74,15 +76,23 @@ AI:  ✅ Task 3: CSS Variables — done
 | **Codex** | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
 | **OpenCode** | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
 
-**Verify:** Start a new session, say "I want to build X". The agent should start with `exploring` — asking questions, not writing code.
+### Verify
+
+Start a new session and say "I want to build X". The agent should begin with `exploring` — asking questions, not writing code.
 
 ## Key Design Choices
 
-**You control git.** The agent never runs git commands. It pauses after each task for you to review and commit.
+### You Control Git
 
-**Behavioral shaping.** Every skill has Red Flags tables, Iron Laws, and rationalization defenses — hard constraints from real failure patterns, not suggestions.
+The agent never runs git commands. It pauses after each task for you to review and commit.
 
-**Role isolation.** The AI plays a different constrained role at each stage:
+### Behavioral Shaping
+
+Every skill includes Red Flags tables, Iron Laws, and rationalization defenses — hard constraints derived from real failure patterns, not suggestions.
+
+### Role Isolation
+
+The AI plays a different constrained role at each stage:
 
 | Stage | Role | Cannot |
 |-------|------|--------|
@@ -93,11 +103,15 @@ AI:  ✅ Task 3: CSS Variables — done
 | Planning | Tech Lead | Start implementing |
 | Executing | Developer | Skip TDD or modify specs |
 
-**Dual execution mode.** Step-by-step (default): one task → review → commit → continue. Fast mode: all tasks → unified review → commit everything.
+### Dual Execution Mode
+
+- **Step-by-Step** (default): one task → review → commit → continue
+- **Fast Mode**: all tasks → unified review → commit everything
 
 ## Skills
 
 ### Core Workflow
+
 | Skill | Purpose |
 |-------|---------|
 | `using-skills` | Session init and skill routing |
@@ -109,7 +123,8 @@ AI:  ✅ Task 3: CSS Variables — done
 | `spec-driven-development` | Dual-mode execution engine |
 | `archiving` | Delta spec merging and history |
 
-### Foundation (from Superpowers)
+### Foundation
+
 | Skill | Purpose |
 |-------|---------|
 | `test-driven-development` | RED-GREEN-REFACTOR iron law |
