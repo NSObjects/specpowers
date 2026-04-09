@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import fc from 'fast-check';
-import { resolveModules } from '../scripts/lib/dependency-resolver.js';
+import { resolveModules, resolveProfile } from '../scripts/lib/dependency-resolver.js';
 
 // --- Helpers ---
 
@@ -214,6 +214,40 @@ test('Property 8: Module Dependency Resolution', async (t) => {
         /not found/,
         'Expected error for non-existent module',
       );
+    },
+  );
+
+  await t.test(
+    'excluding a required dependency keeps it in the resolved profile',
+    () => {
+      const catalog = [
+        { id: 'rules-common', dependencies: [] },
+        { id: 'rules-typescript', dependencies: ['rules-common'] },
+        { id: 'quality-gate', dependencies: [] },
+      ];
+
+      const resolved = resolveProfile(['rules-typescript', 'quality-gate'], catalog, {
+        exclude: ['rules-common'],
+      });
+
+      assert.deepStrictEqual(resolved, ['rules-common', 'rules-typescript', 'quality-gate']);
+    },
+  );
+
+  await t.test(
+    'excluding an optional module still removes it from the resolved profile',
+    () => {
+      const catalog = [
+        { id: 'rules-common', dependencies: [] },
+        { id: 'rules-typescript', dependencies: ['rules-common'] },
+        { id: 'quality-gate', dependencies: [] },
+      ];
+
+      const resolved = resolveProfile(['rules-typescript', 'quality-gate'], catalog, {
+        exclude: ['quality-gate'],
+      });
+
+      assert.deepStrictEqual(resolved, ['rules-common', 'rules-typescript']);
     },
   );
 });

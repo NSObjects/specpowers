@@ -104,12 +104,12 @@ export function resolveProfile(profileModules, catalog, options = {}) {
   // Merge profile modules with additions, deduplicate
   const combined = [...new Set([...profileModules, ...add])];
 
-  // Resolve full dependency tree
-  const resolved = resolveModules(combined, catalog);
-
   // Remove excluded modules
-  if (exclude.length === 0) return resolved;
+  if (exclude.length === 0) {
+    return resolveModules(combined, catalog);
+  }
 
   const excludeSet = new Set(exclude);
-  return resolved.filter((id) => !excludeSet.has(id));
+  const roots = combined.filter((id) => !excludeSet.has(id));
+  return resolveModules(roots, catalog);
 }

@@ -13,36 +13,26 @@
  * Validates: Requirements 1.5, 2.3, 3.3, 4.5
  */
 
-import { describe, it, before, after, beforeEach } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, unlinkSync, existsSync, mkdirSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { readFileSync, cpSync, mkdtempSync, rmSync, existsSync } from 'node:fs';
+import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getStatePath, readPlatformState, writeState } from '../scripts/lib/install-state.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const STATE_PATH = resolve(ROOT, 'manifests/install-state.json');
 
-// Save original state to restore after tests
-let originalState = null;
+function setupTmpRoot() {
+  const tmp = mkdtempSync(join(process.env.TMPDIR || '/tmp', 'sp-auto-install-'));
+  for (const entry of ['manifests', 'scripts', 'skills', 'package.json']) {
+    cpSync(join(ROOT, entry), join(tmp, entry), { recursive: true });
+  }
+  rmSync(join(tmp, 'manifests', 'install-state.json'), { force: true });
+  return tmp;
+}
 
 describe('Agent Auto-Install Integration', () => {
-  before(() => {
-    // Backup existing install-state.json
-    if (existsSync(STATE_PATH)) {
-      originalState = readFileSync(STATE_PATH, 'utf-8');
-    }
-  });
-
-  after(() => {
-    // Restore original state
-    if (originalState !== null) {
-      writeFileSync(STATE_PATH, originalState, 'utf-8');
-    } else if (existsSync(STATE_PATH)) {
-      unlinkSync(STATE_PATH);
-    }
-  });
-
   describe('Import resolution', () => {
     it('session-bootstrap.js exports bootstrap function', async () => {
       const mod = await import('../scripts/lib/session-bootstrap.js');
@@ -78,102 +68,185 @@ describe('Agent Auto-Install Integration', () => {
   });
 
   describe('First-run bootstrap (Req 2.6, 5.1, 5.2)', () => {
-    beforeEach(() => {
-      // Remove install-state.json to simulate first run
-      if (existsSync(STATE_PATH)) {
-        unlinkSync(STATE_PATH);
+    it('installs developer profile + language modules on first run with TS files', async () => {
+      const tmp = setupTmpRoot();
+      const { bootstrap } = await import('../scripts/lib/session-bootstrap.js');
+
+      try {
+        const result = await bootstrap({
+          platform: 'claude-code',
+          fileList: ['src/index.ts', 'src/utils.ts', 'README.md'],
+          rootDir: tmp,
+        });
+
+        assert.equal(result.action, 'first_run');
+        assert.ok(
+          result.installedModules.includes('rules-typescript') || result.installedModules.length === 0,
+          'Should install rules-typescript or have it already from developer profile'
+        );
+        assert.ok(result.summary.length > 0, 'Should have a non-empty summary');
+        assert.ok(result.summary.includes('SpecPowers'), 'Summary should include welcome text');
+
+        const statePath = getStatePath(tmp, 'claude-code');
+        assert.ok(existsSync(statePath), 'platform state should exist after first run');
+
+        const state = JSON.parse(readFileSync(statePath, 'utf-8'));
+        assert.equal(state.platform, 'claude-code');
+        assert.equal(state.profile, 'developer');
+      } finally {
+        rmSync(tmp, { recursive: true, force: true });
       }
     });
 
-    it('installs developer profile + language modules on first run with TS files', async () => {
-      const { bootstrap } = await import('../scripts/lib/session-bootstrap.js');
+    it('treats bootstrap as first run when another platform is already installed', async () => {
+      const tmp = setupTmpRoot();
+      try {
+        const { install } = await import('../scripts/install.js');
+        const { bootstrap } = await import('../scripts/lib/session-bootstrap.js');
 
-      const result = await bootstrap({
-        platform: 'claude-code',
-        fileList: ['src/index.ts', 'src/utils.ts', 'README.md'],
-        rootDir: ROOT,
-      });
+        await install({
+          platform: 'codex',
+          profile: 'developer',
+          rootDir: tmp,
+        });
 
-      assert.equal(result.action, 'first_run');
-      // rules-typescript should be installed (detected from .ts files)
-      assert.ok(
-        result.installedModules.includes('rules-typescript') || result.installedModules.length === 0,
-        'Should install rules-typescript or have it already from developer profile'
-      );
-      assert.ok(result.summary.length > 0, 'Should have a non-empty summary');
-      assert.ok(result.summary.includes('SpecPowers'), 'Summary should include welcome text');
+        const result = await bootstrap({
+          platform: 'claude-code',
+          fileList: ['src/index.ts'],
+          rootDir: tmp,
+        });
 
-      // Verify install-state.json was created
-      assert.ok(existsSync(STATE_PATH), 'install-state.json should exist after first run');
+        assert.equal(result.action, 'first_run');
+        assert.ok(result.summary.includes('SpecPowers'));
+        assert.ok(existsSync(getStatePath(tmp, 'codex')));
+        assert.ok(existsSync(getStatePath(tmp, 'claude-code')));
+      } finally {
+        rmSync(tmp, { recursive: true, force: true });
+      }
+    });
 
-      // Verify state has platform set
-      const state = JSON.parse(readFileSync(STATE_PATH, 'utf-8'));
-      assert.equal(state.platform, 'claude-code');
-      assert.equal(state.profile, 'developer');
+    it('treats incomplete install state as first run and restores baseline install', async () => {
+      const tmp = setupTmpRoot();
+      try {
+        writeState(
+          getStatePath(tmp, 'claude-code'),
+          { modules: [] },
+        );
+
+        const { bootstrap } = await import('../scripts/lib/session-bootstrap.js');
+        const result = await bootstrap({
+          platform: 'claude-code',
+          fileList: ['app.py'],
+          rootDir: tmp,
+        });
+
+        assert.equal(result.action, 'first_run');
+        assert.ok(result.installedModules.includes('rules-python'));
+        assert.ok(result.summary.includes('SpecPowers'));
+
+        const state = JSON.parse(readFileSync(getStatePath(tmp, 'claude-code'), 'utf-8'));
+        const moduleIds = state.modules.map((m) => m.id);
+        assert.equal(state.platform, 'claude-code');
+        assert.equal(state.profile, 'developer');
+        assert.ok(moduleIds.includes('core-workflow'));
+        assert.ok(moduleIds.includes('foundation'));
+        assert.ok(moduleIds.includes('rules-python'));
+      } finally {
+        rmSync(tmp, { recursive: true, force: true });
+      }
     });
   });
 
   describe('Incremental bootstrap (Req 2.3, 6.1, 6.2)', () => {
-    beforeEach(async () => {
-      // Set up a base install with developer profile (no language rules)
-      if (existsSync(STATE_PATH)) {
-        unlinkSync(STATE_PATH);
+    it('installs only missing language modules when new language detected', async () => {
+      const tmp = setupTmpRoot();
+      try {
+        const { install } = await import('../scripts/install.js');
+        const { bootstrap } = await import('../scripts/lib/session-bootstrap.js');
+
+        await install({ platform: 'claude-code', profile: 'developer', rootDir: tmp });
+
+        const result = await bootstrap({
+          platform: 'claude-code',
+          fileList: ['app.py', 'utils.py'],
+          rootDir: tmp,
+        });
+
+        assert.equal(result.action, 'incremental');
+        assert.ok(result.installedModules.includes('rules-python'), 'Should install rules-python');
+        assert.ok(result.summary.includes('rules-python'), 'Summary should mention rules-python');
+
+        const state = readPlatformState(tmp, 'claude-code');
+        const moduleIds = state.modules.map((m) => m.id);
+        assert.ok(moduleIds.includes('rules-python'), 'State should include rules-python');
+        assert.ok(moduleIds.includes('core-workflow'), 'State should still include core-workflow');
+        assert.ok(moduleIds.includes('foundation'), 'State should still include foundation');
+      } finally {
+        rmSync(tmp, { recursive: true, force: true });
       }
-      const { install } = await import('../scripts/install.js');
-      await install({ platform: 'claude-code', profile: 'developer', rootDir: ROOT });
     });
 
-    it('installs only missing language modules when new language detected', async () => {
-      const { bootstrap } = await import('../scripts/lib/session-bootstrap.js');
+    it('installs missing language rules for the current platform even when another platform already has them', async () => {
+      const tmp = setupTmpRoot();
+      try {
+        const { install } = await import('../scripts/install.js');
+        const { bootstrap } = await import('../scripts/lib/session-bootstrap.js');
 
-      // First bootstrap with Python files
-      const result = await bootstrap({
-        platform: 'claude-code',
-        fileList: ['app.py', 'utils.py'],
-        rootDir: ROOT,
-      });
+        await install({
+          platform: 'codex',
+          profile: 'developer',
+          add: ['rules-python'],
+          rootDir: tmp,
+        });
+        await install({
+          platform: 'claude-code',
+          profile: 'developer',
+          rootDir: tmp,
+        });
 
-      assert.equal(result.action, 'incremental');
-      assert.ok(result.installedModules.includes('rules-python'), 'Should install rules-python');
-      assert.ok(result.summary.includes('rules-python'), 'Summary should mention rules-python');
+        const beforeCodexState = readPlatformState(tmp, 'codex');
+        const result = await bootstrap({
+          platform: 'claude-code',
+          fileList: ['app.py'],
+          rootDir: tmp,
+        });
 
-      // Verify state was updated
-      const state = JSON.parse(readFileSync(STATE_PATH, 'utf-8'));
-      const moduleIds = state.modules.map((m) => m.id);
-      assert.ok(moduleIds.includes('rules-python'), 'State should include rules-python');
-      // Developer profile modules should still be there
-      assert.ok(moduleIds.includes('core-workflow'), 'State should still include core-workflow');
-      assert.ok(moduleIds.includes('foundation'), 'State should still include foundation');
+        assert.equal(result.action, 'incremental');
+        assert.ok(result.installedModules.includes('rules-python'));
+        assert.deepStrictEqual(readPlatformState(tmp, 'codex'), beforeCodexState);
+        assert.ok(readPlatformState(tmp, 'claude-code').modules.some((m) => m.id === 'rules-python'));
+      } finally {
+        rmSync(tmp, { recursive: true, force: true });
+      }
     });
   });
 
   describe('Up-to-date bootstrap (Req 6.3)', () => {
-    beforeEach(async () => {
-      // Set up a full install with TypeScript already installed
-      if (existsSync(STATE_PATH)) {
-        unlinkSync(STATE_PATH);
-      }
-      const { install } = await import('../scripts/install.js');
-      await install({
-        platform: 'claude-code',
-        profile: 'developer',
-        add: ['rules-typescript'],
-        rootDir: ROOT,
-      });
-    });
-
     it('returns up_to_date when all language modules already installed', async () => {
-      const { bootstrap } = await import('../scripts/lib/session-bootstrap.js');
+      const tmp = setupTmpRoot();
+      try {
+        const { install } = await import('../scripts/install.js');
+        const { bootstrap } = await import('../scripts/lib/session-bootstrap.js');
 
-      const result = await bootstrap({
-        platform: 'claude-code',
-        fileList: ['src/index.ts', 'src/utils.ts'],
-        rootDir: ROOT,
-      });
+        await install({
+          platform: 'claude-code',
+          profile: 'developer',
+          add: ['rules-typescript'],
+          rootDir: tmp,
+        });
 
-      assert.equal(result.action, 'up_to_date');
-      assert.deepEqual(result.installedModules, []);
-      assert.equal(result.summary, '');
+        const result = await bootstrap({
+          platform: 'claude-code',
+          fileList: ['src/index.ts', 'src/utils.ts'],
+          rootDir: tmp,
+        });
+
+        assert.equal(result.action, 'up_to_date');
+        assert.deepEqual(result.installedModules, []);
+        assert.equal(result.summary, '');
+      } finally {
+        rmSync(tmp, { recursive: true, force: true });
+      }
     });
   });
 

@@ -6,10 +6,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { tmpdir } from 'node:os';
-import { mkdtempSync, rmSync, cpSync } from 'node:fs';
+import { mkdtempSync, rmSync, cpSync, existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { writeState, readState } from '../scripts/lib/install-state.js';
+import {
+  getStatePath,
+  readPlatformState,
+  writePlatformState,
+} from '../scripts/lib/install-state.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPECPOWERS_ROOT = resolve(__dirname, '..');
@@ -27,16 +31,62 @@ function setupTmpRoot() {
   cpSync(join(SPECPOWERS_ROOT, 'skills'), join(tmp, 'skills'), { recursive: true });
   // Copy package.json for sourceVersion
   cpSync(join(SPECPOWERS_ROOT, 'package.json'), join(tmp, 'package.json'));
+  rmSync(join(tmp, 'manifests', 'install-state.json'), { force: true });
   return tmp;
 }
 
 test('installModules() incremental install', async (t) => {
+  await t.test('installs modules for the requested platform without mutating another platform state', async () => {
+    const tmp = setupTmpRoot();
+    try {
+      const { install, installModules } = await import('../scripts/install.js');
+
+      await install({
+        platform: 'codex',
+        profile: 'developer',
+        rootDir: tmp,
+      });
+
+      const beforeCodexState = readPlatformState(tmp, 'codex');
+      const result = await installModules({
+        platform: 'claude-code',
+        moduleIds: ['rules-python'],
+        rootDir: tmp,
+      });
+
+      assert.equal(result.success, true);
+      assert.deepStrictEqual(result.skippedModules, []);
+      assert.ok(result.installedModules.includes('rules-python'));
+      assert.ok(result.installedModules.includes('rules-common'));
+
+      const claudeState = readPlatformState(tmp, 'claude-code');
+      const codexState = readPlatformState(tmp, 'codex');
+      const claudeInstalledIds = claudeState.modules.map((m) => m.id);
+      const codexInstalledIds = codexState.modules.map((m) => m.id);
+
+      assert.ok(claudeInstalledIds.includes('rules-python'));
+      assert.ok(claudeInstalledIds.includes('rules-common'));
+      assert.deepStrictEqual(codexState, beforeCodexState);
+      assert.ok(!codexInstalledIds.includes('rules-python'));
+      assert.ok(
+        existsSync(join(tmp, '.claude/skills/rules-python/SKILL.md')),
+        'incremental install should materialize files for the requested platform',
+      );
+      assert.ok(
+        !existsSync(join(tmp, '.codex/skills/rules-python/SKILL.md')),
+        'incremental install should not materialize files for another platform',
+      );
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   await t.test('installs new modules and their dependencies', async () => {
     const tmp = setupTmpRoot();
     try {
-      const statePath = join(tmp, 'manifests/install-state.json');
+      const statePath = getStatePath(tmp, 'claude-code');
       // Start with empty state
-      writeState(statePath, {
+      writePlatformState(tmp, 'claude-code', {
         version: 1,
         platform: 'claude-code',
         installedAt: '2025-01-01T00:00:00Z',
@@ -61,7 +111,7 @@ test('installModules() incremental install', async (t) => {
       assert.ok(result.installedModules.includes('rules-common'));
 
       // Verify state was updated
-      const state = readState(statePath);
+      const state = readPlatformState(tmp, 'claude-code');
       const installedIds = state.modules.map((m) => m.id);
       assert.ok(installedIds.includes('rules-typescript'));
       assert.ok(installedIds.includes('rules-common'));
@@ -73,9 +123,8 @@ test('installModules() incremental install', async (t) => {
   await t.test('skips already-installed modules (Req 6.3)', async () => {
     const tmp = setupTmpRoot();
     try {
-      const statePath = join(tmp, 'manifests/install-state.json');
       // Pre-install rules-common
-      writeState(statePath, {
+      writePlatformState(tmp, 'claude-code', {
         version: 1,
         platform: 'claude-code',
         installedAt: '2025-01-01T00:00:00Z',
@@ -102,7 +151,7 @@ test('installModules() incremental install', async (t) => {
       assert.ok(!result.installedModules.includes('rules-common'));
 
       // Verify existing record preserved (Req 6.2)
-      const state = readState(statePath);
+      const state = readPlatformState(tmp, 'claude-code');
       const commonRecord = state.modules.find((m) => m.id === 'rules-common');
       assert.equal(commonRecord.installedAt, '2025-01-01T00:00:00Z');
     } finally {
@@ -113,11 +162,10 @@ test('installModules() incremental install', async (t) => {
   await t.test('preserves existing module records (Req 6.2)', async () => {
     const tmp = setupTmpRoot();
     try {
-      const statePath = join(tmp, 'manifests/install-state.json');
       const existingModules = [
         { id: 'core-workflow', installedAt: '2025-01-01T00:00:00Z', paths: ['.claude/skills/using-skills'] },
       ];
-      writeState(statePath, {
+      writePlatformState(tmp, 'claude-code', {
         version: 1,
         platform: 'claude-code',
         installedAt: '2025-01-01T00:00:00Z',
@@ -135,7 +183,7 @@ test('installModules() incremental install', async (t) => {
         rootDir: tmp,
       });
 
-      const state = readState(statePath);
+      const state = readPlatformState(tmp, 'claude-code');
       // Original module should still be there with original timestamp
       const coreRecord = state.modules.find((m) => m.id === 'core-workflow');
       assert.ok(coreRecord, 'Existing module record should be preserved');
@@ -173,8 +221,7 @@ test('installModules() incremental install', async (t) => {
   await t.test('returns success with empty lists when all modules already installed', async () => {
     const tmp = setupTmpRoot();
     try {
-      const statePath = join(tmp, 'manifests/install-state.json');
-      writeState(statePath, {
+      writePlatformState(tmp, 'claude-code', {
         version: 1,
         platform: 'claude-code',
         installedAt: '2025-01-01T00:00:00Z',
@@ -205,7 +252,6 @@ test('installModules() incremental install', async (t) => {
   await t.test('rollback on error — state unchanged (Req 6.5)', async () => {
     const tmp = setupTmpRoot();
     try {
-      const statePath = join(tmp, 'manifests/install-state.json');
       const originalState = {
         version: 1,
         platform: 'claude-code',
@@ -216,7 +262,7 @@ test('installModules() incremental install', async (t) => {
         extraModules: [],
         excludedModules: [],
       };
-      writeState(statePath, originalState);
+      writePlatformState(tmp, 'claude-code', originalState);
 
       const { installModules } = await import('../scripts/install.js');
       // Request a module that doesn't exist in catalog — should trigger error
@@ -230,7 +276,7 @@ test('installModules() incremental install', async (t) => {
       assert.ok(result.error.includes('not found in catalog'));
 
       // State should be unchanged
-      const state = readState(statePath);
+      const state = readPlatformState(tmp, 'claude-code');
       assert.deepStrictEqual(state, originalState);
     } finally {
       rmSync(tmp, { recursive: true, force: true });

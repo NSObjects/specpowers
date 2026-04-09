@@ -21,6 +21,54 @@ async function loadInstallApi(tmpRoot) {
 }
 
 test('install rollback integrity', async (t) => {
+  await t.test('full install failure preserves another platform payload and both platform state files', async () => {
+    const tmp = setupTmpRoot();
+    try {
+      const { install } = await loadInstallApi(tmp);
+      const claudeStatePath = join(tmp, 'manifests/install-state/claude-code.json');
+      const codexStatePath = join(tmp, 'manifests/install-state/codex.json');
+
+      await install({
+        platform: 'codex',
+        profile: 'developer',
+        rootDir: tmp,
+      });
+      await install({
+        platform: 'claude-code',
+        profile: 'developer',
+        rootDir: tmp,
+      });
+
+      const beforeClaudeState = readFileSync(claudeStatePath, 'utf-8');
+      const beforeCodexState = readFileSync(codexStatePath, 'utf-8');
+      assert.ok(existsSync(join(tmp, '.codex/skills/search-first/SKILL.md')));
+      assert.ok(existsSync(join(tmp, '.claude/skills/search-first/SKILL.md')));
+
+      rmSync(join(tmp, 'skills/search-first'), { recursive: true, force: true });
+
+      await assert.rejects(
+        install({
+          platform: 'claude-code',
+          profile: 'developer',
+          rootDir: tmp,
+        }),
+      );
+
+      assert.equal(readFileSync(claudeStatePath, 'utf-8'), beforeClaudeState);
+      assert.equal(readFileSync(codexStatePath, 'utf-8'), beforeCodexState);
+      assert.ok(
+        existsSync(join(tmp, '.codex/skills/search-first/SKILL.md')),
+        'failed reinstall should leave another platform payload intact',
+      );
+      assert.ok(
+        existsSync(join(tmp, '.claude/skills/search-first/SKILL.md')),
+        'failed reinstall should restore the target platform payload',
+      );
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   await t.test('full install failure preserves the previous managed payload and state', async () => {
     const tmp = setupTmpRoot();
     try {

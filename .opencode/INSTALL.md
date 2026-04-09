@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- [OpenCode.ai](https://opencode.ai) installed
+- [OpenCode](https://opencode.ai) installed
 
 ## Installation
 
@@ -14,9 +14,17 @@ Add specpowers to the `plugin` array in your `opencode.json` (global or project-
 }
 ```
 
-Restart OpenCode. That's it — the plugin auto-installs and registers all skills.
+Restart OpenCode. The plugin auto-installs and registers all skills.
 
-Verify by asking: "Tell me about your specpowers skills"
+### Verify
+
+Start a new session and ask:
+
+```text
+I want to build X
+```
+
+The workflow should begin with `exploring` — asking questions, not writing code.
 
 ## Usage
 
@@ -55,7 +63,10 @@ To pin a specific version:
 ### Tool mapping
 
 When skills reference Claude Code tools:
-- `TodoWrite` → `todowrite`
-- `Task` with subagents → `@mention` syntax
-- `Skill` tool → OpenCode's native `skill` tool
-- File operations → your native tools
+
+| SpecPowers Reference | OpenCode Equivalent |
+|---------------------|---------------------|
+| `TodoWrite` | `todowrite` |
+| `Task` with subagents | `@mention` syntax |
+| `Skill` tool | OpenCode's native `skill` tool |
+| File operations | Your native tools |

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { tmpdir } from 'node:os';
-import { mkdtempSync, rmSync, cpSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, cpSync, existsSync, readFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -13,6 +13,7 @@ function setupTmpRoot() {
   for (const entry of ['manifests', 'scripts', 'skills', 'package.json']) {
     cpSync(join(ROOT, entry), join(tmp, entry), { recursive: true });
   }
+  rmSync(join(tmp, 'manifests', 'install-state.json'), { force: true });
   return tmp;
 }
 
@@ -21,6 +22,40 @@ async function loadInstallApi(tmpRoot) {
 }
 
 test('install materialization', async (t) => {
+  await t.test('install() keeps managed payloads for multiple platforms in the same repository', async () => {
+    const tmp = setupTmpRoot();
+    try {
+      const { install } = await loadInstallApi(tmp);
+
+      await install({
+        platform: 'codex',
+        profile: 'developer',
+        rootDir: tmp,
+      });
+
+      const result = await install({
+        platform: 'claude-code',
+        profile: 'developer',
+        rootDir: tmp,
+      });
+
+      assert.equal(result.success, true);
+      assert.ok(existsSync(join(tmp, '.codex/skills/using-skills/SKILL.md')));
+      assert.ok(existsSync(join(tmp, '.claude/skills/using-skills/SKILL.md')));
+
+      const codexState = JSON.parse(
+        readFileSync(join(tmp, 'manifests/install-state/codex.json'), 'utf-8'),
+      );
+      const claudeState = JSON.parse(
+        readFileSync(join(tmp, 'manifests/install-state/claude-code.json'), 'utf-8'),
+      );
+      assert.equal(codexState.platform, 'codex');
+      assert.equal(claudeState.platform, 'claude-code');
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   await t.test('install() copies profile content into the platform target dir', async () => {
     const tmp = setupTmpRoot();
     try {
@@ -85,7 +120,13 @@ test('install materialization', async (t) => {
         profile: 'full',
         rootDir: tmp,
       });
+      await install({
+        platform: 'codex',
+        profile: 'developer',
+        rootDir: tmp,
+      });
       assert.ok(existsSync(join(tmp, '.claude/skills/rules-typescript/SKILL.md')));
+      assert.ok(existsSync(join(tmp, '.codex/skills/using-skills/SKILL.md')));
 
       const result = await install({
         platform: 'claude-code',
@@ -101,6 +142,10 @@ test('install materialization', async (t) => {
       assert.ok(
         existsSync(join(tmp, '.claude/skills/rules-common/SKILL.md')),
         'shared managed files should remain',
+      );
+      assert.ok(
+        existsSync(join(tmp, '.codex/skills/using-skills/SKILL.md')),
+        'reinstall should not remove another platform payload',
       );
     } finally {
       rmSync(tmp, { recursive: true, force: true });

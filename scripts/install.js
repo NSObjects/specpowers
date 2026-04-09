@@ -22,7 +22,12 @@ import { tmpdir } from 'node:os';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveProfile, resolveModules } from './lib/dependency-resolver.js';
-import { readState, writeState } from './lib/install-state.js';
+import {
+  getStatePath,
+  readPlatformState,
+  readState,
+  writePlatformState,
+} from './lib/install-state.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -378,8 +383,8 @@ export async function install(options) {
     // ignore
   }
 
-  const statePath = resolve(rootDir, 'manifests/install-state.json');
-  const currentState = readState(statePath);
+  const statePath = getStatePath(rootDir, platform);
+  const currentState = readPlatformState(rootDir, platform);
   const transactionalPaths = [
     ...currentState.modules.flatMap((module) => module.paths),
     ...moduleRecords.flatMap((module) => module.paths),
@@ -399,7 +404,7 @@ export async function install(options) {
   withRollback(rootDir, statePath, transactionalPaths, () => {
     // Sync managed files before updating install state
     syncManagedModules(rootDir, currentState.modules, moduleRecords, catalogMap);
-    writeState(statePath, state);
+    writePlatformState(rootDir, platform, state);
   });
 
   return {
@@ -436,8 +441,16 @@ export async function installModules(options) {
   }
 
   // Read current install state
-  const statePath = resolve(rootDir, 'manifests/install-state.json');
-  const currentState = readState(statePath);
+  const statePath = getStatePath(rootDir, platform);
+  const currentState = readPlatformState(rootDir, platform);
+  if (currentState.platform !== null && currentState.platform !== platform) {
+    return {
+      success: false,
+      installedModules: [],
+      skippedModules: [],
+      error: `Platform mismatch: install state is for "${currentState.platform}" but requested "${platform}"`,
+    };
+  }
   const installedIds = new Set(currentState.modules.map((m) => m.id));
 
   try {
@@ -480,7 +493,7 @@ export async function installModules(options) {
       newRecords.flatMap((module) => module.paths),
       () => {
         materializeModules(rootDir, newRecords, catalogMap);
-        writeState(statePath, updatedState);
+        writePlatformState(rootDir, platform, updatedState);
       },
     );
 
@@ -575,7 +588,7 @@ async function main() {
   const profileName = args.profile || 'developer';
   console.log(`Installed ${result.installedModules.length} modules for ${args.platform} (profile: ${profileName})`);
   console.log(`Modules: ${result.installedModules.join(', ')}`);
-  console.log(`State written to: ${resolve(ROOT, 'manifests/install-state.json')}`);
+  console.log(`State written to: ${getStatePath(ROOT, args.platform)}`);
 }
 
 // Guard: only run CLI main() when executed directly (not when imported as a module)

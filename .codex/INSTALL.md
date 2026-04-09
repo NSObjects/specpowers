@@ -1,44 +1,97 @@
 # Installing SpecPowers for Codex
 
-SpecPowers supports two installation modes in Codex:
+Two installation methods are available:
 
-1. Recommended: install it as a local plugin through a personal marketplace.
-2. Legacy: install only the skills through native skill discovery.
+| Method | What it does |
+|--------|-------------|
+| [Skills install](#method-1-skills-install) | Clone + symlink, no marketplace needed |
+| [Plugin install](#method-2-plugin-install) | Full plugin UI with marketplace registration |
 
-The plugin flow is the better default because SpecPowers shows up in Codex's plugin directory and uses the metadata from `.codex-plugin/plugin.json`.
-
-## Recommended: install as a local plugin
-
-This follows Codex's local plugin flow: copy the plugin into `~/.codex/plugins/`, register it in `~/.agents/plugins/marketplace.json`, then install it from the plugin directory.
-
-### Prerequisites
+## Prerequisites
 
 - Git
 - Codex CLI or Codex app, signed in with ChatGPT
+- Node.js (only for plugin install)
 
-### 1. Clone the repository into the local plugin directory
+---
+
+## Method 1: Skills Install
+
+Skills are stored in `~/.codex/skills/` and auto-discovered by Codex.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/NSObjects/specpowers ~/.codex/specpowers
+```
+
+### 2. Symlink the skills
+
+**macOS / Linux:**
+
+```bash
+mkdir -p ~/.codex/skills
+ln -s ~/.codex/specpowers/skills ~/.codex/skills/specpowers
+```
+
+**Windows (PowerShell):**
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills"
+cmd /c mklink /J "$env:USERPROFILE\.codex\skills\specpowers" "$env:USERPROFILE\.codex\specpowers\skills"
+```
+
+### 3. Restart Codex and verify
+
+Restart Codex, start a new thread and say "I want to build X". The workflow should begin with `exploring`.
+
+### Updating
+
+```bash
+cd ~/.codex/specpowers && git pull
+```
+
+### Uninstalling
+
+```bash
+rm ~/.codex/skills/specpowers
+rm -rf ~/.codex/specpowers
+```
+
+---
+
+## Method 2: Plugin Install
+
+Registers SpecPowers in Codex's plugin directory via a marketplace.
+
+### 1. Clone the repository
 
 ```bash
 mkdir -p ~/.codex/plugins
 git clone https://github.com/NSObjects/specpowers ~/.codex/plugins/specpowers
 ```
 
-### 1.5 Bootstrap the managed skills payload
-
-From the cloned plugin directory, seed the managed Codex install paths that
-`.codex-plugin/plugin.json` points at:
+### 2. Bootstrap the managed skills
 
 ```bash
 cd ~/.codex/plugins/specpowers
 node scripts/install.js --platform codex --profile developer
 ```
 
-This creates `.codex/skills/` and the initial install state used by session
-bootstrap and language-rule auto-install.
+### 3. Register in a marketplace
 
-### 2. Create or update your personal marketplace
+Codex supports two marketplace scopes. Choose one based on your needs:
 
-If `~/.agents/plugins/marketplace.json` does not exist yet, create it with:
+| Scope | Marketplace file | `source.path` | Use case |
+|-------|-----------------|---------------|----------|
+| Personal | `~/.agents/plugins/marketplace.json` | `./.codex/plugins/specpowers` | Available across all your repos |
+| Workspace | `$REPO_ROOT/.agents/plugins/marketplace.json` | `./plugins/specpowers` | Shared with team via version control |
+
+> Codex resolves `source.path` relative to the marketplace root (home directory for personal, repo root for workspace). Paths must start with `./`.
+
+Add the following entry. If the marketplace file does not exist, create it with the full structure below. If it already exists, append the entry to the `plugins` array.
+
+**Personal** (`~/.agents/plugins/marketplace.json`):
 
 ```json
 {
@@ -63,117 +116,37 @@ If `~/.agents/plugins/marketplace.json` does not exist yet, create it with:
 }
 ```
 
-If the file already exists, append this plugin entry to the existing `plugins` array instead of replacing the whole file:
+**Workspace** (`$REPO_ROOT/.agents/plugins/marketplace.json`):
 
-```json
-{
-  "name": "specpowers",
-  "source": {
-    "source": "local",
-    "path": "./.codex/plugins/specpowers"
-  },
-  "policy": {
-    "installation": "AVAILABLE",
-    "authentication": "ON_INSTALL"
-  },
-  "category": "Coding"
-}
-```
+Same structure, but change `source.path` to point to the plugin location relative to your repo root (e.g. `./plugins/specpowers`).
 
-### 3. Restart Codex
+### 4. Restart Codex and install
 
-Quit and relaunch Codex so it reloads the marketplace.
+Restart Codex, then:
 
-### 4. Install the plugin from the plugin directory
+- **Codex CLI**: Run `/plugins`
+- **Codex App**: Open the Plugins page
 
-- In Codex CLI, start Codex and run `/plugins`.
-- In the Codex app, open the Plugins page.
-- Find `SpecPowers` in your local marketplace and choose `Install plugin`.
+Find `SpecPowers` in your marketplace and choose `Install plugin`.
 
 ### 5. Verify
 
-Start a new thread and say:
+Start a new thread and say "I want to build X". The workflow should begin with `exploring`.
 
-```text
-I want to build X
-```
-
-SpecPowers should be available as an installed plugin, and the workflow should begin with `exploring`.
-
-## Legacy: skills-only install
-
-Use this if you only want native skill discovery and do not want to manage plugins or marketplaces.
-
-### 1. Clone the specpowers repository
-
-```bash
-git clone https://github.com/NSObjects/specpowers ~/.codex/specpowers
-```
-
-### 2. Create the skills symlink
-
-```bash
-mkdir -p ~/.agents/skills
-ln -s ~/.codex/specpowers/skills ~/.agents/skills/specpowers
-```
-
-**Windows (PowerShell):**
-
-```powershell
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.agents\skills"
-cmd /c mklink /J "$env:USERPROFILE\.agents\skills\specpowers" "$env:USERPROFILE\.codex\specpowers\skills"
-```
-
-### 3. Restart Codex
-
-Quit and relaunch the CLI or app so Codex discovers the skills.
-
-### 4. Verify
-
-```bash
-ls -la ~/.agents/skills/specpowers
-```
-
-You should see a symlink (or junction on Windows) pointing to the SpecPowers `skills/` directory.
-
-## Updating
-
-Plugin install:
+### Updating
 
 ```bash
 cd ~/.codex/plugins/specpowers && git pull
 ```
 
-Then restart Codex so the local marketplace install picks up the latest files.
+Restart Codex to pick up the latest files.
 
-Skills-only install:
-
-```bash
-cd ~/.codex/specpowers && git pull
-```
-
-Skills update instantly through the symlink, but restarting Codex is still the safest way to force a fresh discovery pass.
-
-## Uninstalling
-
-Plugin install:
+### Uninstalling
 
 1. Disable or remove `specpowers` from Codex's Plugins UI.
-2. Remove the `specpowers` entry from `~/.agents/plugins/marketplace.json`.
-3. Optionally delete the local clone:
+2. Remove the `specpowers` entry from your marketplace file.
+3. Optionally delete the clone:
 
 ```bash
 rm -rf ~/.codex/plugins/specpowers
-```
-
-Skills-only install:
-
-```bash
-rm ~/.agents/skills/specpowers
-```
-
-Optionally delete the clone:
-
-```bash
-rm -rf ~/.codex/specpowers
 ```

@@ -8,11 +8,10 @@
 
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readState } from './install-state.js';
+import { readPlatformState } from './install-state.js';
 import { detectLanguages } from './language-detect.js';
 import {
   install,
-  getInstalledModules,
   getMissingLanguageModules,
   installModules,
 } from '../install.js';
@@ -61,8 +60,7 @@ function formatSummary(action, installedModules, profile) {
  * @returns {Promise<BootstrapResult>}
  */
 export async function bootstrap({ platform, fileList, rootDir = ROOT }) {
-  const statePath = resolve(rootDir, 'manifests/install-state.json');
-  const state = readState(statePath);
+  let state = readPlatformState(rootDir, platform);
 
   let isFirstRun = false;
 
@@ -77,6 +75,7 @@ export async function bootstrap({ platform, fileList, rootDir = ROOT }) {
         summary: `Error: ${firstRunResult.error}`,
       };
     }
+    state = readPlatformState(rootDir, platform);
   }
 
   // Detect languages from project files
@@ -93,7 +92,7 @@ export async function bootstrap({ platform, fileList, rootDir = ROOT }) {
   }
 
   // Compare installed modules with detected languages
-  const installedIds = getInstalledModules(statePath);
+  const installedIds = state.modules.map((module) => module.id);
   const missingModules = getMissingLanguageModules(installedIds, detectedSkills);
 
   if (missingModules.length === 0) {
