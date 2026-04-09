@@ -193,7 +193,7 @@ Issues and PRs welcome. If you're adding a new skill, use the `writing-skills` m
 
 ## Acknowledgments
 
-Built on ideas from [OpenSpec](https://github.com/Fission-AI/OpenSpec) (structured artifact system) and [Superpowers](https://github.com/obra/superpowers) (behavioral shaping engine).
+Built on ideas from [OpenSpec](https://github.com/Fission-AI/OpenSpec)  and [Superpowers](https://github.com/obra/superpowers) 
 
 ## License
 
