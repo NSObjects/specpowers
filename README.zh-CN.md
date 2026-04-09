@@ -132,6 +132,37 @@ TypeScript · Python · Go · Rust · Java · Kotlin · C++ · Swift · PHP · P
 - **流程层** — 面向用户的入口能力，例如 `requesting-code-review`、`receiving-code-review`、`dispatching-parallel-agents`。在审查场景里，`requesting-code-review` 是唯一对外的审查入口。
 - **角色层** — `security-reviewer`、`planner`、`tdd-guide` 这类内部协作角色。它们通过流程层被按需调用，而不是与流程层并列的用户入口。
 
+### 执行图
+
+```mermaid
+flowchart TD
+  using["using-skills"]
+  rules["rules-common + rules-*（常驻规则）"]
+  workflow["exploring → proposing → specifying → designing → planning → spec-driven-development → archiving"]
+  task["任务内钩子：TDD + 两阶段审查"]
+  milestone["里程碑闸门：verification-loop"]
+  completion["完成声明闸门：verification-before-completion"]
+  review["独立审查流：requesting-code-review"]
+  roles["角色层 helper：security-reviewer / planner / tdd-guide"]
+
+  using --> rules
+  using --> workflow
+  rules -. 约束 .-> workflow
+  workflow --> task
+  task -. 每 3-4 个任务 / 较大交付前 .-> milestone
+  milestone -. 为完成声明提供证据 .-> completion
+  review --> roles
+  review -. 最终对外结论仍受其约束 .-> completion
+```
+
+可以把它理解成“一条主流程 + 几类挂点”：
+- `using-skills` 负责先决定当前该激活哪个流程技能。
+- `rules-common` 和 `rules-*` 作为常驻标准围绕流程生效，而不是额外流程阶段。
+- `spec-driven-development` 内部再挂任务级钩子，例如 TDD 和两阶段审查。
+- `verification-loop` 是里程碑闸门，不是主流程里的平级阶段。
+- `verification-before-completion` 是最终完成声明前的闸门。
+- `requesting-code-review` 是独立的手动审查流，可以按需调用角色层 helper，但不会再展开成新的顶层流程。
+
 ## 设计理念
 
 - **先规范后代码** — 先定义行为再实现

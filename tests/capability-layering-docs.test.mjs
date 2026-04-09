@@ -36,3 +36,26 @@ test('README documents rules, workflows, and roles as separate layers', () => {
   assert.ok(readmeZh.includes('security-reviewer'));
   assert.ok(readmeZh.includes('内部'));
 });
+
+test('README includes an execution graph for workflow-attached capabilities', () => {
+  const readme = read('README.md');
+  const readmeZh = read('README.zh-CN.md');
+
+  assert.ok(readme.includes('Execution Graph'));
+  assert.ok(readme.includes('```mermaid'));
+  assert.ok(readme.includes('using-skills'));
+  assert.ok(readme.includes('rules-common'));
+  assert.ok(readme.includes('spec-driven-development'));
+  assert.ok(readme.includes('verification-loop'));
+  assert.ok(readme.includes('verification-before-completion'));
+  assert.ok(readme.includes('requesting-code-review'));
+
+  assert.ok(readmeZh.includes('执行图'));
+  assert.ok(readmeZh.includes('```mermaid'));
+  assert.ok(readmeZh.includes('using-skills'));
+  assert.ok(readmeZh.includes('rules-common'));
+  assert.ok(readmeZh.includes('spec-driven-development'));
+  assert.ok(readmeZh.includes('verification-loop'));
+  assert.ok(readmeZh.includes('verification-before-completion'));
+  assert.ok(readmeZh.includes('requesting-code-review'));
+});

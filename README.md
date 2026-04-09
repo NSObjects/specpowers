@@ -132,6 +132,37 @@ Pre-built agent templates: `planner` (read-only analysis), `security-reviewer` (
 - **Workflow Layer** — user-facing entrypoints such as `requesting-code-review`, `receiving-code-review`, and `dispatching-parallel-agents`. For review, `requesting-code-review` is the single surfaced review entrypoint.
 - **Role Layer** — internal helper roles such as `security-reviewer`, `planner`, and `tdd-guide`. These are internal helper roles used behind workflow skills rather than parallel user-facing workflows.
 
+### Execution Graph
+
+```mermaid
+flowchart TD
+  using["using-skills"]
+  rules["rules-common + rules-* (always-on rules)"]
+  workflow["exploring → proposing → specifying → designing → planning → spec-driven-development → archiving"]
+  task["task-internal hooks: TDD + two-stage review"]
+  milestone["milestone gate: verification-loop"]
+  completion["completion gate: verification-before-completion"]
+  review["manual review flow: requesting-code-review"]
+  roles["role-layer helpers: security-reviewer / planner / tdd-guide"]
+
+  using --> rules
+  using --> workflow
+  rules -. constrain .-> workflow
+  workflow --> task
+  task -. every 3-4 tasks / before larger handoff .-> milestone
+  milestone -. evidence for readiness .-> completion
+  review --> roles
+  review -. final claim still gated by .-> completion
+```
+
+Read it as one main workflow with attached hooks:
+- `using-skills` decides which workflow skill to activate first.
+- `rules-common` and `rules-*` stay active as standards around the workflow, not as extra phases.
+- `spec-driven-development` contains task-internal hooks such as TDD and two-stage review.
+- `verification-loop` is a milestone gate, not a peer stage in the main workflow.
+- `verification-before-completion` is the final claim gate before saying work is complete or ready.
+- `requesting-code-review` is a separate manual review flow that can call role-layer helpers without creating extra top-level workflows.
+
 ## Design Principles
 
 - **Specs before code** — define behavior, then implement
