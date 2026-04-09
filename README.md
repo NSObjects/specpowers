@@ -126,6 +126,12 @@ TypeScript · Python · Go · Rust · Java · Kotlin · C++ · Swift · PHP · P
 
 Pre-built agent templates: `planner` (read-only analysis), `security-reviewer` (deep-dive specialists for unified review), `tdd-guide` (TDD coaching).
 
+### Capability Layers
+
+- **Rules Layer** — `rules-common` and `rules-*` are standards and constraints used while writing, modifying, and reviewing code. They shape decisions and review criteria; they are not separate workflow entrypoints.
+- **Workflow Layer** — user-facing entrypoints such as `requesting-code-review`, `receiving-code-review`, and `dispatching-parallel-agents`. For review, `requesting-code-review` is the single surfaced review entrypoint.
+- **Role Layer** — internal helper roles such as `security-reviewer`, `planner`, and `tdd-guide`. These are internal helper roles used behind workflow skills rather than parallel user-facing workflows.
+
 ## Design Principles
 
 - **Specs before code** — define behavior, then implement

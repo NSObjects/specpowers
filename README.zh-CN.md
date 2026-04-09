@@ -126,6 +126,12 @@ TypeScript · Python · Go · Rust · Java · Kotlin · C++ · Swift · PHP · P
 
 预置代理模板：`planner`（只读分析）、`security-reviewer`（由统一审查按需调用的专项深审角色）、`tdd-guide`（TDD 教练）。
 
+### 能力分层
+
+- **规则层** — `rules-common` 和 `rules-*` 是写代码、改代码、review 代码时要遵守的标准与约束。它们塑造决策和审查标准，但不是新的流程入口。
+- **流程层** — 面向用户的入口能力，例如 `requesting-code-review`、`receiving-code-review`、`dispatching-parallel-agents`。在审查场景里，`requesting-code-review` 是唯一对外的审查入口。
+- **角色层** — `security-reviewer`、`planner`、`tdd-guide` 这类内部协作角色。它们通过流程层被按需调用，而不是与流程层并列的用户入口。
+
 ## 设计理念
 
 - **先规范后代码** — 先定义行为再实现
