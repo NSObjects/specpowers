@@ -1,6 +1,6 @@
 {
   "name": "specpowers",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Spec-driven development workflow for AI coding assistants. Merges OpenSpec's structured artifact system with Superpowers' behavioral shaping engine.",
   "devDependencies": {
