@@ -193,7 +193,7 @@ node scripts/install.js --platform cursor --profile full --exclude rules-rust
 
 ## 致谢
 
-设计借鉴了 [OpenSpec](https://github.com/Fission-AI/OpenSpec)（结构化产物体系）和 [Superpowers](https://github.com/obra/superpowers)（行为塑造引擎）。
+设计借鉴了 [OpenSpec](https://github.com/Fission-AI/OpenSpec) 和 [Superpowers](https://github.com/obra/superpowers)。
 
 ## 开源协议
 
