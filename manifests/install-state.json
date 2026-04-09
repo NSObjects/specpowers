@@ -47,13 +47,6 @@
       ]
     },
     {
-      "id": "search-first",
-      "installedAt": "2026-04-09T05:46:34.943Z",
-      "paths": [
-        ".claude/skills/search-first"
-      ]
-    },
-    {
       "id": "quality-gate",
       "installedAt": "2026-04-09T05:46:34.943Z",
       "paths": [

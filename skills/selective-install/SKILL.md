@@ -42,7 +42,7 @@ node scripts/install.js --platform claude-code --profile full --exclude rules-ru
 | Profile | Description | Modules |
 |---------|-------------|---------|
 | `core` | Minimal baseline | core-workflow, foundation |
-| `developer` | Standard development | core + rules-common, verification-loop, search-first, quality-gate, role-agents |
+| `developer` | Standard development | core + rules-common, verification-loop, quality-gate, role-agents |
 | `security` | Security-enhanced | developer + security review focus |
 | `full` | Everything | All modules including all language rules |
 
@@ -61,7 +61,6 @@ Installed Modules (profile: developer, platform: kiro-ide)
   foundation         skills    installed 2025-01-15
   rules-common       rules     installed 2025-01-15
   verification-loop  skills    installed 2025-01-15
-  search-first       skills    installed 2025-01-15
   quality-gate       skills    installed 2025-01-15
   role-agents        agents    installed 2025-01-15
 

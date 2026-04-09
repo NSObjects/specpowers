@@ -251,6 +251,28 @@ describe('Agent Auto-Install Integration', () => {
   });
 
   describe('Auto-install boundary (Req 4.1, 4.4)', () => {
+    it('module catalog no longer exposes search-first as a standalone module', () => {
+      const catalog = JSON.parse(
+        readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
+      );
+
+      assert.ok(
+        !catalog.modules.some((module) => module.id === 'search-first'),
+        'search-first should no longer be exposed as a standalone install module'
+      );
+    });
+
+    it('developer profile no longer lists search-first', () => {
+      const profiles = JSON.parse(
+        readFileSync(resolve(ROOT, 'manifests/install-profiles.json'), 'utf-8')
+      );
+
+      assert.ok(
+        !profiles.profiles.developer.modules.includes('search-first'),
+        'developer profile should no longer include search-first'
+      );
+    });
+
     it('rules-* modules are auto-installable', async () => {
       const { isAutoInstallable, partitionByAutoInstallScope } = await import(
         '../scripts/lib/auto-install.js'
@@ -277,7 +299,7 @@ describe('Agent Auto-Install Integration', () => {
 
       // Non-rules modules should NOT be auto-installable
       assert.ok(!isAutoInstallable('verification-loop', catalog.modules));
-      assert.ok(!isAutoInstallable('search-first', catalog.modules));
+      assert.ok(!isAutoInstallable('quality-gate', catalog.modules));
       assert.ok(!isAutoInstallable('core-workflow', catalog.modules));
       assert.ok(!isAutoInstallable('role-agents', catalog.modules));
     });
@@ -288,14 +310,14 @@ describe('Agent Auto-Install Integration', () => {
         readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
       );
 
-      const mixed = ['rules-typescript', 'verification-loop', 'rules-python', 'search-first'];
+      const mixed = ['rules-typescript', 'verification-loop', 'rules-python', 'quality-gate'];
       const { autoInstall, needsConfirmation } = partitionByAutoInstallScope(
         mixed,
         catalog.modules
       );
 
       assert.deepEqual(autoInstall.sort(), ['rules-python', 'rules-typescript']);
-      assert.deepEqual(needsConfirmation.sort(), ['search-first', 'verification-loop']);
+      assert.deepEqual(needsConfirmation.sort(), ['quality-gate', 'verification-loop']);
     });
   });
 

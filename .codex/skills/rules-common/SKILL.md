@@ -159,15 +159,6 @@ Don't force consumers to depend on methods they don't use. Prefer small, focused
 
 Handle errors explicitly. Don't swallow exceptions silently. Choose a consistent error handling pattern for the project (exceptions, result types, error codes) and stick with it.
 
-### 5.7 Research Before Reinvention
-
-Before recommending custom code, research what already exists. Start with the current codebase, then check the most relevant external solutions for the project's language and runtime.
-
-- Search the project codebase first to avoid duplicating internal implementations
-- Use research when making implementation or technology decisions, not as a separate workflow stage
-- Make the decision explicit: **Adopt / Extend / Compose / Build**
-- If you choose Build, document why existing solutions were not sufficient
-
 ---
 
 ## 6. Git Workflow
@@ -216,7 +207,6 @@ These thoughts mean you're about to violate a rule — stop and reconsider:
 | "I know this works, no need to test" | Confidence without evidence is the #1 source of bugs. |
 | "Let me just commit everything together" | Atomic commits make debugging, reverting, and reviewing possible. |
 | "This override is fine without documenting why" | Undocumented overrides become mysterious bugs. Always explain. |
-| "I'll just build it; research can come later" | Reinventing existing solutions creates avoidable maintenance burden. Search first, then decide. |
 
 ---
 

@@ -80,11 +80,12 @@ These thoughts mean STOP—you're rationalizing:
 When multiple skills could apply, use this order:
 
 1. **Process skills first** (exploring, proposing, specifying, debugging) - these determine HOW to approach
-2. **Implementation skills** (spec-driven-development) - these guide execution
-3. **Quality skills** (verification-loop, quality-gate, rules-common, rules-{language}) - these enforce standards and decision constraints
-4. **Utility skills** (dispatching-parallel-agents, requesting-code-review, selective-install) - these support execution
+2. **Research skills** (search-first) - research existing solutions before building
+3. **Implementation skills** (spec-driven-development) - these guide execution
+4. **Quality skills** (verification-loop, quality-gate, rules-common, rules-{language}) - these enforce standards
+5. **Utility skills** (dispatching-parallel-agents, requesting-code-review, selective-install) - these support execution
 
-"Let's build X" → proposing/exploring first; if existing-solution research matters, handle it inside `exploring` or `designing` under `rules-common`; then implementation skills.
+"Let's build X" → proposing/exploring first, then search-first for research, then implementation skills.
 "Fix this bug" → debugging first, then domain-specific skills.
 "Check code quality" → quality-gate for quick checks, verification-loop for full pipeline.
 "Install/manage modules" → selective-install for lifecycle management.
@@ -93,7 +94,7 @@ When multiple skills could apply, use this order:
 
 **Rigid** (TDD, debugging, specifying, verification-loop, quality-gate): Follow exactly. Don't adapt away discipline.
 
-**Flexible** (exploring, designing, rules-common, rules-{language}): Adapt principles to context.
+**Flexible** (exploring, designing, search-first, rules-common, rules-{language}): Adapt principles to context.
 
 **Utility** (selective-install): Support tooling for managing SpecPowers modules.
 

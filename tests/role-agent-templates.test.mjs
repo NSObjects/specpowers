@@ -39,6 +39,10 @@ const templates = [
     name: 'code-reviewer',
     path: 'skills/requesting-code-review/code-reviewer-prompt.md',
   },
+  {
+    name: 'implementation-researcher',
+    path: 'skills/exploring/implementation-researcher-prompt.md',
+  },
 ];
 
 // Load all template contents once
@@ -184,5 +188,25 @@ test('code reviewer template specifics', async (t) => {
 
   await t.test('includes Minor severity level', () => {
     assert.match(content, /Minor/i, 'code-reviewer should mention Minor severity');
+  });
+});
+
+// --- Implementation researcher-specific tests ---
+
+test('implementation researcher template specifics', async (t) => {
+  const content = templateContents['implementation-researcher'];
+
+  await t.test('mentions codebase-first research order', () => {
+    assert.match(content, /codebase first/i, 'implementation-researcher should search the codebase first');
+  });
+
+  await t.test('requires structured research output', () => {
+    assert.match(content, /Decision/i, 'implementation-researcher should include a decision section');
+    assert.match(content, /Candidates/i, 'implementation-researcher should include candidates in output');
+  });
+
+  await t.test('restricts itself to research rather than implementation', () => {
+    assert.match(content, /MUST NOT/i, 'implementation-researcher should contain MUST NOT restriction');
+    assert.match(content, /implement/i, 'implementation-researcher should forbid implementation work');
   });
 });

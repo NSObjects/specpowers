@@ -163,15 +163,6 @@
       "defaultInstall": true
     },
     {
-      "id": "search-first",
-      "kind": "skills",
-      "description": "Research-first workflow",
-      "paths": ["skills/search-first"],
-      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
-      "dependencies": ["core-workflow"],
-      "defaultInstall": true
-    },
-    {
       "id": "quality-gate",
       "kind": "skills",
       "description": "Quality gate checks",

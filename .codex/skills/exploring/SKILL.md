@@ -27,10 +27,9 @@ Every non-trivial project benefits from exploration. "Simple" projects are where
 3. **Assess scope** — is this one feature or multiple independent subsystems?
 4. **Decompose if too large** — help user break into sub-projects (see below)
 5. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-6. **Use implementation research when warranted** — research existing implementations inside `exploring` when approach quality depends on real evidence
-7. **Propose 2-3 approaches** — with trade-offs and your recommendation
-8. **Get user alignment** — confirm direction before moving on
-9. **Transition** — invoke `proposing` skill (Kiro: readSteering → proposing.md)
+6. **Propose 2-3 approaches** — with trade-offs and your recommendation
+7. **Get user alignment** — confirm direction before moving on
+8. **Transition** — invoke `proposing` skill (Kiro: readSteering → proposing.md)
 
 ## The Process
 
@@ -57,38 +56,9 @@ IF request contains multiple independent subsystems:
 
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs
-- Treat implementation research as part of `exploring`, not as a separate workflow stage.
-- When an approach depends on understanding existing implementations, dependencies, or prior art, perform implementation research before finalizing the trade-offs.
-- For simple requests, skip implementation research and continue the normal exploration conversation.
-- For complex requests, a bounded subagent MAY gather implementation research if the platform supports it; the main agent remains responsible for synthesizing findings, recommending an approach, and aligning with the user.
+- When approaches involve new dependencies or functionality, invoke `search-first` (Kiro: readSteering → search-first.md) to research existing solutions before finalizing the approach trade-offs.
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
-
-## Implementation Research Inside Exploring
-
-Use implementation research only when it improves the quality of the exploration outcome.
-
-**Good triggers:**
-- Choosing between adopting an existing solution and building custom code
-- Comparing new dependencies, integrations, or architectural patterns
-- Understanding how similar behavior is already implemented in the current codebase
-
-**Not required:**
-- Simple requests that can be clarified through normal questioning
-- Cases where the existing codebase patterns already make the direction obvious
-
-**Research order:**
-1. Search the current codebase first
-2. Then check the most relevant external sources for the project's language or runtime
-3. Synthesize the evidence back into the approach trade-offs
-
-**Platform dispatch:**
-- Claude Code: use the `Task` tool (general-purpose) with the filled `./implementation-researcher-prompt.md` template
-- Kiro: use `invokeSubAgent(name="general-task-execution", prompt=...)` with the filled `./implementation-researcher-prompt.md` template
-- Codex: use `spawn_agent(message=...)` with the filled `./implementation-researcher-prompt.md` template
-- Cursor, Gemini CLI, OpenCode: no research subagent dispatch; perform the same implementation research inline in the main agent and continue `exploring`
-
-**Important:** Implementation research never changes the visible workflow stage. The user is still in `exploring`.
 
 **Working in existing codebases:**
 - Explore the current structure before proposing changes

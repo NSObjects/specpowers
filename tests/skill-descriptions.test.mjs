@@ -58,7 +58,6 @@ test('workflow skill descriptions focus on trigger conditions, not workflow summ
 const capabilitySkills = [
   'skills/rules-common/SKILL.md',
   'skills/verification-loop/SKILL.md',
-  'skills/search-first/SKILL.md',
   'skills/quality-gate/SKILL.md',
   'skills/selective-install/SKILL.md',
 ];

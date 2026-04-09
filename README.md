@@ -9,7 +9,7 @@
 AI coding agents are fast but sloppy. They skip requirements, ignore edge cases, and write code before understanding the problem. SpecPowers fixes this by enforcing a structured workflow:
 
 ```
-exploring → proposing → specifying → designing → planning → executing → archiving
+exploring → proposing → specifying → designing → planning → spec-driven-development → archiving
 ```
 
 Every line of code traces back to a spec. Nothing is built without one.
@@ -37,6 +37,8 @@ AI:  ✅ Task 3 — done
 
 The agent never runs git. You review and commit after each task.
 
+For complex requests, `exploring` may research existing implementations or delegate bounded research, but that stays inside `exploring` rather than becoming a separate workflow phase.
+
 ```mermaid
 flowchart TD
     Start([User Request]) --> Exploring[exploring<br/>Socratic dialogue]
@@ -44,7 +46,8 @@ flowchart TD
     Proposing --> Specifying[specifying<br/>spec.md · GIVEN/WHEN/THEN]
     Specifying --> Designing[designing<br/>design.md]
     Designing --> Planning[planning<br/>tasks.md · TDD tasks]
-    Planning --> Choice{Execution Mode}
+    Planning --> Execution[spec-driven-development<br/>execution modes]
+    Execution --> Choice{Execution Mode}
     Choice -->|Step-by-Step| Step[1 task → review → pause]
     Choice -->|Fast| Fast[all tasks → unified review]
     Step -.->|commit then continue| Step
@@ -88,7 +91,7 @@ Start a new session and say "I want to build X". The agent should begin with `ex
 
 | Skill | What it does |
 |-------|-------------|
-| `exploring` | Socratic dialogue to understand intent |
+| `exploring` | Socratic dialogue to understand intent, with implementation research only when needed |
 | `proposing` | Scope, non-goals, success criteria → proposal.md |
 | `specifying` | GIVEN/WHEN/THEN behavioral specs → spec.md |
 | `designing` | Architecture with trade-offs → design.md |
@@ -103,7 +106,6 @@ Start a new session and say "I want to build X". The agent should begin with `ex
 | `test-driven-development` | RED → GREEN → REFACTOR, no exceptions |
 | `verification-loop` | 6-stage pipeline: Build → Types → Lint → Tests → Security → Diff |
 | `quality-gate` | Fast lint/type checks after edits |
-| `search-first` | Research before building (Adopt → Extend → Compose → Build) |
 | `systematic-debugging` | 4-phase root cause analysis |
 
 ### Language Rules
@@ -129,6 +131,7 @@ Pre-built agent templates: `planner` (read-only analysis), `security-reviewer` (
 - **Specs before code** — define behavior, then implement
 - **TDD is mandatory** — every task starts with a failing test
 - **Evidence over claims** — prove it works before moving on
+- **Research is embedded, not a phase** — investigate existing solutions inside decision-making stages instead of adding workflow branches
 - **You control git** — the agent never commits; you review everything
 - **Role isolation** — the AI plays a constrained role at each stage (interviewer, architect, developer…)
 - **Brownfield-first** — built for existing codebases, works great for greenfield too

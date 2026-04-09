@@ -6,19 +6,23 @@ Skills use Claude Code tool names. When you encounter these in a skill, use your
 |-----------------|------------------|
 | `Task` tool (dispatch subagent) | `spawn_agent` (see [Named agent dispatch](#named-agent-dispatch)) |
 | Multiple `Task` calls (parallel) | Multiple `spawn_agent` calls |
-| Task returns result | `wait_agent` |
+| Task returns result | `wait` |
 | Task completes automatically | `close_agent` to free slot |
 | `TodoWrite` (task tracking) | `update_plan` |
 | `Skill` tool (invoke a skill) | Skills load natively — just follow the instructions |
 | `Read`, `Write`, `Edit` (files) | Use your native file tools |
 | `Bash` (run commands) | Use your native shell tools |
 
-## Native subagent support
+## Subagent dispatch requires multi-agent support
 
-Codex supports subagent dispatch natively. Use `spawn_agent`, `wait_agent`, and
-`close_agent` when a skill asks you to delegate work. If a particular Codex
-environment does not expose subagent tools, follow the fallback path described
-in that skill instead of inventing a new prerequisite step.
+Add to your Codex config (`~/.codex/config.toml`):
+
+```toml
+[features]
+multi_agent = true
+```
+
+This enables `spawn_agent`, `wait`, and `close_agent` for skills like `spec-driven-development`.
 
 ## Named agent dispatch
 

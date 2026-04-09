@@ -41,10 +41,10 @@ test('install rollback integrity', async (t) => {
 
       const beforeClaudeState = readFileSync(claudeStatePath, 'utf-8');
       const beforeCodexState = readFileSync(codexStatePath, 'utf-8');
-      assert.ok(existsSync(join(tmp, '.codex/skills/search-first/SKILL.md')));
-      assert.ok(existsSync(join(tmp, '.claude/skills/search-first/SKILL.md')));
+      assert.ok(existsSync(join(tmp, '.codex/skills/quality-gate/SKILL.md')));
+      assert.ok(existsSync(join(tmp, '.claude/skills/quality-gate/SKILL.md')));
 
-      rmSync(join(tmp, 'skills/search-first'), { recursive: true, force: true });
+      rmSync(join(tmp, 'skills/quality-gate'), { recursive: true, force: true });
 
       await assert.rejects(
         install({
@@ -57,11 +57,11 @@ test('install rollback integrity', async (t) => {
       assert.equal(readFileSync(claudeStatePath, 'utf-8'), beforeClaudeState);
       assert.equal(readFileSync(codexStatePath, 'utf-8'), beforeCodexState);
       assert.ok(
-        existsSync(join(tmp, '.codex/skills/search-first/SKILL.md')),
+        existsSync(join(tmp, '.codex/skills/quality-gate/SKILL.md')),
         'failed reinstall should leave another platform payload intact',
       );
       assert.ok(
-        existsSync(join(tmp, '.claude/skills/search-first/SKILL.md')),
+        existsSync(join(tmp, '.claude/skills/quality-gate/SKILL.md')),
         'failed reinstall should restore the target platform payload',
       );
     } finally {
@@ -82,9 +82,9 @@ test('install rollback integrity', async (t) => {
       });
 
       const beforeState = readFileSync(statePath, 'utf-8');
-      assert.ok(existsSync(join(tmp, '.claude/skills/search-first/SKILL.md')));
+      assert.ok(existsSync(join(tmp, '.claude/skills/quality-gate/SKILL.md')));
 
-      rmSync(join(tmp, 'skills/search-first'), { recursive: true, force: true });
+      rmSync(join(tmp, 'skills/quality-gate'), { recursive: true, force: true });
 
       await assert.rejects(
         install({
@@ -96,7 +96,7 @@ test('install rollback integrity', async (t) => {
 
       assert.equal(readFileSync(statePath, 'utf-8'), beforeState);
       assert.ok(
-        existsSync(join(tmp, '.claude/skills/search-first/SKILL.md')),
+        existsSync(join(tmp, '.claude/skills/quality-gate/SKILL.md')),
         'failed reinstall should leave the previously installed payload intact',
       );
     } finally {
