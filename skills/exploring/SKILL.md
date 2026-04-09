@@ -83,7 +83,7 @@ Use implementation research only when it improves the quality of the exploration
 3. Synthesize the evidence back into the approach trade-offs
 
 **Platform dispatch:**
-- Claude Code: use the `Task` tool (general-purpose) with the filled `./implementation-researcher-prompt.md` template
+- Claude Code: use the `Agent` tool (general-purpose) with the filled `./implementation-researcher-prompt.md` template. Claude Code renamed `Task` to `Agent` in v2.1.63; older `Task` references remain compatible aliases.
 - Kiro: use `invokeSubAgent(name="general-task-execution", prompt=...)` with the filled `./implementation-researcher-prompt.md` template
 - Codex: use `spawn_agent(message=...)` with the filled `./implementation-researcher-prompt.md` template
 - Cursor, Gemini CLI, OpenCode: no research subagent dispatch; perform the same implementation research inline in the main agent and continue `exploring`

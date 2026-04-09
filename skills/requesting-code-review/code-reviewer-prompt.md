@@ -33,6 +33,14 @@ Scenario: [name]
 - **Error handling:** Are errors handled appropriately?
 - **Test quality:** Do tests test behavior, not implementation?
 
+## Deep Dive Recommendations
+
+If the change appears risky in a specialized dimension, you MAY recommend a deeper follow-up review instead of trying to exhaust that dimension yourself.
+
+- Recommend `security-reviewer` when changes affect auth, secrets, permissions, untrusted input, or sensitive data flows.
+- Keep the recommendation scoped and explain why a specialist reviewer would add value.
+- Do not turn this into a second user-facing review flow. The main agent remains responsible for orchestration and the final decision.
+
 ## Report Format
 
 ```markdown
@@ -45,6 +53,10 @@ Scenario: [name]
 
 **Issues:**
 - [severity] [description]
+
+## Deep Dive Recommendations
+- `none` — no specialist deep dive warranted
+- `security-reviewer` — [scope and reason, if a security deep dive is warranted]
 
 ## Assessment
 [APPROVED / NEEDS_CHANGES]

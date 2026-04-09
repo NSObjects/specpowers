@@ -11,6 +11,8 @@ You delegate tasks to specialized agents with isolated context. By precisely cra
 
 When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
 
+For review work, parallel specialists should sit behind a **unified review orchestration** layer rather than becoming separate user-facing entrypoints. Use `requesting-code-review` as the surfaced review entrypoint, then dispatch specialists only when that unified review flow truly needs them.
+
 **Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
 
 ## When to Use
@@ -67,9 +69,9 @@ Each agent gets:
 
 ```typescript
 // In Claude Code / AI environment
-Task("Fix agent-tool-abort.test.ts failures")
-Task("Fix batch-completion-behavior.test.ts failures")
-Task("Fix tool-approval-race-conditions.test.ts failures")
+Agent("Fix agent-tool-abort.test.ts failures")
+Agent("Fix batch-completion-behavior.test.ts failures")
+Agent("Fix tool-approval-race-conditions.test.ts failures")
 // All three run concurrently
 ```
 

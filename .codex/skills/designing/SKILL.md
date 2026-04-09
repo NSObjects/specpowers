@@ -77,7 +77,7 @@ YOUR DESIGN MUST follow these patterns unless you document why you're deviating.
 ## Architecture Decisions
 
 ### Decision: [Decision Name]
-When making technology choices, invoke `search-first` (Kiro: readSteering → search-first.md) to evaluate existing solutions. Include the search decision (Adopt/Extend/Compose/Build) in the Architecture Decision.
+When making technology choices, apply the research-first guidance from `rules-common`: check the codebase and other relevant existing solutions before recommending custom building. Include the resulting Adopt / Extend / Compose / Build decision in the Architecture Decision.
 
 Chose [A] over [B] because:
 - [Reason 1]

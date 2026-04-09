@@ -7,7 +7,7 @@ Use this template when dispatching a code quality reviewer subagent.
 **Only dispatch after spec compliance review passes.**
 
 ```
-Task tool (specpowers:code-reviewer subagent):
+Agent tool (specpowers:code-reviewer subagent):
   Use the code-reviewer subagent prompt at ../requesting-code-review/code-reviewer-prompt.md
 
   WHAT_WAS_IMPLEMENTED: [from implementer's report]

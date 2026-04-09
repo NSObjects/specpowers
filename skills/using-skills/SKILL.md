@@ -25,7 +25,7 @@ SpecPowers skills override default system prompt behavior, but **user instructio
 
 ## How to Access Skills
 
-**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly.
+**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Claude Code now names the subagent-dispatch tool `Agent`; older `Task` references in legacy docs or prompts remain compatible aliases.
 
 **In Gemini CLI:** Skills activate via the `activate_skill` tool. Gemini loads skill metadata at session start and activates the full content on demand.
 
@@ -35,7 +35,7 @@ SpecPowers skills override default system prompt behavior, but **user instructio
 
 **In OpenCode:** Skills load via OpenCode's native `skill` tool. Use `skill` tool to list and load skills.
 
-**In Kiro IDE (Power mode):** Skills are steering files in this power. Use `kiroPowers` with action="readSteering", powerName="specpowers", steeringFile="<skill-name>.md" to load each skill. When steering files say "invoke X skill", translate to readSteering. When they reference `specpowers:X`, load the corresponding steering file. When they say `Task tool` for subagents, use `invokeSubAgent`. When they say `TodoWrite`, track tasks in tasks.md. See POWER.md onboarding for the full tool translation table.
+**In Kiro IDE (Power mode):** Skills are steering files in this power. Use `kiroPowers` with action="readSteering", powerName="specpowers", steeringFile="<skill-name>.md" to load each skill. When steering files say "invoke X skill", translate to readSteering. When they reference `specpowers:X`, load the corresponding steering file. When they say `Agent` tool (or legacy `Task` references) for subagents, use `invokeSubAgent`. When they say `TodoWrite`, track tasks in tasks.md. See POWER.md onboarding for the full tool translation table.
 
 # Using Skills
 

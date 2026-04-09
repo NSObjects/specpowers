@@ -118,13 +118,13 @@ TypeScript · Python · Go · Rust · Java · Kotlin · C++ · Swift · PHP · P
 
 | 技能 | 做什么 |
 |------|--------|
-| `requesting-code-review` | 调度审查子代理 |
+| `requesting-code-review` | 统一审查入口，按需下钻专项深审 |
 | `receiving-code-review` | 处理审查反馈 |
 | `dispatching-parallel-agents` | 独立任务并行分发 |
 
 ### 角色代理
 
-预置代理模板：`planner`（只读分析）、`security-reviewer`（漏洞分级）、`tdd-guide`（TDD 教练）。
+预置代理模板：`planner`（只读分析）、`security-reviewer`（由统一审查按需调用的专项深审角色）、`tdd-guide`（TDD 教练）。
 
 ## 设计理念
 

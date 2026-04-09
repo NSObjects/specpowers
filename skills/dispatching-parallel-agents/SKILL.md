@@ -11,6 +11,8 @@ You delegate tasks to specialized agents with isolated context. By precisely cra
 
 When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
 
+For review work, parallel specialists should sit behind a **unified review orchestration** layer rather than becoming separate user-facing entrypoints. Use `requesting-code-review` as the surfaced review entrypoint, then dispatch specialists only when that unified review flow truly needs them.
+
 **Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
 
 ## When to Use
@@ -67,9 +69,9 @@ Each agent gets:
 
 ```typescript
 // In Claude Code / AI environment
-Task("Fix agent-tool-abort.test.ts failures")
-Task("Fix batch-completion-behavior.test.ts failures")
-Task("Fix tool-approval-race-conditions.test.ts failures")
+Agent("Fix agent-tool-abort.test.ts failures")
+Agent("Fix batch-completion-behavior.test.ts failures")
+Agent("Fix tool-approval-race-conditions.test.ts failures")
 // All three run concurrently
 ```
 
@@ -166,12 +168,14 @@ Agent 3 → Fix tool-approval-race-conditions.test.ts
 
 Specialized prompt templates live alongside this skill. Each defines a role with scoped tool permissions and a structured output format. Dispatch them as sub-agents when the task calls for focused expertise.
 
+**Review orchestration boundary:** review-oriented specialist roles stay behind `requesting-code-review`, which owns unified review orchestration and the single user-facing review conclusion. Use the role templates here as internal helpers, not as new peer review workflows.
+
 | Role | Template | When to dispatch |
 |------|----------|-----------------|
 | Planner | [`./planner-agent-prompt.md`](./planner-agent-prompt.md) | Read-only codebase analysis and implementation planning. Use when you need a structured plan before starting work. |
-| Security Reviewer | [`./security-reviewer-prompt.md`](./security-reviewer-prompt.md) | Security-focused code review with severity grading. Use when changes touch authentication, authorization, data handling, or external inputs. |
+| Security Reviewer | [`./security-reviewer-prompt.md`](./security-reviewer-prompt.md) | Security-focused code review with severity grading. Usually invoked through `requesting-code-review` when unified review orchestration needs a scoped security deep dive. |
 | TDD Guide | [`./tdd-guide-prompt.md`](./tdd-guide-prompt.md) | Test-driven development coaching. Use when implementing complex features that benefit from structured test-first guidance. |
-| Code Reviewer | [`../requesting-code-review/code-reviewer-prompt.md`](../requesting-code-review/code-reviewer-prompt.md) | General code quality review. Already exists; use via the `requesting-code-review` skill. |
+| Code Reviewer | [`../requesting-code-review/code-reviewer-prompt.md`](../requesting-code-review/code-reviewer-prompt.md) | General code quality review. Already exists; use via the `requesting-code-review` skill as the primary reviewer inside unified review orchestration. |
 
 ### AI-Generated Code Review Checklist
 

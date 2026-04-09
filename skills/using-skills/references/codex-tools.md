@@ -1,13 +1,13 @@
 # Codex Tool Mapping
 
-Skills use Claude Code tool names. When you encounter these in a skill, use your platform equivalent:
+Skills use current Claude Code tool names. Claude Code renamed `Task` to `Agent` in v2.1.63; older `Task` references still mean the same subagent-dispatch tool. When you encounter these in a skill, use your platform equivalent:
 
 | Skill references | Codex equivalent |
 |-----------------|------------------|
-| `Task` tool (dispatch subagent) | `spawn_agent` (see [Named agent dispatch](#named-agent-dispatch)) |
-| Multiple `Task` calls (parallel) | Multiple `spawn_agent` calls |
-| Task returns result | `wait_agent` |
-| Task completes automatically | `close_agent` to free slot |
+| `Agent` tool (dispatch subagent) | `spawn_agent` (see [Named agent dispatch](#named-agent-dispatch)) |
+| Multiple `Agent` calls (parallel) | Multiple `spawn_agent` calls |
+| Agent returns result | `wait_agent` |
+| Agent completes automatically | `close_agent` to free slot |
 | `TodoWrite` (task tracking) | `update_plan` |
 | `Skill` tool (invoke a skill) | Skills load natively — just follow the instructions |
 | `Read`, `Write`, `Edit` (files) | Use your native file tools |
@@ -35,8 +35,8 @@ When a skill says to dispatch a named agent type:
 
 | Skill instruction | Codex equivalent |
 |-------------------|------------------|
-| `Task tool (specpowers:code-reviewer)` | `spawn_agent(agent_type="worker", message=...)` with `code-reviewer-prompt.md` content |
-| `Task tool (general-purpose)` with inline prompt | `spawn_agent(message=...)` with the same prompt |
+| `Agent tool (specpowers:code-reviewer)` | `spawn_agent(agent_type="worker", message=...)` with `code-reviewer-prompt.md` content |
+| `Agent tool (general-purpose)` with inline prompt | `spawn_agent(message=...)` with the same prompt |
 
 ### Message framing
 

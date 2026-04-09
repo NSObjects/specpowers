@@ -7,12 +7,15 @@ description: Use for standalone reviews before merge, after major features, or w
 
 Dispatch specpowers:code-reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history. This keeps the reviewer focused on the work product, not your thought process, and preserves your own context for continued work.
 
+This is the **single surfaced entrypoint** for review work. Specialist reviewer roles are optional deep dives behind this entrypoint, not parallel user-facing workflows. The main agent owns orchestration and returns a **single final conclusion** after integrating any specialist reviewer findings.
+
 > **Scope:** This skill is for standalone/manual reviews outside the built-in two-stage per-Task review in `spec-driven-development`.
 >
 > **Platform dispatch:**
-> - Claude Code: use `Task` tool with `specpowers:code-reviewer`
+> - Claude Code: use `Agent` tool with `specpowers:code-reviewer` (`Task` remains a compatible legacy alias)
 > - Kiro: use `invokeSubAgent(name="general-task-execution", prompt=...)` with `./code-reviewer-prompt.md`
 > - Codex: use `spawn_agent(agent_type="worker", message=...)` with filled `./code-reviewer-prompt.md`
+> - Cursor, Gemini CLI, OpenCode: no review subagent dispatch; perform the same review inline in the main agent and keep the single surfaced entrypoint
 
 **Core principle:** Review early, review often.
 
@@ -42,7 +45,8 @@ Do not default to `merge-base` if you only want feedback on one task or one foll
 
 **2. Dispatch code-reviewer subagent:**
 
-Use `Task tool (specpowers:code-reviewer)` and fill the reviewer template from `./code-reviewer-prompt.md`.
+Use `Agent tool (specpowers:code-reviewer)` and fill the reviewer template from `./code-reviewer-prompt.md`.
+If an older Claude Code prompt or doc says `Task`, treat it as the same tool.
 On Kiro and Codex, translate that dispatch using the platform mappings above.
 
 **Placeholders:**
@@ -58,6 +62,14 @@ On Kiro and Codex, translate that dispatch using the platform mappings above.
 - Note Minor issues for later
 - Push back if reviewer is wrong (with reasoning)
 - If fixes are non-trivial, re-request review after fixing (re-review loop)
+
+## Specialist Deep Dives
+
+Use a specialist reviewer only when the general review identifies a real need for deeper analysis in one dimension.
+
+- `./code-reviewer-prompt.md` remains the default reviewer.
+- `../dispatching-parallel-agents/security-reviewer-prompt.md` is an example specialist reviewer for security-sensitive changes.
+- The main agent decides whether to invoke a specialist reviewer, synthesizes the findings, and still returns one user-facing review result.
 
 ## Example
 

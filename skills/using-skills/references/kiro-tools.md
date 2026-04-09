@@ -1,12 +1,12 @@
 # Kiro IDE Tool Mapping
 
-Skills use Claude Code tool names. When you encounter these in a skill, use your Kiro equivalent:
+Skills use current Claude Code tool names. Claude Code renamed `Task` to `Agent` in v2.1.63; older `Task` references still mean the same subagent-dispatch tool. When you encounter these in a skill, use your Kiro equivalent:
 
 | Skill references | Kiro equivalent |
 |-----------------|-----------------|
 | `Skill` tool (invoke a skill) | Read `skills/<name>/SKILL.md` directly with readFile/readCode |
-| `Task` tool (dispatch subagent) | `invokeSubAgent` with `general-task-execution` agent |
-| Multiple `Task` calls (parallel) | Multiple `invokeSubAgent` calls |
+| `Agent` tool (dispatch subagent) | `invokeSubAgent` with `general-task-execution` agent |
+| Multiple `Agent` calls (parallel) | Multiple `invokeSubAgent` calls |
 | `TodoWrite` (task tracking) | Track tasks inline in conversation or in tasks.md |
 | `Read` (read files) | `readFile`, `readCode`, `readMultipleFiles` |
 | `Write` (create files) | `fsWrite`, `fsAppend` |
@@ -27,8 +27,8 @@ When a skill says to dispatch a named agent type:
 
 | Skill instruction | Kiro equivalent |
 |-------------------|-----------------|
-| `Task tool (specpowers:code-reviewer)` | `invokeSubAgent(name="general-task-execution", prompt=...)` with `code-reviewer-prompt.md` content |
-| `Task tool (general-purpose)` with inline prompt | `invokeSubAgent(name="general-task-execution", prompt=...)` with the same prompt |
+| `Agent tool (specpowers:code-reviewer)` | `invokeSubAgent(name="general-task-execution", prompt=...)` with `code-reviewer-prompt.md` content |
+| `Agent tool (general-purpose)` with inline prompt | `invokeSubAgent(name="general-task-execution", prompt=...)` with the same prompt |
 
 ## Steering files
 

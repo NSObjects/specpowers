@@ -118,13 +118,13 @@ TypeScript · Python · Go · Rust · Java · Kotlin · C++ · Swift · PHP · P
 
 | Skill | What it does |
 |-------|-------------|
-| `requesting-code-review` | Dispatch review subagent |
+| `requesting-code-review` | Unified review entrypoint with optional deep-dive specialists |
 | `receiving-code-review` | Handle review feedback |
 | `dispatching-parallel-agents` | Fan out independent tasks |
 
 ### Role Agents
 
-Pre-built agent templates: `planner` (read-only analysis), `security-reviewer` (vulnerability grading), `tdd-guide` (TDD coaching).
+Pre-built agent templates: `planner` (read-only analysis), `security-reviewer` (deep-dive specialists for unified review), `tdd-guide` (TDD coaching).
 
 ## Design Principles
 
