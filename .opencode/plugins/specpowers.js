@@ -48,7 +48,12 @@ const normalizePath = (p, homeDir) => {
 
 export const SpecpowersPlugin = async ({ client, directory }) => {
   const homeDir = os.homedir();
-  const specpowersSkillsDir = path.resolve(__dirname, '../../skills');
+  const sourceSkillsDir = path.resolve(__dirname, '../../skills');
+  // Managed selective-install payload lives under .opencode/skills.
+  const managedSkillsDir = path.resolve(__dirname, '../skills');
+  const specpowersSkillsDir = fs.existsSync(path.join(managedSkillsDir, 'using-skills', 'SKILL.md'))
+    ? managedSkillsDir
+    : sourceSkillsDir;
   const envConfigDir = normalizePath(process.env.OPENCODE_CONFIG_DIR, homeDir);
   const configDir = envConfigDir || path.join(homeDir, '.config/opencode');
 

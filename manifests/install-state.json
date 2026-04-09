@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "platform": "claude-code",
+  "installedAt": "2026-04-09T03:41:45.372Z",
+  "sourceVersion": "0.2.0",
+  "profile": "developer",
+  "modules": [
+    {
+      "id": "core-workflow",
+      "installedAt": "2026-04-09T03:41:45.372Z",
+      "paths": [
+        ".claude/skills/using-skills",
+        ".claude/skills/exploring",
+        ".claude/skills/proposing",
+        ".claude/skills/specifying",
+        ".claude/skills/designing",
+        ".claude/skills/planning",
+        ".claude/skills/spec-driven-development",
+        ".claude/skills/archiving"
+      ]
+    },
+    {
+      "id": "foundation",
+      "installedAt": "2026-04-09T03:41:45.372Z",
+      "paths": [
+        ".claude/skills/test-driven-development",
+        ".claude/skills/systematic-debugging",
+        ".claude/skills/dispatching-parallel-agents",
+        ".claude/skills/requesting-code-review",
+        ".claude/skills/receiving-code-review",
+        ".claude/skills/verification-before-completion",
+        ".claude/skills/writing-skills"
+      ]
+    },
+    {
+      "id": "rules-common",
+      "installedAt": "2026-04-09T03:41:45.372Z",
+      "paths": [
+        ".claude/skills/rules-common"
+      ]
+    },
+    {
+      "id": "verification-loop",
+      "installedAt": "2026-04-09T03:41:45.372Z",
+      "paths": [
+        ".claude/skills/verification-loop"
+      ]
+    },
+    {
+      "id": "search-first",
+      "installedAt": "2026-04-09T03:41:45.372Z",
+      "paths": [
+        ".claude/skills/search-first"
+      ]
+    },
+    {
+      "id": "quality-gate",
+      "installedAt": "2026-04-09T03:41:45.372Z",
+      "paths": [
+        ".claude/skills/quality-gate"
+      ]
+    },
+    {
+      "id": "role-agents",
+      "installedAt": "2026-04-09T03:41:45.372Z",
+      "paths": [
+        ".claude/skills/dispatching-parallel-agents/planner-agent-prompt.md",
+        ".claude/skills/dispatching-parallel-agents/security-reviewer-prompt.md",
+        ".claude/skills/dispatching-parallel-agents/tdd-guide-prompt.md"
+      ]
+    }
+  ],
+  "extraModules": [],
+  "excludedModules": []
+}

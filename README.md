@@ -2,43 +2,19 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-Spec-driven development workflow for AI coding assistants. Your agent thinks before it codes.
+> Spec-driven development workflow for AI coding assistants. Your agent thinks before it codes.
 
-## What It Does
+## Why
 
-When you ask your AI agent to build something, it doesn't jump into code. Instead:
+AI coding agents are fast but sloppy. They skip requirements, ignore edge cases, and write code before understanding the problem. SpecPowers fixes this by enforcing a structured workflow:
 
 ```
 exploring → proposing → specifying → designing → planning → executing → archiving
 ```
 
-1. **Explores** your intent through Socratic dialogue
-2. **Proposes** scope, non-goals, and success criteria
-3. **Specifies** testable behavior in GIVEN/WHEN/THEN format — the spine of the workflow
-4. **Designs** architecture with documented trade-offs
-5. **Plans** fine-grained TDD tasks, each mapped to a spec scenario
-6. **Executes** with strict RED→GREEN→REFACTOR, auto code review after each task
-7. **Archives** delta specs into the main specification
-
 Every line of code traces back to a spec. Nothing is built without one.
 
-```mermaid
-flowchart TD
-    Start([User Request]) --> Exploring[exploring<br/>Socratic dialogue]
-    Exploring --> Proposing[proposing<br/>proposal.md]
-    Proposing --> Specifying[specifying<br/>spec.md · GIVEN/WHEN/THEN]
-    Specifying --> Designing[designing<br/>design.md]
-    Designing --> Planning[planning<br/>tasks.md · TDD tasks ↔ specs]
-    Planning --> Choice{Execution Mode}
-    Choice -->|Step-by-Step| Step[Execute 1 task → Review → Pause]
-    Choice -->|Fast| Fast[Execute all → Unified review]
-    Step -.->|commit then continue| Step
-    Step --> Done
-    Fast --> Done
-    Done{All done} --> Archiving[archiving<br/>Merge delta specs]
-```
-
-## Quick Example
+## How It Works
 
 ```text
 You: "Add dark mode to the app"
@@ -47,123 +23,137 @@ AI:  [exploring]  "System-auto-detect, manual toggle, or both?"
 You: "Both"
 
 AI:  [proposing]  → proposal.md    ✓ intent, scope, non-goals
-AI:  [specifying] → spec.md        ✓ 2 requirements, 4 scenarios
+AI:  [specifying] → spec.md        ✓ 2 requirements, 4 scenarios (GIVEN/WHEN/THEN)
 AI:  [designing]  → design.md      ✓ CSS Variables, 3 files
-AI:  [planning]   → tasks.md       ✓ 3 tasks mapped to specs
-     "Step-by-Step or Fast Mode?"
+AI:  [planning]   → tasks.md       ✓ 3 TDD tasks mapped to specs
 
 You: "Step-by-Step"
 
-AI:  ✅ Task 1: Theme Context — RED → GREEN → Code Review: APPROVED
-     ⏸️ "Review and commit, then say Continue"
-You: "Continue"
-AI:  ✅ Task 2: Toggle — done
-You: "Continue"
-AI:  ✅ Task 3: CSS Variables — done
+AI:  ✅ Task 1 — RED → GREEN → Code Review: APPROVED → ⏸️ you commit
+AI:  ✅ Task 2 — done → ⏸️ you commit
+AI:  ✅ Task 3 — done
      🎉 All tasks complete. Say "Archive" to merge specs.
 ```
 
-## Installation
+The agent never runs git. You review and commit after each task.
 
-### Supported Platforms
+```mermaid
+flowchart TD
+    Start([User Request]) --> Exploring[exploring<br/>Socratic dialogue]
+    Exploring --> Proposing[proposing<br/>proposal.md]
+    Proposing --> Specifying[specifying<br/>spec.md · GIVEN/WHEN/THEN]
+    Specifying --> Designing[designing<br/>design.md]
+    Designing --> Planning[planning<br/>tasks.md · TDD tasks]
+    Planning --> Choice{Execution Mode}
+    Choice -->|Step-by-Step| Step[1 task → review → pause]
+    Choice -->|Fast| Fast[all tasks → unified review]
+    Step -.->|commit then continue| Step
+    Step --> Done
+    Fast --> Done
+    Done{Done} --> Archiving[archiving<br/>merge delta specs]
+```
 
-| Platform | Command |
-|----------|---------|
-| **Claude Code** | Step 1: `/plugin marketplace add NSObjects/specpowers` <br> Step 2: `/plugin install specpowers` |
-| **Cursor** | `/add-plugin https://github.com/NSObjects/specpowers` |
-| **Gemini CLI** | `gemini extensions install https://github.com/NSObjects/specpowers` |
-| **Kiro IDE** | Powers panel → Add power from GitHub → `https://github.com/NSObjects/specpowers` |
-| **Codex** | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
-| **OpenCode** | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
+## Install
 
-### Updating
+> Requires Node.js for language rule auto-install and selective install.
 
-Use your platform's native update path against the same source shown above:
+| Platform | Status | How to install |
+|----------|--------|---------------|
+| **Claude Code** | ✅ | `/plugin marketplace add NSObjects/specpowers` then `/plugin install specpowers` |
+| **Codex** | ✅ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
+| **Kiro IDE** | ✅ | Powers panel → Add power from GitHub → `NSObjects/specpowers` |
+| **Cursor** | ❌ | `/add-plugin https://github.com/NSObjects/specpowers` |
+| **Gemini CLI** | ❌ | `gemini extensions install https://github.com/NSObjects/specpowers` |
+| **OpenCode** | ❌ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
 
-- **Codex:** Follow the update steps in `.codex/INSTALL.md`
-- **OpenCode:** Restart OpenCode; it auto-updates from the configured plugin source
-- **Claude Code / Cursor / Gemini CLI / Kiro IDE:** Refresh or reinstall from the same GitHub source or marketplace entry
+For Codex local-plugin installs, bootstrap the managed skills payload once from the cloned repo before first use:
 
-Then verify the running installation, not just the files:
+```bash
+node scripts/install.js --platform codex --profile developer
+```
 
-- Start a fresh session after updating
-- Ask `I want to build X`; it should begin with `exploring`
-- If you updated review-related prompts, invoke `requesting-code-review` and confirm it runs without missing prompt-file errors
+### Language Rules
+
+When the agent activates the `using-skills` skill at session start, it scans your project files and auto-installs matching language rules — e.g., `.ts` files trigger `rules-typescript`, `.py` triggers `rules-python`. No manual setup needed for language rules.
+
+If it's the first session after install (no prior install state), the agent also runs the `developer` profile setup automatically.
 
 ### Verify
 
 Start a new session and say "I want to build X". The agent should begin with `exploring` — asking questions, not writing code.
 
-## Key Design Choices
+## What's Included
 
-### You Control Git
+### Workflow (the spec-driven pipeline)
 
-The agent never runs git commands. It pauses after each task for you to review and commit.
+| Skill | What it does |
+|-------|-------------|
+| `exploring` | Socratic dialogue to understand intent |
+| `proposing` | Scope, non-goals, success criteria → proposal.md |
+| `specifying` | GIVEN/WHEN/THEN behavioral specs → spec.md |
+| `designing` | Architecture with trade-offs → design.md |
+| `planning` | TDD task breakdown → tasks.md |
+| `spec-driven-development` | Step-by-step or fast execution engine |
+| `archiving` | Merge delta specs into main spec |
 
-### Behavioral Shaping
+### Quality
 
-Every skill includes Red Flags tables, Iron Laws, and rationalization defenses — hard constraints derived from real failure patterns, not suggestions.
-
-### Role Isolation
-
-The AI plays a different constrained role at each stage:
-
-| Stage | Role | Cannot |
-|-------|------|--------|
-| Exploring | Interviewer | Create artifacts |
-| Proposing | Product Manager | Write specs or design |
-| Specifying | QA Architect | Mention implementation details |
-| Designing | System Architect | Write code |
-| Planning | Tech Lead | Start implementing |
-| Executing | Developer | Skip TDD or modify specs |
-
-### Dual Execution Mode
-
-- **Step-by-Step** (default): one task → review → commit → continue
-- **Fast Mode**: all tasks → unified review → commit everything
-
-## Skills
-
-### Core Workflow
-
-| Skill | Purpose |
-|-------|---------|
-| `using-skills` | Session init and skill routing |
-| `exploring` | Socratic requirement exploration |
-| `proposing` | Intent and scope capture → proposal.md |
-| `specifying` | Behavioral specs in GIVEN/WHEN/THEN → spec.md |
-| `designing` | Architecture decisions → design.md |
-| `planning` | TDD task decomposition → tasks.md |
-| `spec-driven-development` | Dual-mode execution engine |
-| `archiving` | Delta spec merging and history |
-
-### Foundation
-
-| Skill | Purpose |
-|-------|---------|
-| `test-driven-development` | RED-GREEN-REFACTOR iron law |
+| Skill | What it does |
+|-------|-------------|
+| `test-driven-development` | RED → GREEN → REFACTOR, no exceptions |
+| `verification-loop` | 6-stage pipeline: Build → Types → Lint → Tests → Security → Diff |
+| `quality-gate` | Fast lint/type checks after edits |
+| `search-first` | Research before building (Adopt → Extend → Compose → Build) |
 | `systematic-debugging` | 4-phase root cause analysis |
-| `dispatching-parallel-agents` | Parallel agent dispatch for independent problems |
-| `requesting-code-review` | Code review subagent dispatch |
-| `receiving-code-review` | Handling review feedback |
-| `verification-before-completion` | Evidence before claims |
-| `writing-skills` | Meta-skill for creating new skills |
 
-## Philosophy
+### Language Rules
 
-- **Specs before code** — define behavior before implementing
-- **Structured not freeform** — GIVEN/WHEN/THEN, not prose
-- **Incremental not waterfall** — delta specs for existing projects
+Auto-detected from your project files. `rules-common` loads first, then language-specific rules layer on top.
+
+TypeScript · Python · Go · Rust · Java · Kotlin · C++ · Swift · PHP · Perl · C# · Dart
+
+### Collaboration
+
+| Skill | What it does |
+|-------|-------------|
+| `requesting-code-review` | Dispatch review subagent |
+| `receiving-code-review` | Handle review feedback |
+| `dispatching-parallel-agents` | Fan out independent tasks |
+
+### Role Agents
+
+Pre-built agent templates: `planner` (read-only analysis), `security-reviewer` (vulnerability grading), `tdd-guide` (TDD coaching).
+
+## Design Principles
+
+- **Specs before code** — define behavior, then implement
 - **TDD is mandatory** — every task starts with a failing test
 - **Evidence over claims** — prove it works before moving on
+- **You control git** — the agent never commits; you review everything
+- **Role isolation** — the AI plays a constrained role at each stage (interviewer, architect, developer…)
 - **Brownfield-first** — built for existing codebases, works great for greenfield too
+
+## Advanced: Selective Install
+
+For fine-grained control (most users don't need this):
+
+```bash
+node scripts/install.js --platform claude-code --profile developer
+node scripts/install.js --platform kiro-ide --add rules-typescript
+node scripts/install.js --platform cursor --profile full --exclude rules-rust
+```
+
+Profiles: `core` (minimal) · `developer` (recommended) · `security` · `full` (everything).
+
+Module lifecycle commands (`list`, `doctor`, `repair`, `uninstall`) are in the `selective-install` skill.
+
+## Contributing
+
+Issues and PRs welcome. If you're adding a new skill, use the `writing-skills` meta-skill — it enforces the skill template structure.
 
 ## Acknowledgments
 
-SpecPowers builds on ideas from two projects:
-
-- [OpenSpec](https://github.com/Fission-AI/OpenSpec) — structured artifact system for spec-driven workflows
-- [Superpowers](https://github.com/obra/superpowers) — behavioral shaping engine for AI coding agents
+Built on ideas from [OpenSpec](https://github.com/Fission-AI/OpenSpec) (structured artifact system) and [Superpowers](https://github.com/obra/superpowers) (behavioral shaping engine).
 
 ## License
 

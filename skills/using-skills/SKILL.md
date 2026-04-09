@@ -80,19 +80,53 @@ These thoughts mean STOP—you're rationalizing:
 When multiple skills could apply, use this order:
 
 1. **Process skills first** (exploring, proposing, specifying, debugging) - these determine HOW to approach
-2. **Implementation skills second** (spec-driven-development) - these guide execution
-3. **Utility skills** (dispatching-parallel-agents, requesting-code-review) - these support execution
+2. **Research skills** (search-first) - research existing solutions before building
+3. **Implementation skills** (spec-driven-development) - these guide execution
+4. **Quality skills** (verification-loop, quality-gate, rules-common, rules-{language}) - these enforce standards
+5. **Utility skills** (dispatching-parallel-agents, requesting-code-review, selective-install) - these support execution
 
-"Let's build X" → proposing/exploring first, then implementation skills.
+"Let's build X" → proposing/exploring first, then search-first for research, then implementation skills.
 "Fix this bug" → debugging first, then domain-specific skills.
+"Check code quality" → quality-gate for quick checks, verification-loop for full pipeline.
+"Install/manage modules" → selective-install for lifecycle management.
 
 ## Skill Types
 
-**Rigid** (TDD, debugging, specifying): Follow exactly. Don't adapt away discipline.
+**Rigid** (TDD, debugging, specifying, verification-loop, quality-gate): Follow exactly. Don't adapt away discipline.
 
-**Flexible** (exploring, designing): Adapt principles to context.
+**Flexible** (exploring, designing, search-first, rules-common, rules-{language}): Adapt principles to context.
+
+**Utility** (selective-install): Support tooling for managing SpecPowers modules.
 
 The skill itself tells you which.
+
+## Language Rule Auto-Install
+
+When the agent session starts and this skill is activated, the agent MUST execute
+the session bootstrap flow to detect and install missing language rule modules:
+
+1. Scan project files and call `detectLanguages()` to identify project languages
+2. Check install state to find already-installed modules
+3. For any missing `rules-{language}` modules, call `installModules()` to install them
+4. Report installed modules to the user with a brief summary
+
+The agent calls these functions from `scripts/install.js` and `scripts/lib/session-bootstrap.js`.
+
+### Auto-Install Boundary
+
+- **Auto-install (no confirmation needed):** `rules-*` language modules detected from project files
+- **Needs confirmation:** Any non-language module, profile switches, or manual additions
+
+### First-Run Detection
+
+If install state file does not exist (first use after plugin install):
+1. Auto-detect platform
+2. Run full install with `developer` profile
+3. Then detect and install language-specific rules
+4. Show welcome message with install summary
+
+Always activate `rules-common` first (universal rules), then layer the language-specific
+skill on top. Language rules override common rules where annotated.
 
 ## User Instructions
 

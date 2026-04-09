@@ -56,6 +56,7 @@ IF request contains multiple independent subsystems:
 
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs
+- When approaches involve new dependencies or functionality, invoke `search-first` (Kiro: readSteering → search-first.md) to research existing solutions before finalizing the approach trade-offs.
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
 

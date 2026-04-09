@@ -2,43 +2,19 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-给 AI 编程助手用的规格驱动开发工作流。让你的 AI 先想清楚再动手写代码。
+> 给 AI 编程助手用的规格驱动开发工作流。让你的 AI 先想清楚再动手写代码。
 
-## 它做什么
+## 为什么需要
 
-当你让 AI 助手构建功能时，它不会直接写代码，而是：
+AI 编程助手写代码很快，但容易跑偏——跳过需求分析、忽略边界情况、还没理解问题就开始写代码。SpecPowers 通过强制结构化工作流来解决这个问题：
 
 ```
-探索 → 提案 → 规范定义 → 架构设计 → 任务规划 → 执行 → 归档
+探索 → 提案 → 规范 → 设计 → 规划 → 执行 → 归档
 ```
-
-1. **探索 (exploring)** — 苏格拉底式问答，理解你真正想要什么
-2. **提案 (proposing)** — 确定范围、非目标和成功标准
-3. **规范 (specifying)** — 用 GIVEN/WHEN/THEN 定义可测试的行为——整个工作流的脊柱
-4. **设计 (designing)** — 技术架构决策，附带取舍记录
-5. **规划 (planning)** — 细粒度 TDD 任务，每个任务都映射到规范场景
-6. **执行 (executing)** — 严格遵循 RED→GREEN→REFACTOR，每个任务完成后自动代码审查
-7. **归档 (archiving)** — 将增量规范合并到主规范
 
 每一行代码都能追溯到一份规范。没有规范，就不写代码。
 
-```mermaid
-flowchart TD
-    Start([用户请求]) --> Exploring[exploring<br/>苏格拉底式对话]
-    Exploring --> Proposing[proposing<br/>proposal.md]
-    Proposing --> Specifying[specifying<br/>spec.md · GIVEN/WHEN/THEN]
-    Specifying --> Designing[designing<br/>design.md]
-    Designing --> Planning[planning<br/>tasks.md · TDD 任务 ↔ 规范]
-    Planning --> Choice{执行模式}
-    Choice -->|逐任务| Step[执行 1 个任务 → 审查 → 暂停]
-    Choice -->|快速| Fast[全部执行 → 统一审查]
-    Step -.->|commit 后继续| Step
-    Step --> Done
-    Fast --> Done
-    Done{全部完成} --> Archiving[archiving<br/>合并增量规范]
-```
-
-## 快速示例
+## 怎么用
 
 ```text
 你: "给 App 加上暗黑模式"
@@ -47,123 +23,137 @@ AI:  [exploring]  "自动跟随系统、手动切换，还是都要？"
 你: "都要"
 
 AI:  [proposing]  → proposal.md    ✓ 意图、范围、非目标
-AI:  [specifying] → spec.md        ✓ 2 个需求，4 个场景
+AI:  [specifying] → spec.md        ✓ 2 个需求，4 个场景 (GIVEN/WHEN/THEN)
 AI:  [designing]  → design.md      ✓ CSS Variables 方案，3 个文件
-AI:  [planning]   → tasks.md       ✓ 3 个任务映射到规范
-     "逐任务模式还是快速模式？"
+AI:  [planning]   → tasks.md       ✓ 3 个 TDD 任务映射到规范
 
 你: "逐任务"
 
-AI:  ✅ 任务 1: 主题上下文 — RED → GREEN → 代码审查: APPROVED
-     ⏸️ "请 review 并 commit，然后说 Continue"
-你: "Continue"
-AI:  ✅ 任务 2: 切换组件 — 完成
-你: "Continue"
-AI:  ✅ 任务 3: CSS Variables — 完成
+AI:  ✅ 任务 1 — RED → GREEN → 代码审查: APPROVED → ⏸️ 你来 commit
+AI:  ✅ 任务 2 — 完成 → ⏸️ 你来 commit
+AI:  ✅ 任务 3 — 完成
      🎉 全部完成。说 "Archive" 合并规范。
+```
+
+AI 永远不会执行 git 命令。每个任务完成后由你 review 和 commit。
+
+```mermaid
+flowchart TD
+    Start([用户请求]) --> Exploring[exploring<br/>苏格拉底式对话]
+    Exploring --> Proposing[proposing<br/>proposal.md]
+    Proposing --> Specifying[specifying<br/>spec.md · GIVEN/WHEN/THEN]
+    Specifying --> Designing[designing<br/>design.md]
+    Designing --> Planning[planning<br/>tasks.md · TDD 任务]
+    Planning --> Choice{执行模式}
+    Choice -->|逐任务| Step[1 个任务 → 审查 → 暂停]
+    Choice -->|快速| Fast[全部执行 → 统一审查]
+    Step -.->|commit 后继续| Step
+    Step --> Done
+    Fast --> Done
+    Done{完成} --> Archiving[archiving<br/>合并增量规范]
 ```
 
 ## 安装
 
-### 支持平台
+> 语言规则自动安装和选择性安装功能需要 Node.js 环境。
 
-| 平台 | 安装方式 |
-|------|---------|
-| **Claude Code** | 步骤 1: `/plugin marketplace add NSObjects/specpowers` <br> 步骤 2: `/plugin install specpowers` |
-| **Cursor** | `/add-plugin https://github.com/NSObjects/specpowers` |
-| **Gemini CLI** | `gemini extensions install https://github.com/NSObjects/specpowers` |
-| **Kiro IDE** | Powers 面板 → Add power from GitHub → `https://github.com/NSObjects/specpowers` |
-| **Codex** | 获取并按照说明操作 `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
-| **OpenCode** | 获取并按照说明操作 `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
+| 平台 | 状态 | 安装方式 |
+|------|------|---------|
+| **Claude Code** | ✅ | `/plugin marketplace add NSObjects/specpowers` 然后 `/plugin install specpowers` |
+| **Codex** | ✅ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
+| **Kiro IDE** | ✅ | Powers 面板 → Add power from GitHub → `NSObjects/specpowers` |
+| **Cursor** | ❌ | `/add-plugin https://github.com/NSObjects/specpowers` |
+| **Gemini CLI** | ❌ | `gemini extensions install https://github.com/NSObjects/specpowers` |
+| **OpenCode** | ❌ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
 
-### 更新
+对于 Codex 本地插件安装，需要在首次使用前进入克隆目录执行一次受管安装引导：
 
-按上面同一平台的来源，走该平台自己的更新路径：
+```bash
+node scripts/install.js --platform codex --profile developer
+```
 
-- **Codex：** 按 `.codex/INSTALL.md` 里的更新步骤操作
-- **OpenCode：** 重启 OpenCode，它会从当前配置的插件来源自动更新
-- **Claude Code / Cursor / Gemini CLI / Kiro IDE：** 从同一个 GitHub 来源或 marketplace 条目刷新或重新安装
+### 语言规则
 
-更新后要验证“运行中的安装”确实已经生效，而不只是文件被替换：
+Agent 在会话启动时激活 `using-skills` 技能后，会扫描项目文件并自动安装对应的语言规则——比如 `.ts` 文件触发 `rules-typescript`，`.py` 触发 `rules-python`。语言规则无需手动配置。
 
-- 更新后开一个新会话
-- 发送 `I want to build X`，应该从 `exploring` 开始
-- 如果这次更新涉及 review 相关提示词，再触发一次 `requesting-code-review`，确认不会出现 prompt 文件缺失错误
+如果是安装后的首次会话（没有历史安装状态），Agent 还会自动执行 `developer` 配置文件的初始安装。
 
-### 验证安装
+### 验证
 
 开一个新会话，说"我想做个 X 功能"。AI 应该从 `exploring` 开始问你问题，而不是直接写代码。
 
-## 核心设计
+## 包含什么
 
-### 你掌控 Git
+### 工作流（规格驱动管道）
 
-AI 永远不会执行 git 命令。每个任务完成后暂停，由你 review 和 commit。
-
-### 行为塑造
-
-每个技能都包含红旗预警表、铁律和合理化防御——这些是从真实失败模式中提炼的硬约束，不是建议。
-
-### 角色隔离
-
-AI 在每个阶段扮演不同的受限角色：
-
-| 阶段 | 角色 | 不能做 |
-|------|------|--------|
-| 探索 | 采访者 | 创建任何文件 |
-| 提案 | 产品经理 | 写规范或设计 |
-| 规范 | QA 架构师 | 提及实现细节 |
-| 设计 | 系统架构师 | 写代码 |
-| 规划 | Tech Lead | 开始实现 |
-| 执行 | 开发工程师 | 跳过 TDD 或修改规范 |
-
-### 双执行模式
-
-- **逐任务模式**（默认）：一个任务 → 审查 → commit → 继续
-- **快速模式**：全部任务 → 统一审查 → 一次性 commit
-
-## 技能列表
-
-### 核心工作流
-
-| 技能 | 用途 |
-|------|------|
-| `using-skills` | 会话初始化与技能路由 |
-| `exploring` | 苏格拉底式需求探索 |
-| `proposing` | 意图与范围捕获 → proposal.md |
+| 技能 | 做什么 |
+|------|--------|
+| `exploring` | 苏格拉底式对话，理解意图 |
+| `proposing` | 范围、非目标、成功标准 → proposal.md |
 | `specifying` | GIVEN/WHEN/THEN 行为规范 → spec.md |
-| `designing` | 架构决策 → design.md |
+| `designing` | 架构决策与取舍 → design.md |
 | `planning` | TDD 任务分解 → tasks.md |
-| `spec-driven-development` | 双模执行引擎 |
-| `archiving` | 增量规范合并与归档 |
+| `spec-driven-development` | 逐任务或快速执行引擎 |
+| `archiving` | 增量规范合并到主规范 |
 
-### 基础能力
+### 质量
 
-| 技能 | 用途 |
-|------|------|
-| `test-driven-development` | RED-GREEN-REFACTOR 铁律 |
+| 技能 | 做什么 |
+|------|--------|
+| `test-driven-development` | RED → GREEN → REFACTOR，没有例外 |
+| `verification-loop` | 6 阶段管道：构建 → 类型 → Lint → 测试 → 安全 → Diff |
+| `quality-gate` | 编辑后快速 lint/类型检查 |
+| `search-first` | 先研究再动手（采用 → 扩展 → 组合 → 自建） |
 | `systematic-debugging` | 四阶段根因分析 |
-| `dispatching-parallel-agents` | 独立问题并行代理调度 |
-| `requesting-code-review` | 代码审查子代理调度 |
+
+### 语言规则
+
+根据项目文件自动检测。`rules-common` 先加载，语言特定规则叠加在上面。
+
+TypeScript · Python · Go · Rust · Java · Kotlin · C++ · Swift · PHP · Perl · C# · Dart
+
+### 协作
+
+| 技能 | 做什么 |
+|------|--------|
+| `requesting-code-review` | 调度审查子代理 |
 | `receiving-code-review` | 处理审查反馈 |
-| `verification-before-completion` | 拿证据说话 |
-| `writing-skills` | 创建新技能的元技能 |
+| `dispatching-parallel-agents` | 独立任务并行分发 |
+
+### 角色代理
+
+预置代理模板：`planner`（只读分析）、`security-reviewer`（漏洞分级）、`tdd-guide`（TDD 教练）。
 
 ## 设计理念
 
 - **先规范后代码** — 先定义行为再实现
-- **结构化而非散文** — GIVEN/WHEN/THEN，不是长篇大论
-- **增量而非瀑布** — 已有项目用增量规范
 - **TDD 是强制的** — 每个任务从失败的测试开始
 - **证据优于声明** — 证明能用再往下走
+- **你掌控 git** — AI 永远不 commit，你 review 一切
+- **角色隔离** — AI 在每个阶段扮演受限角色（采访者、架构师、开发者……）
 - **存量优先** — 为已有代码库而生，新项目同样好用
+
+## 高级：选择性安装
+
+需要精细控制时使用（大多数用户不需要）：
+
+```bash
+node scripts/install.js --platform claude-code --profile developer
+node scripts/install.js --platform kiro-ide --add rules-typescript
+node scripts/install.js --platform cursor --profile full --exclude rules-rust
+```
+
+配置文件：`core`（最小）· `developer`（推荐）· `security` · `full`（全部）。
+
+模块生命周期命令（`list`、`doctor`、`repair`、`uninstall`）在 `selective-install` 技能中。
+
+## 参与贡献
+
+欢迎提 Issue 和 PR。如果要添加新技能，请使用 `writing-skills` 元技能——它会强制执行技能模板结构。
 
 ## 致谢
 
-SpecPowers 的设计借鉴了以下两个项目：
-
-- [OpenSpec](https://github.com/Fission-AI/OpenSpec) — 规格驱动工作流的结构化产物体系
-- [Superpowers](https://github.com/obra/superpowers) — AI 编程代理的行为塑造引擎
+设计借鉴了 [OpenSpec](https://github.com/Fission-AI/OpenSpec)（结构化产物体系）和 [Superpowers](https://github.com/obra/superpowers)（行为塑造引擎）。
 
 ## 开源协议
 

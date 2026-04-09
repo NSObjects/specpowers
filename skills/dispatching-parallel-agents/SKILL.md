@@ -162,6 +162,26 @@ Agent 3 → Fix tool-approval-race-conditions.test.ts
 3. **Independence** — Agents don't interfere with each other
 4. **Speed** — 3 problems solved in time of 1
 
+## Role Agent Templates
+
+Specialized prompt templates live alongside this skill. Each defines a role with scoped tool permissions and a structured output format. Dispatch them as sub-agents when the task calls for focused expertise.
+
+| Role | Template | When to dispatch |
+|------|----------|-----------------|
+| Planner | [`./planner-agent-prompt.md`](./planner-agent-prompt.md) | Read-only codebase analysis and implementation planning. Use when you need a structured plan before starting work. |
+| Security Reviewer | [`./security-reviewer-prompt.md`](./security-reviewer-prompt.md) | Security-focused code review with severity grading. Use when changes touch authentication, authorization, data handling, or external inputs. |
+| TDD Guide | [`./tdd-guide-prompt.md`](./tdd-guide-prompt.md) | Test-driven development coaching. Use when implementing complex features that benefit from structured test-first guidance. |
+| Code Reviewer | [`../requesting-code-review/code-reviewer-prompt.md`](../requesting-code-review/code-reviewer-prompt.md) | General code quality review. Already exists; use via the `requesting-code-review` skill. |
+
+### AI-Generated Code Review Checklist
+
+When reviewing AI-generated code (from any agent or LLM), apply these additional checks on top of the standard review:
+
+- **Behavior regression** — Does the change break existing behavior? Compare before/after for all call sites.
+- **Security assumptions** — Are security boundaries maintained? Watch for removed validations, exposed internals, or weakened auth checks.
+- **Hidden coupling** — Does the change create unexpected dependencies between modules, globals, or shared state that didn't exist before?
+- **Unnecessary complexity** — Is the solution simpler than it needs to be? AI-generated code often over-abstracts or adds layers that aren't warranted.
+
 ## Verification
 
 After agents return:

@@ -37,6 +37,20 @@ BEFORE claiming any status or expressing satisfaction:
 Skip any step = lying, not verifying
 ```
 
+## Automated Evidence: Quality Gate
+
+The `quality-gate` skill provides automated evidence gathering for code quality claims. Before claiming code is clean, formatted, or type-safe, run the quality gate to produce a concrete report.
+
+```
+EVIDENCE-FIRST WORKFLOW:
+1. Run quality-gate (format → lint → type check)
+2. Read the quality gate report
+3. If CLEAN: use the report as evidence for your claim
+4. If ISSUES FOUND: fix issues, re-run, then claim with fresh evidence
+```
+
+See `skills/quality-gate/SKILL.md` for the full auto-detection flow and check types.
+
 ## Common Failures
 
 | Claim | Requires | Not Sufficient |

@@ -53,3 +53,23 @@ test('workflow skill descriptions focus on trigger conditions, not workflow summ
     }
   }
 });
+
+// Capability skills — not workflow skills, but must have valid YAML frontmatter with description
+const capabilitySkills = [
+  'skills/rules-common/SKILL.md',
+  'skills/verification-loop/SKILL.md',
+  'skills/search-first/SKILL.md',
+  'skills/quality-gate/SKILL.md',
+  'skills/selective-install/SKILL.md',
+];
+
+test('capability skills have valid YAML frontmatter with description', () => {
+  for (const relativePath of capabilitySkills) {
+    const description = readDescription(relativePath);
+
+    assert.ok(
+      description.length > 0,
+      `${relativePath} should have a non-empty description`,
+    );
+  }
+});

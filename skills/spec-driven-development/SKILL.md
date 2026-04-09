@@ -91,6 +91,7 @@ For each unchecked Task in tasks.md:
    - Follow TDD skill discipline throughout
    - **Do NOT pause between these steps — complete them all in one go**
 4. **Two-stage review:** Stage 1 (spec compliance) → Stage 2 (code quality)
+   > **Milestone verification:** Every 3-4 completed tasks, invoke `verification-loop` for a full pipeline check (Build → Types → Lint → Tests → Security → Diff).
 5. **If either review returns issues:** Fix before reporting to user.
 6. **ONLY NOW report and pause:**
 
@@ -205,6 +206,7 @@ When using subagents, use these templates:
 
 **Related skills (ad-hoc use, NOT part of the two-stage review):**
 - **specpowers:requesting-code-review** — For manual reviews outside spec-driven-development (e.g., before merge, when stuck). The two-stage review above is the per-task automated flow; requesting-code-review is for standalone review requests.
+- **specpowers:verification-loop** — Run the 6-stage verification pipeline after completing tasks or at milestones (Kiro: readSteering → verification-loop.md)
 
 **After all Tasks complete:**
 > "All Tasks complete. You can say 'Archive' to merge Delta Specs into the main specifications."

@@ -23,6 +23,19 @@ mkdir -p ~/.codex/plugins
 git clone https://github.com/NSObjects/specpowers ~/.codex/plugins/specpowers
 ```
 
+### 1.5 Bootstrap the managed skills payload
+
+From the cloned plugin directory, seed the managed Codex install paths that
+`.codex-plugin/plugin.json` points at:
+
+```bash
+cd ~/.codex/plugins/specpowers
+node scripts/install.js --platform codex --profile developer
+```
+
+This creates `.codex/skills/` and the initial install state used by session
+bootstrap and language-rule auto-install.
+
 ### 2. Create or update your personal marketplace
 
 If `~/.agents/plugins/marketplace.json` does not exist yet, create it with:

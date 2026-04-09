@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "modules": [
+    {
+      "id": "core-workflow",
+      "kind": "skills",
+      "description": "Core workflow skills (using-skills through archiving)",
+      "paths": [
+        "skills/using-skills",
+        "skills/exploring",
+        "skills/proposing",
+        "skills/specifying",
+        "skills/designing",
+        "skills/planning",
+        "skills/spec-driven-development",
+        "skills/archiving"
+      ],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": [],
+      "defaultInstall": true
+    },
+    {
+      "id": "foundation",
+      "kind": "skills",
+      "description": "Foundation skills (TDD, debugging, code review, verification)",
+      "paths": [
+        "skills/test-driven-development",
+        "skills/systematic-debugging",
+        "skills/dispatching-parallel-agents",
+        "skills/requesting-code-review",
+        "skills/receiving-code-review",
+        "skills/verification-before-completion",
+        "skills/writing-skills"
+      ],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["core-workflow"],
+      "defaultInstall": true
+    },
+    {
+      "id": "rules-common",
+      "kind": "rules",
+      "description": "Common coding rules",
+      "paths": ["skills/rules-common"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": [],
+      "defaultInstall": true
+    },
+    {
+      "id": "rules-typescript",
+      "kind": "rules",
+      "description": "TypeScript language rules",
+      "paths": ["skills/rules-typescript"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-python",
+      "kind": "rules",
+      "description": "Python language rules",
+      "paths": ["skills/rules-python"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-golang",
+      "kind": "rules",
+      "description": "Go language rules",
+      "paths": ["skills/rules-golang"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-rust",
+      "kind": "rules",
+      "description": "Rust language rules",
+      "paths": ["skills/rules-rust"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-java",
+      "kind": "rules",
+      "description": "Java language rules",
+      "paths": ["skills/rules-java"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-kotlin",
+      "kind": "rules",
+      "description": "Kotlin language rules",
+      "paths": ["skills/rules-kotlin"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-cpp",
+      "kind": "rules",
+      "description": "C++ language rules",
+      "paths": ["skills/rules-cpp"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-swift",
+      "kind": "rules",
+      "description": "Swift language rules",
+      "paths": ["skills/rules-swift"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-php",
+      "kind": "rules",
+      "description": "PHP language rules",
+      "paths": ["skills/rules-php"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-perl",
+      "kind": "rules",
+      "description": "Perl language rules",
+      "paths": ["skills/rules-perl"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-csharp",
+      "kind": "rules",
+      "description": "C# language rules",
+      "paths": ["skills/rules-csharp"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "rules-dart",
+      "kind": "rules",
+      "description": "Dart language rules",
+      "paths": ["skills/rules-dart"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["rules-common"],
+      "defaultInstall": false
+    },
+    {
+      "id": "verification-loop",
+      "kind": "skills",
+      "description": "6-stage verification loop",
+      "paths": ["skills/verification-loop"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["foundation"],
+      "defaultInstall": true
+    },
+    {
+      "id": "search-first",
+      "kind": "skills",
+      "description": "Research-first workflow",
+      "paths": ["skills/search-first"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["core-workflow"],
+      "defaultInstall": true
+    },
+    {
+      "id": "quality-gate",
+      "kind": "skills",
+      "description": "Quality gate checks",
+      "paths": ["skills/quality-gate"],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["foundation"],
+      "defaultInstall": true
+    },
+    {
+      "id": "role-agents",
+      "kind": "agents",
+      "description": "Role agent templates (planner, security-reviewer, tdd-guide)",
+      "paths": [
+        "skills/dispatching-parallel-agents/planner-agent-prompt.md",
+        "skills/dispatching-parallel-agents/security-reviewer-prompt.md",
+        "skills/dispatching-parallel-agents/tdd-guide-prompt.md"
+      ],
+      "targets": ["claude-code", "cursor", "gemini-cli", "kiro-ide", "codex", "opencode"],
+      "dependencies": ["foundation"],
+      "defaultInstall": true
+    }
+  ]
+}

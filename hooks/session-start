@@ -6,8 +6,23 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
+resolve_skills_root() {
+    if [ -n "${CURSOR_PLUGIN_ROOT:-}" ] && [ -f "${PLUGIN_ROOT}/.cursor-plugin/skills/using-skills/SKILL.md" ]; then
+        printf '%s' "${PLUGIN_ROOT}/.cursor-plugin/skills"
+        return
+    fi
+
+    if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -f "${PLUGIN_ROOT}/.claude/skills/using-skills/SKILL.md" ]; then
+        printf '%s' "${PLUGIN_ROOT}/.claude/skills"
+        return
+    fi
+
+    printf '%s' "${PLUGIN_ROOT}/skills"
+}
+
 # Read using-skills content
-using_skills_content=$(cat "${PLUGIN_ROOT}/skills/using-skills/SKILL.md" 2>&1 || echo "Error reading using-skills skill")
+SKILLS_ROOT="$(resolve_skills_root)"
+using_skills_content=$(cat "${SKILLS_ROOT}/using-skills/SKILL.md" 2>&1 || echo "Error reading using-skills skill")
 
 # Escape string for JSON embedding
 escape_for_json() {

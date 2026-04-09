@@ -12,7 +12,7 @@
     "debugging",
     "planning"
   ],
-  "skills": "./skills/",
+  "skills": "./.cursor-plugin/skills/",
   "agents": "./agents/",
   "hooks": "./hooks/hooks-cursor.json"
 }
