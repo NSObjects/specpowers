@@ -57,7 +57,9 @@ Each skill produces a specific artifact. **You cannot skip `specifying`** — it
 1. Check if `specs/changes/` has an active change for this topic
 2. If no active change → invoke `proposing` skill
 3. If change exists but missing artifacts → invoke the next skill in the chain
-4. If tasks.md exists and has unchecked items → invoke `spec-driven-development`
+4. If tasks.md exists and has unchecked items:
+   - If the user has not explicitly chosen `Step-by-Step` or `Fast` for the current change in the current conversation, ask the user to choose before invoking `spec-driven-development`
+   - After the execution mode is established, invoke `spec-driven-development`
 
 ## Red Flags
 

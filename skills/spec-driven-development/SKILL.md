@@ -149,8 +149,9 @@ When finished, you can say 'Archive' to merge Delta Specs into the main specific
 If the user returns to a conversation or starts a new session:
 1. Read `specs/changes/<change-name>/tasks.md`
 2. Find the first unchecked `- [ ]` Task
-3. Announce: "Resuming from Task N.M: [name]"
-4. Continue from there
+3. If no execution mode has been established for the current change, ask the user to choose `Step-by-Step` or `Fast` before resuming
+4. Announce: "Resuming from Task N.M: [name]"
+5. Continue from there
 
 ## Spec Compliance Self-Check
 

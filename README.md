@@ -36,6 +36,7 @@ AI:  ✅ Task 3 — done
 ```
 
 The agent never runs git. You review and commit after each task.
+If you resume a change from an existing `tasks.md`, choose `Step-by-Step` or `Fast` before execution begins or resumes.
 
 For complex requests, `exploring` may research existing implementations or delegate bounded research, but that stays inside `exploring` rather than becoming a separate workflow phase.
 

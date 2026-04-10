@@ -14,7 +14,9 @@ exploring → proposing → specifying → designing → planning → spec-drive
 1. Check if `specs/changes/` has an active change for this topic
 2. If no active change → activate `exploring` skill, then `proposing`
 3. If change exists but missing artifacts → activate the next skill in the chain
-4. If tasks.md exists and has unchecked items → activate `spec-driven-development`
+4. If tasks.md exists and has unchecked items:
+   - If the execution mode has not been established for the current change in the current conversation, ask the user to choose `Step-by-Step` or `Fast` before activating `spec-driven-development`
+   - After the execution mode is established, activate `spec-driven-development`
 
 ## Key Rules
 
@@ -30,7 +32,8 @@ When the user returns to a conversation or starts a new session:
 1. Check `specs/changes/` for active changes
 2. If a change directory exists with `tasks.md`, read it
 3. Find the first unchecked `- [ ]` task
-4. Activate `spec-driven-development` skill and resume from that task
+4. If the execution mode has not been established for the current change in the current conversation, ask the user to choose `Step-by-Step` or `Fast` before activating `spec-driven-development`
+5. Activate `spec-driven-development` skill and resume from that task
 
 ## Tool Translation
 
