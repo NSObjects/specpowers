@@ -1,7 +1,7 @@
 /**
- * Search-first decision matrix evaluation.
+ * Research-before-reinvention decision matrix evaluation.
  *
- * Applies the decision matrix from the search-first skill:
+ * Applies the decision matrix from rules-common §5.7:
  *   - Exact match + active maintenance → Adopt
  *   - Partial match + active/stale maintenance → Extend
  *   - 2+ weak matches → Compose
