@@ -6,13 +6,13 @@ language: csharp
 
 # C# Coding Rules
 
-These rules apply to C# projects. They inherit all rules from `rules-common` and override specific entries where C# conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to C# projects. They inherit all rules from `rules-common` and override specific entries where C# conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** C# has official Microsoft naming guidelines that are deeply embedded in the ecosystem.
 
@@ -24,7 +24,7 @@ These rules apply to C# projects. They inherit all rules from `rules-common` and
 - Namespaces: `PascalCase` matching folder structure (`MyApp.Services.Users`)
 - Async methods: suffix with `Async` (`GetUserAsync`, `SaveChangesAsync`)
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** C#'s LINQ, pattern matching, and expression-bodied members enable concise code.
 
@@ -32,7 +32,7 @@ These rules apply to C# projects. They inherit all rules from `rules-common` and
 - Use expression-bodied members (`=>`) for single-expression methods and properties
 - Extract complex LINQ chains into named methods when they exceed 3-4 operations
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** C# has one-type-per-file convention and namespace-to-folder mapping.
 
@@ -41,7 +41,7 @@ These rules apply to C# projects. They inherit all rules from `rules-common` and
 - Use `partial class` to split large classes across files (e.g., generated + handwritten code)
 - Order: `using` directives → namespace → type → fields → constructors → properties → methods
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** C# has `dotnet format` and `.editorconfig` as the standard formatting tools.
 
@@ -77,7 +77,7 @@ These rules apply to C# projects. They inherit all rules from `rules-common` and
 
 ---
 
-## 3. Error Handling `[覆盖 common: 5.6]`
+## 3. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** C# uses exceptions with specific conventions for custom exceptions and async error handling.
 
@@ -89,7 +89,7 @@ These rules apply to C# projects. They inherit all rules from `rules-common` and
 
 ---
 
-## 4. Testing `[覆盖 common: 2.1]`
+## 4. Testing `[Overrides common: 2.1]`
 
 **Reason:** C# has multiple testing frameworks with specific conventions.
 
@@ -97,7 +97,7 @@ These rules apply to C# projects. They inherit all rules from `rules-common` and
 
 Use xUnit (preferred for new projects), NUnit, or MSTest. Use FluentAssertions for readable assertions. Use Moq or NSubstitute for mocking.
 
-### 4.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** C#'s type system and nullable reference types eliminate certain bug classes.
 
@@ -120,7 +120,7 @@ Use xUnit (preferred for new projects), NUnit, or MSTest. Use FluentAssertions f
 
 ---
 
-## 6. Resource Cleanup `[覆盖 common: 4.3]`
+## 6. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** C# has `IDisposable` and `using` statements as the idiomatic cleanup pattern.
 
@@ -131,7 +131,7 @@ Use xUnit (preferred for new projects), NUnit, or MSTest. Use FluentAssertions f
 
 ---
 
-## 7. Dependency Injection `[覆盖 common: 5.2]`
+## 7. Dependency Injection `[Overrides common: 5.2]`
 
 **Reason:** C# has a built-in DI container in `Microsoft.Extensions.DependencyInjection`.
 
@@ -142,7 +142,7 @@ Use xUnit (preferred for new projects), NUnit, or MSTest. Use FluentAssertions f
 
 ---
 
-## 8. SQL and Injection Prevention `[覆盖 common: 3.6]`
+## 8. SQL and Injection Prevention `[Overrides common: 3.6]`
 
 **Reason:** C# has Entity Framework and Dapper as primary data access tools.
 

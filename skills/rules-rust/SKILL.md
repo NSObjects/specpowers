@@ -6,13 +6,13 @@ language: rust
 
 # Rust Coding Rules
 
-These rules apply to Rust projects. They inherit all rules from `rules-common` and override specific entries where Rust conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to Rust projects. They inherit all rules from `rules-common` and override specific entries where Rust conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** Rust has strict naming conventions enforced by `clippy` lints.
 
@@ -24,7 +24,7 @@ These rules apply to Rust projects. They inherit all rules from `rules-common` a
 - Type parameters: single uppercase letter (`T`, `E`, `K`, `V`) or descriptive (`Item`, `Error`)
 - Conversion methods: `as_` (cheap, borrowed), `to_` (expensive, owned), `into_` (consuming)
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** Rust's ownership, lifetime annotations, and pattern matching add visual weight.
 
@@ -32,7 +32,7 @@ These rules apply to Rust projects. They inherit all rules from `rules-common` a
 - Extract complex match arms into named helper functions
 - Use `?` operator to keep error propagation concise — avoid nested `match` on `Result`
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** Rust has a module system with specific file layout conventions.
 
@@ -42,7 +42,7 @@ These rules apply to Rust projects. They inherit all rules from `rules-common` a
 - Re-export key types from `lib.rs` for a clean public API
 - Group: `use` imports at top, then types, then implementations, then tests at bottom
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** Rust has a single canonical formatter — there is no debate.
 
@@ -72,7 +72,7 @@ Let the compiler infer lifetimes when possible (lifetime elision rules). Add exp
 
 ---
 
-## 3. Error Handling `[覆盖 common: 5.6]`
+## 3. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** Rust uses `Result<T, E>` and `Option<T>` as its primary error handling mechanism — no exceptions.
 
@@ -98,7 +98,7 @@ Let the compiler infer lifetimes when possible (lifetime elision rules). Add exp
 
 ---
 
-## 4. Testing `[覆盖 common: 2.1]`
+## 4. Testing `[Overrides common: 2.1]`
 
 **Reason:** Rust has a built-in test framework with specific conventions.
 
@@ -106,7 +106,7 @@ Let the compiler infer lifetimes when possible (lifetime elision rules). Add exp
 
 Place unit tests in a `#[cfg(test)] mod tests` block at the bottom of each source file. Integration tests go in the `tests/` directory.
 
-### 4.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** Rust's type system and ownership model eliminate many bug classes — focus testing on logic.
 
@@ -118,7 +118,7 @@ Place unit tests in a `#[cfg(test)] mod tests` block at the bottom of each sourc
 
 ---
 
-## 5. Immutability `[覆盖 common: 5.4]`
+## 5. Immutability `[Overrides common: 5.4]`
 
 **Reason:** Rust variables are immutable by default — this is a core language feature.
 
@@ -129,7 +129,7 @@ Place unit tests in a `#[cfg(test)] mod tests` block at the bottom of each sourc
 
 ---
 
-## 6. Resource Cleanup `[覆盖 common: 4.3]`
+## 6. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** Rust's ownership system provides automatic resource cleanup via `Drop`.
 
@@ -140,7 +140,7 @@ Place unit tests in a `#[cfg(test)] mod tests` block at the bottom of each sourc
 
 ---
 
-## 7. Traits and Composition `[覆盖 common: 5.1]`
+## 7. Traits and Composition `[Overrides common: 5.1]`
 
 **Reason:** Rust has no inheritance — traits and composition are the only abstraction mechanisms.
 
@@ -152,7 +152,7 @@ Place unit tests in a `#[cfg(test)] mod tests` block at the bottom of each sourc
 
 ---
 
-## 8. Dependency Injection `[覆盖 common: 5.2]`
+## 8. Dependency Injection `[Overrides common: 5.2]`
 
 **Reason:** Rust uses generics and trait bounds for compile-time DI.
 
@@ -163,7 +163,7 @@ Place unit tests in a `#[cfg(test)] mod tests` block at the bottom of each sourc
 
 ---
 
-## 9. Algorithm Complexity `[覆盖 common: 4.2]`
+## 9. Algorithm Complexity `[Overrides common: 4.2]`
 
 **Reason:** Rust's zero-cost abstractions and ownership model affect performance patterns.
 
@@ -195,7 +195,7 @@ Rust's type system prevents data races at compile time. Leverage this:
 
 ---
 
-## 11. SQL and Injection Prevention `[覆盖 common: 3.6]`
+## 11. SQL and Injection Prevention `[Overrides common: 3.6]`
 
 **Reason:** Rust has type-safe database access patterns.
 
@@ -218,7 +218,7 @@ Rust's type system prevents data races at compile time. Leverage this:
 
 ---
 
-## 13. Git Workflow `[覆盖 common: 6.5]`
+## 13. Git Workflow `[Overrides common: 6.5]`
 
 **Reason:** Rust has specific build artifacts and generated files.
 

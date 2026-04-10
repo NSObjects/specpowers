@@ -6,13 +6,13 @@ language: python
 
 # Python Coding Rules
 
-These rules apply to Python projects. They inherit all rules from `rules-common` and override specific entries where Python conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to Python projects. They inherit all rules from `rules-common` and override specific entries where Python conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** Python has PEP 8 naming conventions that are deeply embedded in the ecosystem.
 
@@ -24,7 +24,7 @@ These rules apply to Python projects. They inherit all rules from `rules-common`
 - Modules and packages: `snake_case`, short, lowercase
 - Booleans: use `is_`, `has_`, `should_`, `can_` prefixes
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** Python's significant whitespace and docstrings affect line counts.
 
@@ -32,7 +32,7 @@ These rules apply to Python projects. They inherit all rules from `rules-common`
 - Use early returns to reduce nesting — Python's flat-is-better-than-nested philosophy
 - Extract complex comprehensions into named helper functions when they exceed one line of logic
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** Python has specific conventions for module structure and `__init__.py`.
 
@@ -41,7 +41,7 @@ These rules apply to Python projects. They inherit all rules from `rules-common`
 - One class per file is NOT required — group related classes in a single module
 - Use `__all__` to explicitly declare public exports
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** Python has converged on specific formatters with strong community adoption.
 
@@ -81,7 +81,7 @@ Type hints are not enforced at runtime. Use `pydantic`, `attrs`, or `dataclasses
 
 ---
 
-## 3. Testing `[覆盖 common: 2.1]`
+## 3. Testing `[Overrides common: 2.1]`
 
 **Reason:** Python has a rich testing ecosystem with specific conventions.
 
@@ -89,7 +89,7 @@ Type hints are not enforced at runtime. Use `pydantic`, `attrs`, or `dataclasses
 
 Use `pytest` as the test runner. Write test functions (not classes) unless you need shared setup. Use fixtures for dependency injection in tests.
 
-### 3.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 3.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** Python's dynamic nature means more runtime bugs — test more aggressively.
 
@@ -100,7 +100,7 @@ Use `pytest` as the test runner. Write test functions (not classes) unless you n
 
 ---
 
-## 4. Error Handling `[覆盖 common: 5.6]`
+## 4. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** Python uses exceptions as a primary control flow mechanism (EAFP over LBYL).
 
@@ -112,7 +112,7 @@ Use `pytest` as the test runner. Write test functions (not classes) unless you n
 
 ---
 
-## 5. Resource Cleanup `[覆盖 common: 4.3]`
+## 5. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** Python has context managers as the idiomatic resource management pattern.
 
@@ -123,7 +123,7 @@ Use `pytest` as the test runner. Write test functions (not classes) unless you n
 
 ---
 
-## 6. Immutability `[覆盖 common: 5.4]`
+## 6. Immutability `[Overrides common: 5.4]`
 
 **Reason:** Python has specific tools for immutability that differ from other languages.
 
@@ -135,7 +135,7 @@ Use `pytest` as the test runner. Write test functions (not classes) unless you n
 
 ---
 
-## 7. Composition and Inheritance `[覆盖 common: 5.1]`
+## 7. Composition and Inheritance `[Overrides common: 5.1]`
 
 **Reason:** Python supports multiple inheritance and mixins — use them carefully.
 
@@ -146,7 +146,7 @@ Use `pytest` as the test runner. Write test functions (not classes) unless you n
 
 ---
 
-## 8. Dependency Injection `[覆盖 common: 5.2]`
+## 8. Dependency Injection `[Overrides common: 5.2]`
 
 **Reason:** Python's dynamic nature enables simpler DI patterns than other languages.
 
@@ -157,7 +157,7 @@ Use `pytest` as the test runner. Write test functions (not classes) unless you n
 
 ---
 
-## 9. Algorithm Complexity `[覆盖 common: 4.2]`
+## 9. Algorithm Complexity `[Overrides common: 4.2]`
 
 **Reason:** Python's interpreted nature makes algorithmic choices more impactful.
 
@@ -168,7 +168,7 @@ Use `pytest` as the test runner. Write test functions (not classes) unless you n
 
 ---
 
-## 10. Batch Operations `[覆盖 common: 4.5]`
+## 10. Batch Operations `[Overrides common: 4.5]`
 
 **Reason:** Python's per-call overhead makes batching especially important.
 
@@ -179,7 +179,7 @@ Use `pytest` as the test runner. Write test functions (not classes) unless you n
 
 ---
 
-## 11. SQL and Injection Prevention `[覆盖 common: 3.6]`
+## 11. SQL and Injection Prevention `[Overrides common: 3.6]`
 
 **Reason:** Python has specific ORM and query builder patterns.
 
@@ -190,7 +190,7 @@ Use `pytest` as the test runner. Write test functions (not classes) unless you n
 
 ---
 
-## 12. Git Workflow `[覆盖 common: 6.5]`
+## 12. Git Workflow `[Overrides common: 6.5]`
 
 **Reason:** Python has specific generated files and virtual environment patterns.
 

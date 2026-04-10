@@ -6,13 +6,13 @@ language: golang
 
 # Go Coding Rules
 
-These rules apply to Go projects. They inherit all rules from `rules-common` and override specific entries where Go conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to Go projects. They inherit all rules from `rules-common` and override specific entries where Go conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** Go has strong community conventions enforced by `gofmt` and Effective Go.
 
@@ -24,7 +24,7 @@ These rules apply to Go projects. They inherit all rules from `rules-common` and
 - Avoid stuttering: `http.Client`, not `http.HTTPClient`
 - Getters: `Name()`, not `GetName()` — Go convention omits `Get` prefix
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** Go's explicit error handling adds lines — adjust expectations.
 
@@ -32,7 +32,7 @@ These rules apply to Go projects. They inherit all rules from `rules-common` and
 - Error handling typically adds 3 lines per check (`if err != nil { return err }`) — this is expected, not bloat
 - Extract complex logic into helper functions, but keep error handling inline
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** Go has strict package-level organization conventions.
 
@@ -42,7 +42,7 @@ These rules apply to Go projects. They inherit all rules from `rules-common` and
 - `internal/` directory for package-private code that should not be imported externally
 - `cmd/` directory for executable entry points
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** Go has a single canonical formatter — there is no debate.
 
@@ -53,7 +53,7 @@ These rules apply to Go projects. They inherit all rules from `rules-common` and
 
 ---
 
-## 2. Error Handling `[覆盖 common: 5.6]`
+## 2. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** Go uses explicit error returns as its primary error handling mechanism — not exceptions.
 
@@ -79,7 +79,7 @@ These rules apply to Go projects. They inherit all rules from `rules-common` and
 
 ---
 
-## 3. Testing `[覆盖 common: 2.1]`
+## 3. Testing `[Overrides common: 2.1]`
 
 **Reason:** Go has a built-in testing framework with specific conventions.
 
@@ -87,7 +87,7 @@ These rules apply to Go projects. They inherit all rules from `rules-common` and
 
 Use the standard `testing` package. Test functions are `TestXxx(t *testing.T)`. Use table-driven tests as the default pattern.
 
-### 3.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 3.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** Go's type system and explicit error handling reduce certain bug classes — focus testing on behavior.
 
@@ -124,7 +124,7 @@ Use descriptive subtest names in table-driven tests: `t.Run("empty input returns
 
 ---
 
-## 5. Resource Cleanup `[覆盖 common: 4.3]`
+## 5. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** Go uses `defer` as its primary resource cleanup mechanism.
 
@@ -135,7 +135,7 @@ Use descriptive subtest names in table-driven tests: `t.Run("empty input returns
 
 ---
 
-## 6. Interfaces `[覆盖 common: 5.5]`
+## 6. Interfaces `[Overrides common: 5.5]`
 
 **Reason:** Go interfaces are implicitly satisfied — this changes how you design them.
 
@@ -146,7 +146,7 @@ Use descriptive subtest names in table-driven tests: `t.Run("empty input returns
 
 ---
 
-## 7. Composition `[覆盖 common: 5.1]`
+## 7. Composition `[Overrides common: 5.1]`
 
 **Reason:** Go has no inheritance — composition via embedding is the only option.
 
@@ -157,7 +157,7 @@ Use descriptive subtest names in table-driven tests: `t.Run("empty input returns
 
 ---
 
-## 8. Dependency Injection `[覆盖 common: 5.2]`
+## 8. Dependency Injection `[Overrides common: 5.2]`
 
 **Reason:** Go favors explicit, simple DI over frameworks.
 
@@ -168,7 +168,7 @@ Use descriptive subtest names in table-driven tests: `t.Run("empty input returns
 
 ---
 
-## 9. Algorithm Complexity `[覆盖 common: 4.2]`
+## 9. Algorithm Complexity `[Overrides common: 4.2]`
 
 **Reason:** Go's performance characteristics make certain patterns more or less important.
 
@@ -179,7 +179,7 @@ Use descriptive subtest names in table-driven tests: `t.Run("empty input returns
 
 ---
 
-## 10. SQL and Injection Prevention `[覆盖 common: 3.6]`
+## 10. SQL and Injection Prevention `[Overrides common: 3.6]`
 
 **Reason:** Go has specific database patterns and query builders.
 
@@ -190,7 +190,7 @@ Use descriptive subtest names in table-driven tests: `t.Run("empty input returns
 
 ---
 
-## 11. Git Workflow `[覆盖 common: 6.5]`
+## 11. Git Workflow `[Overrides common: 6.5]`
 
 **Reason:** Go has specific generated and binary files to exclude.
 

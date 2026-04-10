@@ -6,13 +6,13 @@ language: perl
 
 # Perl Coding Rules
 
-These rules apply to Perl projects. They inherit all rules from `rules-common` and override specific entries where Perl conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to Perl projects. They inherit all rules from `rules-common` and override specific entries where Perl conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** Perl has community conventions from `perlstyle` and Perl Best Practices.
 
@@ -23,7 +23,7 @@ These rules apply to Perl projects. They inherit all rules from `rules-common` a
 - Filehandle variables: uppercase (`STDIN`, `STDOUT`) or lexical (`my $fh`)
 - Sigils indicate type: `$scalar`, `@array`, `%hash`, `&subroutine`
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** Perl's concise syntax (regex, one-liners) can pack a lot into few lines — prioritize readability.
 
@@ -31,7 +31,7 @@ These rules apply to Perl projects. They inherit all rules from `rules-common` a
 - Avoid complex one-liners in production code — readability beats cleverness
 - Extract complex regex operations into named subroutines with comments explaining the pattern
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** Perl modules use `package` declarations and `.pm` file extension.
 
@@ -40,7 +40,7 @@ These rules apply to Perl projects. They inherit all rules from `rules-common` a
 - End every module with `1;` (true return value)
 - Order: `use strict` → `use warnings` → `use` imports → package declaration → subroutines
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** Perl has `perltidy` as the standard formatter.
 
@@ -68,7 +68,7 @@ These rules apply to Perl projects. They inherit all rules from `rules-common` a
 
 ---
 
-## 3. Error Handling `[覆盖 common: 5.6]`
+## 3. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** Perl uses `die`/`eval` for exception handling and return values for error codes.
 
@@ -80,7 +80,7 @@ These rules apply to Perl projects. They inherit all rules from `rules-common` a
 
 ---
 
-## 4. Testing `[覆盖 common: 2.1]`
+## 4. Testing `[Overrides common: 2.1]`
 
 **Reason:** Perl has a mature testing ecosystem built on TAP (Test Anything Protocol).
 
@@ -88,7 +88,7 @@ These rules apply to Perl projects. They inherit all rules from `rules-common` a
 
 Use `Test::More` for unit tests. Use `Test::Deep` for complex data structure comparisons. Use `prove` as the test runner.
 
-### 4.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** Perl's dynamic nature requires thorough testing — the language won't catch type errors.
 
@@ -100,7 +100,7 @@ Use `Test::More` for unit tests. Use `Test::Deep` for complex data structure com
 
 ---
 
-## 5. Resource Cleanup `[覆盖 common: 4.3]`
+## 5. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** Perl uses lexical scoping and reference counting for resource management.
 
@@ -111,7 +111,7 @@ Use `Test::More` for unit tests. Use `Test::Deep` for complex data structure com
 
 ---
 
-## 6. SQL and Injection Prevention `[覆盖 common: 3.6]`
+## 6. SQL and Injection Prevention `[Overrides common: 3.6]`
 
 **Reason:** Perl's DBI module has strong parameterized query support.
 
@@ -122,7 +122,7 @@ Use `Test::More` for unit tests. Use `Test::Deep` for complex data structure com
 
 ---
 
-## 7. Immutability `[覆盖 common: 5.4]`
+## 7. Immutability `[Overrides common: 5.4]`
 
 **Reason:** Perl variables are mutable by default — use modules to enforce immutability.
 

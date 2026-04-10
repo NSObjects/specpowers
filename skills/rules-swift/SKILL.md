@@ -6,13 +6,13 @@ language: swift
 
 # Swift Coding Rules
 
-These rules apply to Swift projects. They inherit all rules from `rules-common` and override specific entries where Swift conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to Swift projects. They inherit all rules from `rules-common` and override specific entries where Swift conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** Swift has official API Design Guidelines from Apple that emphasize clarity at the point of use.
 
@@ -24,7 +24,7 @@ These rules apply to Swift projects. They inherit all rules from `rules-common` 
 - Mutating/non-mutating pairs: verb for mutating (`sort()`), past participle for non-mutating (`sorted()`)
 - Label first arguments when they clarify meaning; omit when the function name provides context
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** Swift's closures, guard statements, and protocol extensions enable concise code.
 
@@ -32,7 +32,7 @@ These rules apply to Swift projects. They inherit all rules from `rules-common` 
 - Use `guard` for early exits instead of nested `if let`
 - Extract complex closures into named functions or computed properties
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** Swift uses extensions for organizing code within a file.
 
@@ -41,7 +41,7 @@ These rules apply to Swift projects. They inherit all rules from `rules-common` 
 - One primary type per file, with related extensions in the same file
 - Order: properties → initializers → public methods → private methods → extensions
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** Swift has `swift-format` (Apple's official formatter) and SwiftLint.
 
@@ -70,7 +70,7 @@ These rules apply to Swift projects. They inherit all rules from `rules-common` 
 
 ---
 
-## 3. Error Handling `[覆盖 common: 5.6]`
+## 3. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** Swift uses `throws`/`try`/`catch` with typed errors and `Result<T, E>`.
 
@@ -82,7 +82,7 @@ These rules apply to Swift projects. They inherit all rules from `rules-common` 
 
 ---
 
-## 4. Testing `[覆盖 common: 2.1]`
+## 4. Testing `[Overrides common: 2.1]`
 
 **Reason:** Swift has XCTest and the newer Swift Testing framework.
 
@@ -90,7 +90,7 @@ These rules apply to Swift projects. They inherit all rules from `rules-common` 
 
 Use XCTest for established projects, or Swift Testing (`@Test`, `#expect`) for new projects (Swift 5.9+). Use `@testable import` to access internal members.
 
-### 4.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** Swift's type system and optionals eliminate null-related bugs — focus tests on logic.
 
@@ -101,7 +101,7 @@ Use XCTest for established projects, or Swift Testing (`@Test`, `#expect`) for n
 
 ---
 
-## 5. Resource Cleanup `[覆盖 common: 4.3]`
+## 5. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** Swift uses ARC (Automatic Reference Counting) — not garbage collection.
 
@@ -113,7 +113,7 @@ Use XCTest for established projects, or Swift Testing (`@Test`, `#expect`) for n
 
 ---
 
-## 6. Immutability `[覆盖 common: 5.4]`
+## 6. Immutability `[Overrides common: 5.4]`
 
 **Reason:** Swift distinguishes `let` (immutable) from `var` (mutable) at the language level.
 

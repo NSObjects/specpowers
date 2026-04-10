@@ -5,15 +5,15 @@ description: Use when writing, reviewing, or modifying code in any language — 
 
 # Universal Coding Rules
 
-These rules apply to all programming languages. Language-specific rule skills (e.g., `rules-typescript`, `rules-python`) inherit these rules and may override entries marked `[可覆盖]`.
+These rules apply to all programming languages. Language-specific rule skills (e.g., `rules-typescript`, `rules-python`) inherit these rules and may override entries marked `[Overridable]`.
 
-**Override mechanism:** When a language rule declares `[覆盖 common: X.Y]`, that language-specific version replaces the common rule for projects using that language.
+**Override mechanism:** When a language rule declares `[Overrides common: X.Y]`, that language-specific version replaces the common rule for projects using that language.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Clarity `[可覆盖]`
+### 1.1 Naming Clarity `[Overridable]`
 
 Use descriptive, intention-revealing names. Avoid abbreviations unless they are universally understood within the domain (e.g., `id`, `url`, `http`).
 
@@ -21,14 +21,14 @@ Use descriptive, intention-revealing names. Avoid abbreviations unless they are 
 - Functions: describe what they do, starting with a verb
 - Booleans: use `is`, `has`, `should`, `can` prefixes
 
-### 1.2 Function Size `[可覆盖]`
+### 1.2 Function Size `[Overridable]`
 
 Keep functions focused on a single responsibility. A function that requires a comment to explain "what it does" is too complex — split it.
 
 - Aim for functions that fit on one screen (~30 lines)
 - Extract helper functions when logic branches exceed 2 levels of nesting
 
-### 1.3 File Organization `[可覆盖]`
+### 1.3 File Organization `[Overridable]`
 
 One module = one concept. Group related functionality into cohesive files. Avoid "utils" or "helpers" grab-bags — name files after what they contain.
 
@@ -39,7 +39,7 @@ Write comments that explain **why**, not **what**. The code explains what; comme
 - Document public APIs with purpose, parameters, return values, and edge cases
 - Remove commented-out code — version control remembers
 
-### 1.5 Consistent Formatting `[可覆盖]`
+### 1.5 Consistent Formatting `[Overridable]`
 
 Use the project's established formatter. If none exists, adopt the language community's standard formatter. Never mix formatting styles within a project.
 
@@ -51,7 +51,7 @@ No magic numbers or strings in logic. Extract them into named constants with des
 
 ## 2. Testing
 
-### 2.1 Test-First When Possible `[可覆盖]`
+### 2.1 Test-First When Possible `[Overridable]`
 
 Write tests before or alongside implementation. Tests are specifications — they document what the code should do.
 
@@ -63,7 +63,7 @@ Test names describe the scenario, not the implementation. Use the pattern: `[uni
 
 Each test must be independent — no shared mutable state between tests, no ordering dependencies. A test that fails in isolation but passes in a suite (or vice versa) is broken.
 
-### 2.4 Test Coverage Strategy `[可覆盖]`
+### 2.4 Test Coverage Strategy `[Overridable]`
 
 Test the behavior, not the implementation. Focus on:
 - Happy path (the common case)
@@ -103,7 +103,7 @@ Know your dependencies. Audit new dependencies before adding them. Prefer well-m
 
 Error messages shown to users must not leak internal details (stack traces, file paths, database schemas, internal IPs). Log details internally; show generic messages externally.
 
-### 3.6 SQL and Injection Prevention `[可覆盖]`
+### 3.6 SQL and Injection Prevention `[Overridable]`
 
 Use parameterized queries or prepared statements. Never concatenate user input into queries, commands, or templates.
 
@@ -115,11 +115,11 @@ Use parameterized queries or prepared statements. Never concatenate user input i
 
 Do not optimize without evidence. Profile first, identify the bottleneck, then optimize that specific path. Premature optimization obscures intent.
 
-### 4.2 Algorithm Complexity Awareness `[可覆盖]`
+### 4.2 Algorithm Complexity Awareness `[Overridable]`
 
 Choose appropriate data structures and algorithms. Know the Big-O of your operations. An O(n²) loop hidden inside an O(n) loop is O(n³) — watch for nested iterations.
 
-### 4.3 Resource Cleanup `[可覆盖]`
+### 4.3 Resource Cleanup `[Overridable]`
 
 Close what you open. File handles, database connections, network sockets, timers — ensure cleanup happens even on error paths. Use language-provided resource management patterns (try-with-resources, defer, using, context managers).
 
@@ -127,7 +127,7 @@ Close what you open. File handles, database connections, network sockets, timers
 
 Caching adds complexity (invalidation, staleness, memory pressure). Add caching only when measurement shows it's needed, and always define an invalidation strategy.
 
-### 4.5 Batch Over Chatty `[可覆盖]`
+### 4.5 Batch Over Chatty `[Overridable]`
 
 Prefer batch operations over many small ones. One query returning 100 rows beats 100 queries returning 1 row each. This applies to database calls, API requests, and file I/O.
 
@@ -135,11 +135,11 @@ Prefer batch operations over many small ones. One query returning 100 rows beats
 
 ## 5. Design Patterns
 
-### 5.1 Composition Over Inheritance `[可覆盖]`
+### 5.1 Composition Over Inheritance `[Overridable]`
 
 Prefer composing behavior from small, focused components over deep inheritance hierarchies. Inheritance creates tight coupling; composition creates flexibility.
 
-### 5.2 Dependency Injection `[可覆盖]`
+### 5.2 Dependency Injection `[Overridable]`
 
 Pass dependencies in rather than creating them internally. This makes code testable and configurable. Hard-coded dependencies are hidden coupling.
 
@@ -147,7 +147,7 @@ Pass dependencies in rather than creating them internally. This makes code testa
 
 Validate preconditions early and fail immediately with clear error messages. Do not let invalid state propagate through the system.
 
-### 5.4 Immutability by Default `[可覆盖]`
+### 5.4 Immutability by Default `[Overridable]`
 
 Prefer immutable data structures. Mutation is a common source of bugs, especially in concurrent code. When mutation is necessary, contain it — minimize the scope of mutable state.
 
@@ -155,7 +155,7 @@ Prefer immutable data structures. Mutation is a common source of bugs, especiall
 
 Don't force consumers to depend on methods they don't use. Prefer small, focused interfaces over large, general-purpose ones.
 
-### 5.6 Error Handling Strategy `[可覆盖]`
+### 5.6 Error Handling Strategy `[Overridable]`
 
 Handle errors explicitly. Don't swallow exceptions silently. Choose a consistent error handling pattern for the project (exceptions, result types, error codes) and stick with it.
 
@@ -190,7 +190,7 @@ Keep branches short-lived and focused. One branch = one feature or fix. Rebase o
 
 All code changes should be reviewed before merging. Self-review at minimum — read your own diff as if someone else wrote it.
 
-### 6.5 No Generated Files in VCS `[可覆盖]`
+### 6.5 No Generated Files in VCS `[Overridable]`
 
 Don't commit generated files (build artifacts, compiled output, lock files for non-root packages). Use `.gitignore` to exclude them. Exception: lock files at the project root (e.g., `package-lock.json`, `pnpm-lock.yaml`) should be committed.
 

@@ -6,13 +6,13 @@ language: php
 
 # PHP Coding Rules
 
-These rules apply to PHP projects. They inherit all rules from `rules-common` and override specific entries where PHP conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to PHP projects. They inherit all rules from `rules-common` and override specific entries where PHP conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** PHP follows PSR-12 and PSR-1 naming conventions.
 
@@ -23,7 +23,7 @@ These rules apply to PHP projects. They inherit all rules from `rules-common` an
 - Namespaces: `PascalCase` matching directory structure (`App\Services\UserService`)
 - Booleans: use `is`, `has`, `should`, `can` prefixes
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** PHP's mixed paradigm (OOP + procedural) and type declarations affect line counts.
 
@@ -31,7 +31,7 @@ These rules apply to PHP projects. They inherit all rules from `rules-common` an
 - Use early returns with type checks to reduce nesting
 - Extract complex array operations into named helper methods
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** PHP uses PSR-4 autoloading with namespace-to-directory mapping.
 
@@ -40,7 +40,7 @@ These rules apply to PHP projects. They inherit all rules from `rules-common` an
 - Use `declare(strict_types=1);` at the top of every file
 - Order: `declare` → `namespace` → `use` imports → class definition
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** PHP has PSR-12 as the community standard and PHP-CS-Fixer as the primary formatter.
 
@@ -68,7 +68,7 @@ These rules apply to PHP projects. They inherit all rules from `rules-common` an
 
 ---
 
-## 3. Error Handling `[覆盖 common: 5.6]`
+## 3. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** PHP has exceptions and a legacy error system — use exceptions consistently.
 
@@ -80,7 +80,7 @@ These rules apply to PHP projects. They inherit all rules from `rules-common` an
 
 ---
 
-## 4. Testing `[覆盖 common: 2.1]`
+## 4. Testing `[Overrides common: 2.1]`
 
 **Reason:** PHP has PHPUnit as the dominant testing framework.
 
@@ -88,7 +88,7 @@ These rules apply to PHP projects. They inherit all rules from `rules-common` an
 
 Use PHPUnit for unit and integration tests. Use `@dataProvider` for table-driven tests. Use Pest PHP for a more expressive syntax if the team prefers it.
 
-### 4.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** PHP's dynamic nature means more runtime errors — test defensively.
 
@@ -99,7 +99,7 @@ Use PHPUnit for unit and integration tests. Use `@dataProvider` for table-driven
 
 ---
 
-## 5. Resource Cleanup `[覆盖 common: 4.3]`
+## 5. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** PHP has no built-in RAII — use try/finally and destructors carefully.
 
@@ -110,7 +110,7 @@ Use PHPUnit for unit and integration tests. Use `@dataProvider` for table-driven
 
 ---
 
-## 6. SQL and Injection Prevention `[覆盖 common: 3.6]`
+## 6. SQL and Injection Prevention `[Overrides common: 3.6]`
 
 **Reason:** PHP has a history of SQL injection vulnerabilities — be extra vigilant.
 
@@ -121,7 +121,7 @@ Use PHPUnit for unit and integration tests. Use `@dataProvider` for table-driven
 
 ---
 
-## 7. Dependency Injection `[覆盖 common: 5.2]`
+## 7. Dependency Injection `[Overrides common: 5.2]`
 
 **Reason:** PHP frameworks (Laravel, Symfony) have mature DI containers.
 

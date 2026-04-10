@@ -6,13 +6,13 @@ language: kotlin
 
 # Kotlin Coding Rules
 
-These rules apply to Kotlin projects. They inherit all rules from `rules-common` and override specific entries where Kotlin conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to Kotlin projects. They inherit all rules from `rules-common` and override specific entries where Kotlin conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** Kotlin follows JetBrains coding conventions with some differences from Java.
 
@@ -23,7 +23,7 @@ These rules apply to Kotlin projects. They inherit all rules from `rules-common`
 - Backing properties: prefix with underscore (`_mutableList` backing `mutableList`)
 - Extension functions: name as if they were members of the receiver type
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** Kotlin's concise syntax (expression bodies, scope functions) allows shorter functions.
 
@@ -31,7 +31,7 @@ These rules apply to Kotlin projects. They inherit all rules from `rules-common`
 - Use single-expression functions (`fun double(x: Int) = x * 2`) when the body is simple
 - Use scope functions (`let`, `apply`, `also`, `run`, `with`) to reduce temporary variables, but don't chain more than 2
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** Kotlin allows multiple public classes per file and has top-level functions.
 
@@ -39,7 +39,7 @@ These rules apply to Kotlin projects. They inherit all rules from `rules-common`
 - Use top-level functions for utility operations instead of static methods in companion objects
 - File name: `PascalCase.kt` if the file contains a single primary class, descriptive `camelCase.kt` otherwise
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** Kotlin has an official style guide and formatter from JetBrains.
 
@@ -75,7 +75,7 @@ These rules apply to Kotlin projects. They inherit all rules from `rules-common`
 
 ---
 
-## 3. Error Handling `[覆盖 common: 5.6]`
+## 3. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** Kotlin has no checked exceptions and provides `Result<T>` and sealed classes for error modeling.
 
@@ -87,7 +87,7 @@ These rules apply to Kotlin projects. They inherit all rules from `rules-common`
 
 ---
 
-## 4. Testing `[覆盖 common: 2.1]`
+## 4. Testing `[Overrides common: 2.1]`
 
 **Reason:** Kotlin has specific testing libraries and conventions.
 
@@ -95,7 +95,7 @@ These rules apply to Kotlin projects. They inherit all rules from `rules-common`
 
 Use JUnit 5 with Kotlin extensions, or `kotest` for a more Kotlin-idiomatic experience. Use `MockK` instead of Mockito for Kotlin-friendly mocking.
 
-### 4.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** Kotlin's null safety and type system reduce certain bug classes.
 
@@ -123,7 +123,7 @@ Use JUnit 5 with Kotlin extensions, or `kotest` for a more Kotlin-idiomatic expe
 
 ---
 
-## 6. Resource Cleanup `[覆盖 common: 4.3]`
+## 6. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** Kotlin provides `use` extension function for `Closeable` resources.
 
@@ -133,7 +133,7 @@ Use JUnit 5 with Kotlin extensions, or `kotest` for a more Kotlin-idiomatic expe
 
 ---
 
-## 7. Immutability `[覆盖 common: 5.4]`
+## 7. Immutability `[Overrides common: 5.4]`
 
 **Reason:** Kotlin distinguishes `val` (read-only) from `var` (mutable) at the language level.
 
@@ -144,7 +144,7 @@ Use JUnit 5 with Kotlin extensions, or `kotest` for a more Kotlin-idiomatic expe
 
 ---
 
-## 8. Dependency Injection `[覆盖 common: 5.2]`
+## 8. Dependency Injection `[Overrides common: 5.2]`
 
 **Reason:** Kotlin supports constructor injection naturally and has Kotlin-specific DI frameworks.
 

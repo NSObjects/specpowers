@@ -2,9 +2,9 @@
  * Unit tests for rule layering SKILL.md structure.
  *
  * Validates:
- * - rules-common has proper YAML frontmatter, Red Flags, Iron Laws, [可覆盖] tags, numbered rule IDs
+ * - rules-common has proper YAML frontmatter, Red Flags, Iron Laws, [Overridable] tags, numbered rule IDs
  * - Each language rule SKILL.md has proper frontmatter (name, description, language),
- *   Red Flags, Iron Laws, [覆盖 common: X.Y] annotations referencing valid common rule IDs
+ *   Red Flags, Iron Laws, [Overrides common: X.Y] annotations referencing valid common rule IDs
  *
  * Requirements: 1.1, 1.2, 1.3, 1.7
  */
@@ -38,10 +38,10 @@ function extractRuleIds(content) {
   return [...new Set(ids)];
 }
 
-/** Extract all override annotations [覆盖 common: X.Y] from content. */
+/** Extract all override annotations [Overrides common: X.Y] from content. */
 function extractOverrideRefs(content) {
   const refs = [];
-  for (const m of content.matchAll(/\[覆盖 common: (\d+\.\d+)\]/g)) {
+  for (const m of content.matchAll(/\[Overrides common: (\d+\.\d+)\]/g)) {
     refs.push(m[1]);
   }
   return refs;
@@ -83,10 +83,16 @@ test('rules-common SKILL.md structure', async (t) => {
     assert.match(commonContent, /^## Iron Laws/m, 'should contain a ## Iron Laws section');
   });
 
-  await t.test('contains [可覆盖] tags on overridable rules', () => {
-    const overridableTags = commonContent.match(/\[可覆盖\]/g);
-    assert.ok(overridableTags, 'should contain at least one [可覆盖] tag');
-    assert.ok(overridableTags.length >= 3, `should have multiple [可覆盖] tags, found ${overridableTags.length}`);
+  await t.test('contains [Overridable] tags on overridable rules', () => {
+    const overridableTags = commonContent.match(/\[Overridable\]/g);
+    assert.ok(overridableTags, 'should contain at least one [Overridable] tag');
+    assert.ok(overridableTags.length >= 3, `should have multiple [Overridable] tags, found ${overridableTags.length}`);
+    assert.ok(!commonContent.includes('[可覆盖]'), 'should not contain legacy [可覆盖] tags');
+  });
+
+  await t.test('describes the override mechanism with English markers', () => {
+    assert.ok(commonContent.includes('[Overrides common: X.Y]'), 'should describe overrides with [Overrides common: X.Y]');
+    assert.ok(!commonContent.includes('[覆盖 common: X.Y]'), 'should not contain legacy [覆盖 common: X.Y] in rules-common');
   });
 
   await t.test('contains numbered rule IDs (### X.Y)', () => {
@@ -122,9 +128,10 @@ test('language rule SKILL.md structure', async (t) => {
         assert.match(content, /^## Iron Laws/m, `${skillName} should contain ## Iron Laws`);
       });
 
-      await t2.test('contains override annotations [覆盖 common: X.Y]', () => {
+      await t2.test('contains override annotations [Overrides common: X.Y]', () => {
         const overrides = extractOverrideRefs(content);
-        assert.ok(overrides.length > 0, `${skillName} should have at least one [覆盖 common: X.Y] annotation`);
+        assert.ok(overrides.length > 0, `${skillName} should have at least one [Overrides common: X.Y] annotation`);
+        assert.ok(!content.includes('[覆盖 common:'), `${skillName} should not contain legacy [覆盖 common: X.Y] annotations`);
       });
 
       await t2.test('override annotations reference valid common rule IDs', () => {

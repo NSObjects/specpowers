@@ -6,13 +6,13 @@ language: dart
 
 # Dart Coding Rules
 
-These rules apply to Dart projects (including Flutter). They inherit all rules from `rules-common` and override specific entries where Dart conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to Dart projects (including Flutter). They inherit all rules from `rules-common` and override specific entries where Dart conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** Dart has official Effective Dart naming conventions.
 
@@ -24,7 +24,7 @@ These rules apply to Dart projects (including Flutter). They inherit all rules f
 - File names: `snake_case.dart` (`user_service.dart`)
 - Booleans: use `is`, `has`, `should`, `can` prefixes
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** Dart's cascade notation, collection literals, and named parameters enable concise code.
 
@@ -32,7 +32,7 @@ These rules apply to Dart projects (including Flutter). They inherit all rules f
 - Use cascade notation (`..`) to chain operations on the same object
 - Extract complex widget trees (Flutter) into separate widget classes or methods
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** Dart uses `part`/`part of` and library-level organization.
 
@@ -41,7 +41,7 @@ These rules apply to Dart projects (including Flutter). They inherit all rules f
 - Order: `import` directives (dart: → package: → relative) → class definition
 - Use `export` directives in barrel files sparingly
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** Dart has `dart format` as the single canonical formatter.
 
@@ -70,7 +70,7 @@ These rules apply to Dart projects (including Flutter). They inherit all rules f
 
 ---
 
-## 3. Error Handling `[覆盖 common: 5.6]`
+## 3. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** Dart uses exceptions with `try`/`catch`/`on` and `Future` error handling.
 
@@ -82,7 +82,7 @@ These rules apply to Dart projects (including Flutter). They inherit all rules f
 
 ---
 
-## 4. Testing `[覆盖 common: 2.1]`
+## 4. Testing `[Overrides common: 2.1]`
 
 **Reason:** Dart has a built-in `test` package with specific conventions.
 
@@ -90,7 +90,7 @@ These rules apply to Dart projects (including Flutter). They inherit all rules f
 
 Use `package:test` for unit tests. Use `group()` for organizing related tests. Use `setUp()` and `tearDown()` for test lifecycle.
 
-### 4.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** Dart's sound null safety eliminates null-related bugs — focus tests on logic.
 
@@ -119,7 +119,7 @@ Use `package:test` for unit tests. Use `group()` for organizing related tests. U
 
 ---
 
-## 6. Resource Cleanup `[覆盖 common: 4.3]`
+## 6. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** Dart has no `using`/`with` statement — use `try/finally` and dispose patterns.
 
@@ -130,7 +130,7 @@ Use `package:test` for unit tests. Use `group()` for organizing related tests. U
 
 ---
 
-## 7. Immutability `[覆盖 common: 5.4]`
+## 7. Immutability `[Overrides common: 5.4]`
 
 **Reason:** Dart provides `final`, `const`, and immutable collections.
 
@@ -142,7 +142,7 @@ Use `package:test` for unit tests. Use `group()` for organizing related tests. U
 
 ---
 
-## 8. Dependency Injection `[覆盖 common: 5.2]`
+## 8. Dependency Injection `[Overrides common: 5.2]`
 
 **Reason:** Dart/Flutter has specific DI patterns and packages.
 

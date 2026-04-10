@@ -6,13 +6,13 @@ language: cpp
 
 # C++ Coding Rules
 
-These rules apply to C++ projects. They inherit all rules from `rules-common` and override specific entries where C++ conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to C++ projects. They inherit all rules from `rules-common` and override specific entries where C++ conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** C++ has multiple naming conventions (Google, LLVM, Qt); pick one and enforce it project-wide.
 
@@ -24,7 +24,7 @@ These rules apply to C++ projects. They inherit all rules from `rules-common` an
 - Template parameters: `PascalCase` (`typename Container`, `typename ValueType`)
 - Macros: `UPPER_SNAKE_CASE` — and avoid macros when possible
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** C++ templates, RAII patterns, and error handling add visual weight.
 
@@ -32,7 +32,7 @@ These rules apply to C++ projects. They inherit all rules from `rules-common` an
 - Extract complex template metaprogramming into named type aliases or helper traits
 - Use early returns and guard clauses to reduce nesting
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** C++ has header/source separation and include management concerns.
 
@@ -42,7 +42,7 @@ These rules apply to C++ projects. They inherit all rules from `rules-common` an
 - Order includes: corresponding header → C system → C++ standard → third-party → project headers
 - Use forward declarations to minimize header dependencies
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** C++ has `clang-format` as the de facto standard formatter.
 
@@ -72,7 +72,7 @@ These rules apply to C++ projects. They inherit all rules from `rules-common` an
 
 ---
 
-## 3. Error Handling `[覆盖 common: 5.6]`
+## 3. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** C++ has exceptions, error codes, and `std::expected` (C++23) — choose consistently.
 
@@ -84,7 +84,7 @@ These rules apply to C++ projects. They inherit all rules from `rules-common` an
 
 ---
 
-## 4. Testing `[覆盖 common: 2.1]`
+## 4. Testing `[Overrides common: 2.1]`
 
 **Reason:** C++ has specific testing frameworks and compilation considerations.
 
@@ -92,7 +92,7 @@ These rules apply to C++ projects. They inherit all rules from `rules-common` an
 
 Use Google Test (`gtest`) or Catch2 for unit testing. Use `TEST()` / `TEST_F()` macros (gtest) or `TEST_CASE` / `SECTION` (Catch2).
 
-### 4.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** C++ has undefined behavior and memory safety concerns that require targeted testing.
 
@@ -103,7 +103,7 @@ Use Google Test (`gtest`) or Catch2 for unit testing. Use `TEST()` / `TEST_F()` 
 
 ---
 
-## 5. Resource Cleanup `[覆盖 common: 4.3]`
+## 5. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** C++ uses RAII as its fundamental resource management pattern.
 
@@ -115,7 +115,7 @@ Use Google Test (`gtest`) or Catch2 for unit testing. Use `TEST()` / `TEST_F()` 
 
 ---
 
-## 6. Immutability `[覆盖 common: 5.4]`
+## 6. Immutability `[Overrides common: 5.4]`
 
 **Reason:** C++ provides `const` at multiple levels — use it aggressively.
 
@@ -126,7 +126,7 @@ Use Google Test (`gtest`) or Catch2 for unit testing. Use `TEST()` / `TEST_F()` 
 
 ---
 
-## 7. Composition and Inheritance `[覆盖 common: 5.1]`
+## 7. Composition and Inheritance `[Overrides common: 5.1]`
 
 **Reason:** C++ supports multiple inheritance — use it carefully.
 
@@ -138,7 +138,7 @@ Use Google Test (`gtest`) or Catch2 for unit testing. Use `TEST()` / `TEST_F()` 
 
 ---
 
-## 8. Algorithm Complexity `[覆盖 common: 4.2]`
+## 8. Algorithm Complexity `[Overrides common: 4.2]`
 
 **Reason:** C++ gives direct control over memory layout, which affects performance significantly.
 

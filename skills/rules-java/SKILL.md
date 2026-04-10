@@ -6,13 +6,13 @@ language: java
 
 # Java Coding Rules
 
-These rules apply to Java projects. They inherit all rules from `rules-common` and override specific entries where Java conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to Java projects. They inherit all rules from `rules-common` and override specific entries where Java conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** Java has deeply established naming conventions from the Java Language Specification and Google Java Style Guide.
 
@@ -23,7 +23,7 @@ These rules apply to Java projects. They inherit all rules from `rules-common` a
 - Generics: single uppercase letter (`T`, `E`, `K`, `V`) or descriptive (`TResult`)
 - Booleans: use `is`, `has`, `should`, `can` prefixes for methods; avoid for fields when using frameworks that expect `getX()`
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** Java's verbosity (type declarations, checked exceptions, annotations) inflates line counts.
 
@@ -31,7 +31,7 @@ These rules apply to Java projects. They inherit all rules from `rules-common` a
 - Extract complex conditionals into well-named private methods
 - Use early returns to reduce nesting — avoid deep `if/else` chains
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** Java enforces one public class per file, named to match the file.
 
@@ -40,7 +40,7 @@ These rules apply to Java projects. They inherit all rules from `rules-common` a
 - Group related classes in the same package, not the same file
 - Use `package-info.java` for package-level documentation
 
-### 1.4 Formatting `[覆盖 common: 1.5]`
+### 1.4 Formatting `[Overrides common: 1.5]`
 
 **Reason:** Java ecosystem has converged on specific formatters.
 
@@ -72,7 +72,7 @@ Use `var` (Java 10+) when the type is obvious from the right-hand side. Do not u
 
 ---
 
-## 3. Error Handling `[覆盖 common: 5.6]`
+## 3. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** Java uses checked and unchecked exceptions — a unique dual system.
 
@@ -84,7 +84,7 @@ Use `var` (Java 10+) when the type is obvious from the right-hand side. Do not u
 
 ---
 
-## 4. Testing `[覆盖 common: 2.1]`
+## 4. Testing `[Overrides common: 2.1]`
 
 **Reason:** Java has a mature testing ecosystem with specific conventions.
 
@@ -92,7 +92,7 @@ Use `var` (Java 10+) when the type is obvious from the right-hand side. Do not u
 
 Use JUnit 5 (`@Test`, `@ParameterizedTest`, `@Nested`). Use AssertJ for fluent assertions. Use Mockito for mocking external dependencies only.
 
-### 4.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** Java's type system catches type errors at compile time — focus tests on behavior.
 
@@ -103,7 +103,7 @@ Use JUnit 5 (`@Test`, `@ParameterizedTest`, `@Nested`). Use AssertJ for fluent a
 
 ---
 
-## 5. Resource Cleanup `[覆盖 common: 4.3]`
+## 5. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** Java has try-with-resources as the idiomatic cleanup pattern.
 
@@ -114,7 +114,7 @@ Use JUnit 5 (`@Test`, `@ParameterizedTest`, `@Nested`). Use AssertJ for fluent a
 
 ---
 
-## 6. Immutability `[覆盖 common: 5.4]`
+## 6. Immutability `[Overrides common: 5.4]`
 
 **Reason:** Java requires explicit effort for immutability.
 
@@ -125,7 +125,7 @@ Use JUnit 5 (`@Test`, `@ParameterizedTest`, `@Nested`). Use AssertJ for fluent a
 
 ---
 
-## 7. Dependency Injection `[覆盖 common: 5.2]`
+## 7. Dependency Injection `[Overrides common: 5.2]`
 
 **Reason:** Java has a strong DI ecosystem centered on Spring and CDI.
 
@@ -136,7 +136,7 @@ Use JUnit 5 (`@Test`, `@ParameterizedTest`, `@Nested`). Use AssertJ for fluent a
 
 ---
 
-## 8. SQL and Injection Prevention `[覆盖 common: 3.6]`
+## 8. SQL and Injection Prevention `[Overrides common: 3.6]`
 
 **Reason:** Java has mature ORM and query builder patterns.
 

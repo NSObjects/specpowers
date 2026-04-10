@@ -6,13 +6,13 @@ language: typescript
 
 # TypeScript Coding Rules
 
-These rules apply to TypeScript projects. They inherit all rules from `rules-common` and override specific entries where TypeScript conventions differ. Overrides are marked with `[覆盖 common: X.Y]` and include the reason.
+These rules apply to TypeScript projects. They inherit all rules from `rules-common` and override specific entries where TypeScript conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
 
 ---
 
 ## 1. Coding Style
 
-### 1.1 Naming Conventions `[覆盖 common: 1.1]`
+### 1.1 Naming Conventions `[Overrides common: 1.1]`
 
 **Reason:** TypeScript has established community conventions for casing and naming that differ from generic guidance.
 
@@ -22,7 +22,7 @@ These rules apply to TypeScript projects. They inherit all rules from `rules-com
 - Generics: single uppercase letter for simple cases (`T`, `K`, `V`), descriptive `PascalCase` for complex ones (`TResult`, `TInput`)
 - Files: `kebab-case.ts` for modules, `PascalCase.tsx` for React components
 
-### 1.2 Function Size `[覆盖 common: 1.2]`
+### 1.2 Function Size `[Overrides common: 1.2]`
 
 **Reason:** TypeScript's type annotations add visual weight — adjust line targets accordingly.
 
@@ -30,7 +30,7 @@ These rules apply to TypeScript projects. They inherit all rules from `rules-com
 - Extract complex type transformations into named type aliases
 - Use overload signatures sparingly — prefer union types or generics when possible
 
-### 1.3 File Organization `[覆盖 common: 1.3]`
+### 1.3 File Organization `[Overrides common: 1.3]`
 
 **Reason:** TypeScript has specific conventions for exports, type-only files, and barrel patterns.
 
@@ -43,7 +43,7 @@ These rules apply to TypeScript projects. They inherit all rules from `rules-com
 
 Always enable `strict: true` in `tsconfig.json`. This includes `strictNullChecks`, `noImplicitAny`, `strictFunctionTypes`, and more. Never weaken strict mode to fix type errors — fix the types instead.
 
-### 1.5 Formatting `[覆盖 common: 1.5]`
+### 1.5 Formatting `[Overrides common: 1.5]`
 
 **Reason:** TypeScript ecosystem has converged on specific formatters.
 
@@ -71,7 +71,7 @@ type Result<T> = { ok: true; value: T } | { ok: false; error: Error };
 type Result<T> = { ok: boolean; value?: T; error?: Error };
 ```
 
-### 2.3 Readonly by Default `[覆盖 common: 5.4]`
+### 2.3 Readonly by Default `[Overrides common: 5.4]`
 
 **Reason:** TypeScript provides `readonly`, `Readonly<T>`, and `as const` — use them aggressively.
 
@@ -90,7 +90,7 @@ Leverage built-in utility types (`Partial`, `Required`, `Pick`, `Omit`, `Record`
 
 ---
 
-## 3. Testing `[覆盖 common: 2.1]`
+## 3. Testing `[Overrides common: 2.1]`
 
 **Reason:** TypeScript testing has specific toolchain considerations.
 
@@ -98,7 +98,7 @@ Leverage built-in utility types (`Partial`, `Required`, `Pick`, `Omit`, `Record`
 
 Write tests in TypeScript, not JavaScript. Type-check your tests — they are code too. Use `vitest`, `jest` with `ts-jest`, or `node:test` with a TypeScript loader.
 
-### 3.2 Test Coverage Strategy `[覆盖 common: 2.4]`
+### 3.2 Test Coverage Strategy `[Overrides common: 2.4]`
 
 **Reason:** TypeScript's type system eliminates certain classes of bugs — focus testing elsewhere.
 
@@ -108,7 +108,7 @@ Write tests in TypeScript, not JavaScript. Type-check your tests — they are co
 
 ---
 
-## 4. Error Handling `[覆盖 common: 5.6]`
+## 4. Error Handling `[Overrides common: 5.6]`
 
 **Reason:** TypeScript lacks checked exceptions — use the type system for error handling.
 
@@ -135,7 +135,7 @@ Use `Promise.all()` for independent parallel operations. Use `Promise.allSettled
 
 ---
 
-## 6. Resource Cleanup `[覆盖 common: 4.3]`
+## 6. Resource Cleanup `[Overrides common: 4.3]`
 
 **Reason:** TypeScript/Node.js has specific patterns for resource management.
 
@@ -146,7 +146,7 @@ Use `Promise.all()` for independent parallel operations. Use `Promise.allSettled
 
 ---
 
-## 7. Dependency Injection `[覆盖 common: 5.2]`
+## 7. Dependency Injection `[Overrides common: 5.2]`
 
 **Reason:** TypeScript supports multiple DI patterns with varying trade-offs.
 
@@ -157,7 +157,7 @@ Use `Promise.all()` for independent parallel operations. Use `Promise.allSettled
 
 ---
 
-## 8. SQL and Injection Prevention `[覆盖 common: 3.6]`
+## 8. SQL and Injection Prevention `[Overrides common: 3.6]`
 
 **Reason:** TypeScript ecosystem has type-safe query builders that go beyond parameterized queries.
 
