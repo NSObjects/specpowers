@@ -151,4 +151,25 @@ test('install materialization', async (t) => {
       rmSync(tmp, { recursive: true, force: true });
     }
   });
+
+  await t.test('install() regenerates Codex managed skills after the generated tree is deleted', async () => {
+    const tmp = setupTmpRoot();
+    try {
+      const { install } = await loadInstallApi(tmp);
+
+      await install({ platform: 'codex', profile: 'developer', rootDir: tmp });
+      assert.ok(existsSync(join(tmp, '.codex/skills/using-skills/SKILL.md')));
+
+      rmSync(join(tmp, '.codex', 'skills'), { recursive: true, force: true });
+      assert.ok(!existsSync(join(tmp, '.codex/skills/using-skills/SKILL.md')),
+        'generated tree should be gone after deletion');
+
+      const result = await install({ platform: 'codex', profile: 'developer', rootDir: tmp });
+      assert.equal(result.success, true);
+      assert.ok(existsSync(join(tmp, '.codex/skills/using-skills/SKILL.md')),
+        'install should regenerate the Codex managed tree from authored skills');
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  });
 });

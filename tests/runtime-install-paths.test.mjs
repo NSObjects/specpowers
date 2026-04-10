@@ -42,4 +42,26 @@ test('runtime entrypoints use managed install directories', async (t) => {
     const content = readFileSync(resolve(ROOT, 'README.md'), 'utf-8');
     assert.ok(content.includes('node scripts/install.js --platform codex --profile developer'));
   });
+
+  await t.test('.gitignore excludes generated Codex managed skills', () => {
+    const gitignore = readFileSync(resolve(ROOT, '.gitignore'), 'utf-8');
+    assert.ok(gitignore.includes('.codex/skills/'));
+  });
+
+  await t.test('README describes Codex skills as materialized content', () => {
+    const readme = readFileSync(resolve(ROOT, 'README.md'), 'utf-8');
+    assert.match(readme, /materializ|bootstrap the managed skills payload/i);
+  });
+
+  await t.test('README.zh-CN describes Codex skills as generated managed content', () => {
+    const readmeZh = readFileSync(resolve(ROOT, 'README.zh-CN.md'), 'utf-8');
+    assert.match(readmeZh, /受管技能产物|物化|生成受管/);
+  });
+
+  await t.test('.codex/INSTALL.md describes materialization not manual maintenance', () => {
+    const install = readFileSync(resolve(ROOT, '.codex/INSTALL.md'), 'utf-8');
+    assert.match(install, /materializ|generated|managed skills/i);
+    assert.ok(!install.match(/manually maintain|hand.maintain/i),
+      'Install docs should not instruct readers to maintain .codex/skills/ as a second authored source');
+  });
 });

@@ -69,7 +69,7 @@ flowchart TD
 | **Gemini CLI** | ❌ | `gemini extensions install https://github.com/NSObjects/specpowers` |
 | **OpenCode** | ❌ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
 
-对于 Codex 本地插件安装，需要在首次使用前进入克隆目录执行一次受管安装引导：
+对于 Codex 本地插件安装，首次使用前需执行一次物化步骤，从 `skills/` 生成受管技能产物到 `.codex/skills/`：
 
 ```bash
 node scripts/install.js --platform codex --profile developer
