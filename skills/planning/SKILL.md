@@ -13,7 +13,7 @@ Break the design into bite-sized, TDD-driven tasks. Each task maps back to a spe
 
 <HARD-GATE>
 Every Task MUST include a `Covers specs:` field mapping to a Spec Scenario.
-Every code step MUST include actual code — no placeholders.
+Every step MUST include concrete acceptance criteria, file paths, or spec references — no vague placeholders.
 Do NOT proceed to execution without user confirmation.
 </HARD-GATE>
 
@@ -92,42 +92,31 @@ Tasks MUST be ordered so each builds on the previous:
 
 - [ ] **Step 1: Write failing test**
   Acceptance from spec: GIVEN [precondition] WHEN [action] THEN [expected]
-  ```typescript
-  test('[test name from Spec scenario]', () => {
-      // GIVEN
-      const context = setupTestContext();
-      // WHEN
-      const result = context.doAction();
-      // THEN
-      expect(result).toBe(expected);
-  });
-  ```
+  Test name: `[descriptive test name from Spec scenario]`
 
 - [ ] **Step 2: Run test, verify RED**
-  Run: `npm test path/to/test.ts`
+  Run: `[test command]`
   Expected: FAIL — "[specific failure reason]"
 
 - [ ] **Step 3: Implement minimal code**
-  ```typescript
-  // Complete code, no placeholders
-  export function doAction(): Result {
-      return expected;
-  }
-  ```
+  File: `[exact file path]`
+  Responsibility: [what this code does, not how]
 
 - [ ] **Step 4: Run test, verify GREEN**
-  Run: `npm test path/to/test.ts`
+  Run: `[test command]`
   Expected: PASS
 ````
 
 ## No Placeholders
 
-Every step must contain the actual content. These are **plan failures** — never write them:
+Every step must contain concrete, actionable content. These are **plan failures** — never write them:
 - "TBD", "TODO", "implement later", "fill in details"
 - "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code)
-- "Similar to Task N" (repeat the code — tasks may be read independently)
-- Steps that describe what to do without showing how (code blocks required for code steps)
+- "Write tests for the above" (without specifying GIVEN/WHEN/THEN)
+- "Similar to Task N" (repeat the spec references — tasks may be read independently)
+- Steps that lack acceptance criteria or file paths
+
+**Plans describe WHAT to build and WHERE, not HOW.** Actual test code and implementation code are written by the implementer during the TDD cycle, following `test-driven-development` and `rules-{language}` disciplines.
 
 ## Spec-Task Mapping Contract
 
@@ -149,11 +138,11 @@ After writing the complete plan:
 
 1. **Spec coverage:** For each Scenario in the specs, can you point to a Task? List any gaps.
 2. **Placeholder scan:** Search for red flags — any patterns from "No Placeholders" above. Fix them.
-3. **Type consistency:** Do the types, method signatures, and names used in later tasks match earlier tasks?
+3. **Interface consistency:** Do the file paths, responsibilities, and spec references in later tasks align with earlier tasks?
 4. **Test-first check:** Does every Task start with writing a failing test?
 5. **Size check:** Does any Task have more than 5 steps or touch more than 3 files? Split it.
 6. **Dependency check:** Are Tasks ordered so each one compiles independently?
-7. **Code correctness:** Do the code snippets in later Tasks use the APIs defined in earlier Tasks correctly?
+7. **Dependency coherence:** Do later Tasks reference files and responsibilities defined in earlier Tasks correctly?
 
 Fix issues inline. If you find a Spec Scenario with no Task, add the Task.
 
@@ -162,8 +151,8 @@ Fix issues inline. If you find a Spec Scenario with no Task, add the Task.
 | Thought | Reality |
 |---------|---------|
 | "This Task is big but it's all related" | If you can't describe what it does in one sentence, split it. |
-| "I'll figure out the exact code during implementation" | The plan IS the code. If you write "implement the logic", you haven't planned. |
-| "Tests for this are obvious, no need to write them" | If they're obvious, they take 30 seconds to write. No excuses. |
+| "I'll figure out the details during implementation" | The plan defines WHAT and WHERE. If you write "implement the logic" without spec references and file paths, you haven't planned. |
+| "Tests for this are obvious, no need to specify acceptance criteria" | If they're obvious, the GIVEN/WHEN/THEN takes 30 seconds to write. No excuses. |
 | "The dependency order doesn't matter, I'll sort it out" | Wrong order = compile errors = wasted time = bad experience for the user. |
 | "This infrastructure task doesn't need a Spec mapping" | Correct — mark it as infrastructure. But don't use this as an excuse for unmapped business logic. |
 | "I'll add error handling as a separate Task later" | Error handling IS the behavior. Spec scenarios include edge cases. Plan them now. |
@@ -173,7 +162,7 @@ Fix issues inline. If you find a Spec Scenario with no Task, add the Task.
 | Excuse | Reality |
 |--------|---------|
 | "The plan is too detailed, it slows things down" | Detailed plans execute faster than vague ones. Every minute of planning saves 10 of debugging. |
-| "I can't write exact code without running it" | You can write directionally correct code. The plan is a sketch, not production. |
+| "I can't know the exact acceptance criteria without running it" | The spec defines the criteria. Translate GIVEN/WHEN/THEN into the plan. |
 | "6 steps per Task is too many, I'll condense" | Each step is 2-5 minutes. 6 steps = 15 minutes. That's the right granularity. |
 
 ## After Planning

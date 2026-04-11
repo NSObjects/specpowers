@@ -28,13 +28,16 @@ Agent tool (general-purpose):
 
     ## Your Job
 
+    **Before writing any code**, load these skills:
+    - `specpowers:rules-common` — Keep the universal rules active as the baseline for naming, testing, design, and review judgment
+    - `specpowers:test-driven-development` — TDD is mandatory for every task
+    - `specpowers:rules-{language}` — Load the language rule skill matching the project's primary language (e.g., `rules-golang`, `rules-typescript`, `rules-python`) so language-specific rules layer on top of `rules-common`
+
     Once you're clear on requirements:
-    1. Implement exactly what the task specifies
-    2. Write tests (following TDD if task says to)
-    3. Verify implementation works
-    4. Commit your work
-    5. Self-review (see below)
-    6. Report back
+    1. Follow TDD: write a failing test first, verify RED, then implement minimal code to pass
+    2. Verify implementation works (all tests GREEN)
+    3. Self-review (see below)
+    4. Report back
 
     Work from: [directory]
 
@@ -92,7 +95,7 @@ Agent tool (general-purpose):
 
     **Testing:**
     - Do tests actually verify behavior (not just mock behavior)?
-    - Did I follow TDD if required?
+    - Did I follow TDD discipline (test-first, RED → GREEN → REFACTOR)?
     - Are tests comprehensive?
 
     If you find issues during self-review, fix them now before reporting.

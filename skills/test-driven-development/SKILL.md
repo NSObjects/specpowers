@@ -28,6 +28,10 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 Thinking "skip TDD just this once"? Stop. That's rationalization.
 
+## Language Rules Integration
+
+When this skill is activated, keep `rules-common` active as the universal rules baseline, then load the corresponding `rules-{language}` skill for the project's primary language (e.g., `rules-golang` for Go, `rules-typescript` for TypeScript, `rules-python` for Python). Language-specific rules define test conventions (table-driven tests, naming patterns, framework choices) that must be followed during the TDD cycle without replacing the common baseline.
+
 ## The Iron Law
 
 ```

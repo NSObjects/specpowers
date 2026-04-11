@@ -10,6 +10,11 @@ Use this template when dispatching a code quality reviewer subagent.
 Agent tool (specpowers:code-reviewer subagent):
   Use the code-reviewer subagent prompt at ../requesting-code-review/code-reviewer-prompt.md
 
+  Before reviewing, load `specpowers:rules-common` as the universal review baseline,
+  then load `specpowers:rules-{language}` for the project's primary language
+  (e.g., rules-golang, rules-typescript, rules-python) so language-specific conventions
+  layer on top during review.
+
   WHAT_WAS_IMPLEMENTED: [from implementer's report]
   SPEC_SCENARIOS: [GIVEN/WHEN/THEN scenarios from the spec that this task covers]
   BASE_SHA: [commit before task]
