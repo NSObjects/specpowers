@@ -91,9 +91,10 @@ For each unchecked Task in tasks.md:
    - Follow TDD skill discipline throughout
    - **Do NOT pause between these steps — complete them all in one go**
 4. **Two-stage review:** Stage 1 (spec compliance) → Stage 2 (code quality)
-   > **Milestone verification:** Every 3-4 completed tasks, invoke `verification-loop` for a full pipeline check (Build → Types → Lint → Tests → Security → Diff).
-5. **If either review returns issues:** Fix before reporting to user.
-6. **ONLY NOW report and pause:**
+   > **Feature-group milestone verification:** Run `verification-loop` when the current Task is the last subtask in a feature group. Intermediate subtasks do not trigger `verification-loop` by count alone.
+5. **Feature-group handoff gate:** Before starting the next feature group, confirm the current feature group has a `verification-loop` result. If that result is missing or failed, do not proceed to the next feature group.
+6. **If either review returns issues:** Fix before reporting to user.
+7. **ONLY NOW report and pause:**
 
 ```markdown
 ✅ Task N.M Complete: [Task Name]
@@ -117,15 +118,18 @@ For each unchecked Task in tasks.md:
 3. Say "Continue" to execute the next Task, or provide feedback
 ```
 
-7. **Wait for user instruction.** Do NOT proceed until user explicitly says to continue.
-8. **Mark Task as complete** (check the checkbox in tasks.md `- [ ]` → `- [x]`) when user says "Continue" or confirms.
+8. **Wait for user instruction.** Do NOT proceed until user explicitly says to continue.
+9. **Mark Task as complete** (check the checkbox in tasks.md `- [ ]` → `- [x]`) when user says "Continue" or confirms.
 
 ## Execution Flow — Fast Mode
 
 Execute all unchecked Tasks continuously:
 
 1. For each Task: build context → execute (subagent or main agent) → two-stage review → fix if needed → mark complete
-2. After ALL Tasks: produce unified report:
+2. When the current Task is the last subtask in a feature group: run `verification-loop` before treating that feature group as complete
+3. Before starting the next feature group: confirm the current feature group's `verification-loop` result exists and is ready; if it is missing or failed, do not proceed to the next feature group
+4. After all feature groups are complete: run a final `verification-loop` before the final completion report.
+5. After ALL Tasks: produce unified report:
 
 ```markdown
 🎉 All Tasks Complete!
@@ -139,6 +143,7 @@ Execute all unchecked Tasks continuously:
 **Spec Coverage:** M/M scenarios, 100%
 
 **Reviews:** All Tasks passed two-stage review (spec compliance + code quality)
+**Verification:** Each feature group passed its `verification-loop`, and the final global `verification-loop` passed
 
 Please review all code changes, then manually commit if satisfied.
 When finished, you can say 'Archive' to merge Delta Specs into the main specifications.

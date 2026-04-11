@@ -165,11 +165,11 @@ If a tool is not installed, the corresponding stage is skipped with a note — n
 
 ## When to Run
 
-- **After completing a TDD task** in `spec-driven-development` — run before marking the task done
+- **After completing the last subtask in a feature group** in `spec-driven-development` — run before treating that feature group as complete
 - **After a major refactoring** — verify nothing broke
 - **Before committing** — the final gate before `git commit`
 - **Before opening a PR** — the last check before requesting review
-- **At milestones during long sessions** — every 3-4 completed tasks, run a verification pass
+- **After all feature groups are complete** — run a final `verification-loop` pass before the final completion report
 
 ---
 
@@ -231,8 +231,9 @@ Non-negotiable rules for the verification loop:
 
 ### Integrating with spec-driven-development
 
-After completing a task in the spec-driven-development workflow:
-1. Run the verification loop before marking the task as done
-2. If NOT READY, fix issues before proceeding to the next task
-3. At major milestones (every 3-4 tasks), run a full verification even if individual tasks passed
-
+After completing work in the spec-driven-development workflow:
+1. Run the verification loop when the current Task is the last subtask in a feature group
+2. If NOT READY, fix issues before treating that feature group as complete
+3. Do not start the next feature group until the current feature group has a ready `verification-loop` result
+4. After all feature groups are complete, run a final `verification-loop` pass before the final completion report
+5. A single feature-group change still requires a final `verification-loop` pass before completion

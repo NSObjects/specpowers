@@ -80,6 +80,8 @@ Tasks MUST be ordered so each builds on the previous:
 
 ## Task Format
 
+Use `## 1. [Module Name]` to define one feature group boundary. Each nested `Task N.M` entry is a subtask within that feature group.
+
 ````markdown
 # Tasks
 
