@@ -38,4 +38,8 @@ test('distribution metadata versions stay aligned with package.json', async (t) 
     assert.ok(plugin, 'Expected specpowers entry in .claude-plugin/marketplace.json');
     assert.equal(plugin.version, packageVersion);
   });
+
+  await t.test('gemini-extension.json matches package.json', () => {
+    assert.equal(readJson('gemini-extension.json').version, packageVersion);
+  });
 });

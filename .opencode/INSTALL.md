@@ -43,7 +43,7 @@ To pin a specific version:
 
 ```json
 {
-  "plugin": ["specpowers@git+https://github.com/NSObjects/specpowers#v0.1.0"]
+  "plugin": ["specpowers@git+https://github.com/NSObjects/specpowers#v0.6.0"]
 }
 ```
 

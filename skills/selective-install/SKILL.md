@@ -83,7 +83,7 @@ Doctor Report
 ✓ State file found and valid
 ✓ 7 modules in state, 7 on disk
 ✗ rules-common: SKILL.md missing from disk
-✗ Version mismatch: installed 0.1.0, current 0.2.0
+✗ Version mismatch: installed 0.5.0, current 0.6.0
 
 Recommendation: run `repair` to fix 2 issues
 ```
