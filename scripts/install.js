@@ -237,32 +237,50 @@ function withRollback(rootDir, statePath, targetRelativePaths, operation) {
 /**
  * Build state records for the provided modules on a platform.
  *
+ * When the adapter exports `expandModulePaths`, each source path is expanded
+ * into its individual target files (used by kiro-ide to flatten skills into
+ * steering files). Otherwise falls back to the standard 1:1 path mapping.
+ *
  * @param {string[]} moduleIds
  * @param {Map<string, { id: string, paths: string[] }>} catalogMap
- * @param {{ getInstallPath: (path: string) => string }} adapter
+ * @param {{ getInstallPath: (path: string) => string, expandModulePaths?: (rootDir: string, path: string) => Array<{ source: string, target: string }> }} adapter
  * @param {string} installedAt
+ * @param {string} rootDir - SpecPowers root directory (needed for expandModulePaths)
  * @returns {{ id: string, installedAt: string, paths: string[] }[]}
  */
-function buildModuleRecords(moduleIds, catalogMap, adapter, installedAt) {
+function buildModuleRecords(moduleIds, catalogMap, adapter, installedAt, rootDir) {
   return moduleIds.map((id) => {
     const mod = catalogMap.get(id);
-    return {
-      id,
-      installedAt,
-      paths: mod.paths.map((p) => adapter.getInstallPath(p)),
-    };
+    let paths;
+
+    if (typeof adapter.expandModulePaths === 'function') {
+      // Expand each source path into its individual target files
+      paths = mod.paths.flatMap((p) => {
+        const expanded = adapter.expandModulePaths(rootDir, p);
+        return expanded.map((pair) => pair.target);
+      });
+    } else {
+      paths = mod.paths.map((p) => adapter.getInstallPath(p));
+    }
+
+    return { id, installedAt, paths };
   });
 }
 
 /**
  * Materialize a full desired state and prune managed paths no longer selected.
  *
+ * When the adapter exports `expandModulePaths` and `materializeFile`, uses
+ * the adapter's custom file-level materialization (e.g. kiro-ide steering
+ * flattening). Otherwise falls back to standard directory-level copy.
+ *
  * @param {string} rootDir
  * @param {Array<{ paths: string[] }>} currentModules
  * @param {Array<{ id: string, paths: string[] }>} desiredModules
  * @param {Map<string, { id: string, paths: string[] }>} catalogMap
+ * @param {{ expandModulePaths?: Function, materializeFile?: Function }} [adapter]
  */
-function syncManagedModules(rootDir, currentModules, desiredModules, catalogMap) {
+function syncManagedModules(rootDir, currentModules, desiredModules, catalogMap, adapter) {
   const currentPaths = currentModules.flatMap((module) => module.paths);
   const desiredPaths = desiredModules.flatMap((module) => module.paths);
   const desiredPathSet = new Set(desiredPaths);
@@ -273,27 +291,58 @@ function syncManagedModules(rootDir, currentModules, desiredModules, catalogMap)
     }
   }
 
-  for (const module of desiredModules) {
-    const sourceModule = catalogMap.get(module.id);
-    sourceModule.paths.forEach((sourceRelativePath, index) => {
-      materializePath(rootDir, sourceRelativePath, module.paths[index]);
-    });
+  if (typeof adapter?.expandModulePaths === 'function' && typeof adapter?.materializeFile === 'function') {
+    // Adapter-driven file-level materialization
+    for (const module of desiredModules) {
+      const sourceModule = catalogMap.get(module.id);
+      for (const sourcePath of sourceModule.paths) {
+        const expanded = adapter.expandModulePaths(rootDir, sourcePath);
+        for (const { source, target } of expanded) {
+          adapter.materializeFile(rootDir, source, target);
+        }
+      }
+    }
+  } else {
+    // Standard directory-level copy
+    for (const module of desiredModules) {
+      const sourceModule = catalogMap.get(module.id);
+      sourceModule.paths.forEach((sourceRelativePath, index) => {
+        materializePath(rootDir, sourceRelativePath, module.paths[index]);
+      });
+    }
   }
 }
 
 /**
  * Materialize only newly added modules without pruning existing ones.
  *
+ * When the adapter exports `expandModulePaths` and `materializeFile`, uses
+ * the adapter's custom file-level materialization. Otherwise falls back to
+ * standard directory-level copy.
+ *
  * @param {string} rootDir
  * @param {Array<{ id: string, paths: string[] }>} newModules
  * @param {Map<string, { id: string, paths: string[] }>} catalogMap
+ * @param {{ expandModulePaths?: Function, materializeFile?: Function }} [adapter]
  */
-function materializeModules(rootDir, newModules, catalogMap) {
-  for (const module of newModules) {
-    const sourceModule = catalogMap.get(module.id);
-    sourceModule.paths.forEach((sourceRelativePath, index) => {
-      materializePath(rootDir, sourceRelativePath, module.paths[index]);
-    });
+function materializeModules(rootDir, newModules, catalogMap, adapter) {
+  if (typeof adapter?.expandModulePaths === 'function' && typeof adapter?.materializeFile === 'function') {
+    for (const module of newModules) {
+      const sourceModule = catalogMap.get(module.id);
+      for (const sourcePath of sourceModule.paths) {
+        const expanded = adapter.expandModulePaths(rootDir, sourcePath);
+        for (const { source, target } of expanded) {
+          adapter.materializeFile(rootDir, source, target);
+        }
+      }
+    }
+  } else {
+    for (const module of newModules) {
+      const sourceModule = catalogMap.get(module.id);
+      sourceModule.paths.forEach((sourceRelativePath, index) => {
+        materializePath(rootDir, sourceRelativePath, module.paths[index]);
+      });
+    }
   }
 }
 
@@ -372,7 +421,7 @@ export async function install(options) {
   // Build module install records
   const catalogMap = new Map(catalog.modules.map((m) => [m.id, m]));
   const now = new Date().toISOString();
-  const moduleRecords = buildModuleRecords(resolvedIds, catalogMap, adapter, now);
+  const moduleRecords = buildModuleRecords(resolvedIds, catalogMap, adapter, now, rootDir);
 
   // Read package.json for sourceVersion
   let sourceVersion = 'unknown';
@@ -403,7 +452,7 @@ export async function install(options) {
 
   withRollback(rootDir, statePath, transactionalPaths, () => {
     // Sync managed files before updating install state
-    syncManagedModules(rootDir, currentState.modules, moduleRecords, catalogMap);
+    syncManagedModules(rootDir, currentState.modules, moduleRecords, catalogMap, adapter);
     writePlatformState(rootDir, platform, state);
   });
 
@@ -481,7 +530,7 @@ export async function installModules(options) {
     // Build module records for new modules
     const catalogMap = new Map(catalog.modules.map((m) => [m.id, m]));
     const now = new Date().toISOString();
-    const newRecords = buildModuleRecords(newModuleIds, catalogMap, adapter, now);
+    const newRecords = buildModuleRecords(newModuleIds, catalogMap, adapter, now, rootDir);
     const updatedState = {
       ...currentState,
       modules: [...currentState.modules, ...newRecords],
@@ -492,7 +541,7 @@ export async function installModules(options) {
       statePath,
       newRecords.flatMap((module) => module.paths),
       () => {
-        materializeModules(rootDir, newRecords, catalogMap);
+        materializeModules(rootDir, newRecords, catalogMap, adapter);
         writePlatformState(rootDir, platform, updatedState);
       },
     );
