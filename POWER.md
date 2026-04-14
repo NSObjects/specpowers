@@ -9,57 +9,99 @@ keywords: ["specpowers", "workflow", "tdd", "spec-driven", "code review", "artif
 
 You now have access to SpecPowers — a spec-driven development workflow for AI coding assistants.
 
-## Step 1: Install Skills
+SpecPowers enforces a structured artifact flow: every feature goes through exploring → proposing → specifying → designing → planning → implementation → archiving. TDD is mandatory. Code review is automatic.
 
-Copy each skill folder from this power's `skills/` directory into the user's workspace `.kiro/skills/` directory. Each folder contains a `SKILL.md` file that Kiro will auto-discover and activate based on context.
+No installation steps needed. Use the scenario detection below to load the right steering file for the current task.
 
-**Core skills (always install):**
+# Scenario Detection & Steering File Selection
 
-| Source | Target |
-|--------|--------|
-| `skills/using-skills/` | `.kiro/skills/using-skills/` |
-| `skills/exploring/` | `.kiro/skills/exploring/` |
-| `skills/proposing/` | `.kiro/skills/proposing/` |
-| `skills/specifying/` | `.kiro/skills/specifying/` |
-| `skills/designing/` | `.kiro/skills/designing/` |
-| `skills/planning/` | `.kiro/skills/planning/` |
-| `skills/spec-driven-development/` | `.kiro/skills/spec-driven-development/` |
-| `skills/archiving/` | `.kiro/skills/archiving/` |
-| `skills/test-driven-development/` | `.kiro/skills/test-driven-development/` |
-| `skills/systematic-debugging/` | `.kiro/skills/systematic-debugging/` |
-| `skills/requesting-code-review/` | `.kiro/skills/requesting-code-review/` |
-| `skills/receiving-code-review/` | `.kiro/skills/receiving-code-review/` |
-| `skills/verification-before-completion/` | `.kiro/skills/verification-before-completion/` |
-| `skills/verification-loop/` | `.kiro/skills/verification-loop/` |
-| `skills/dispatching-parallel-agents/` | `.kiro/skills/dispatching-parallel-agents/` |
-| `skills/writing-skills/` | `.kiro/skills/writing-skills/` |
-| `skills/quality-gate/` | `.kiro/skills/quality-gate/` |
-| `skills/selective-install/` | `.kiro/skills/selective-install/` |
-| `skills/rules-common/` | `.kiro/skills/rules-common/` |
+## 🏗️ Building / Implementing → `specpowers-workflow.md`
 
-**Language rule skills (install based on project languages):**
+**Load when:** "build", "create", "implement", "add feature", "develop", or resuming work.
 
-| Source | Target | Language |
-|--------|--------|----------|
-| `skills/rules-typescript/` | `.kiro/skills/rules-typescript/` | TypeScript |
-| `skills/rules-python/` | `.kiro/skills/rules-python/` | Python |
-| `skills/rules-golang/` | `.kiro/skills/rules-golang/` | Go |
-| `skills/rules-rust/` | `.kiro/skills/rules-rust/` | Rust |
-| `skills/rules-java/` | `.kiro/skills/rules-java/` | Java |
-| `skills/rules-kotlin/` | `.kiro/skills/rules-kotlin/` | Kotlin |
-| `skills/rules-csharp/` | `.kiro/skills/rules-csharp/` | C# |
-| `skills/rules-swift/` | `.kiro/skills/rules-swift/` | Swift |
-| `skills/rules-cpp/` | `.kiro/skills/rules-cpp/` | C++ |
-| `skills/rules-dart/` | `.kiro/skills/rules-dart/` | Dart |
-| `skills/rules-php/` | `.kiro/skills/rules-php/` | PHP |
-| `skills/rules-perl/` | `.kiro/skills/rules-perl/` | Perl |
+Workflow chain: `exploring → proposing → specifying → designing → planning → spec-driven-development → archiving`
 
-Copy each folder with all its contents (SKILL.md and any supporting files like prompt templates, reference docs). For language rule skills, install only the ones matching the project's languages — use `selective-install` for profile-based installation.
+## 🔍 Exploring → `exploring.md`
 
-## Step 2: Verify Installation
+**Load when:** "explore", "understand", "how does this work", "investigate"
+- Subagent prompt: `exploring--implementation-researcher-prompt.md`
 
-Confirm that `.kiro/skills/` contains at minimum the 19 core skill folders, each with a `SKILL.md`. Skills should be visible in the Kiro panel under "Agent Steering & Skills".
-Also confirm `.kiro/skills/requesting-code-review/code-reviewer-prompt.md` exists, since that skill depends on the reviewer prompt template being installed alongside `SKILL.md`.
+## 📝 Proposing → `proposing.md`
 
-# When to Load Steering Files
-- When building, creating, implementing features, or resuming work → `specpowers-workflow.md`
+**Load when:** "propose", "suggest", "what if we", "RFC"
+
+## 📋 Specifying → `specifying.md`
+
+**Load when:** "specify", "requirements", "behavioral spec", "acceptance criteria"
+- Reference: `specifying--delta-format-guide.md`
+
+## 🏛️ Designing → `designing.md`
+
+**Load when:** "design", "architecture", "technical approach"
+
+## 📅 Planning → `planning.md`
+
+**Load when:** "plan", "break down", "task list", "implementation plan"
+
+## ⚙️ Implementing → `spec-driven-development.md`
+
+**Load when:** "implement", "start coding", "next task", "continue", or `tasks.md` has unchecked items.
+- Subagent prompts: `spec-driven-development--implementer-prompt.md`, `spec-driven-development--code-quality-reviewer-prompt.md`, `spec-driven-development--spec-reviewer-prompt.md`
+
+## 🐛 Debugging → `systematic-debugging.md`
+
+**Load when:** "bug", "debug", "fix", "broken", "failing", "error"
+- References: `systematic-debugging--root-cause-tracing.md`, `systematic-debugging--defense-in-depth.md`, `systematic-debugging--condition-based-waiting.md`
+
+## ✅ Verification → `verification-loop.md`
+
+**Load when:** "verify", "check", "validate", "ready to commit", "pre-PR"
+
+## ✔️ Completion Check → `verification-before-completion.md`
+
+**Load when:** claiming work is complete.
+
+## 🔒 Quality Gate → `quality-gate.md`
+
+**Load when:** "lint", "format", "type check", "code quality"
+- Reference: `quality-gate--protected-configs.md`
+
+## 🧪 TDD → `test-driven-development.md`
+
+**Load when:** "test first", "TDD", "write tests", "red-green-refactor"
+- Reference: `test-driven-development--testing-anti-patterns.md`
+
+## 📦 Archiving → `archiving.md`
+
+**Load when:** "archive", "done", "complete", "wrap up"
+
+## 👀 Code Review → `requesting-code-review.md` / `receiving-code-review.md`
+
+**Load when:** "review", "code review", "feedback"
+- Subagent prompt: `requesting-code-review--code-reviewer-prompt.md`
+
+## 🚀 Parallel Agents → `dispatching-parallel-agents.md`
+
+**Load when:** "parallel", "dispatch", "multiple agents"
+- Subagent prompts: `dispatching-parallel-agents--planner-agent-prompt.md`, `dispatching-parallel-agents--security-reviewer-prompt.md`, `dispatching-parallel-agents--tdd-guide-prompt.md`
+
+## 📏 Coding Rules → `rules-common.md`
+
+**Load when writing or reviewing code.** Then layer language-specific rules:
+
+`rules-typescript.md` · `rules-python.md` · `rules-golang.md` · `rules-rust.md` · `rules-java.md` · `rules-kotlin.md` · `rules-csharp.md` · `rules-swift.md` · `rules-cpp.md` · `rules-dart.md` · `rules-php.md` · `rules-perl.md`
+
+## ✍️ Writing Skills → `writing-skills.md`
+
+**Load when:** "write a skill", "create a skill", "new skill"
+
+## 🔧 Module Management → `selective-install.md`
+
+**Load when:** "install modules", "manage skills", "profiles", "doctor", "repair"
+
+## 📖 Skill System → `using-skills.md`
+
+**Load when:** starting a session or unsure which skill applies.
+- References: `using-skills--references--kiro-tools.md`, `using-skills--references--codex-tools.md`
+
+
