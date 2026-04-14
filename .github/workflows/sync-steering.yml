@@ -21,7 +21,7 @@ jobs:
         env:
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
-          node-version: 22
+          node-version: 24
 
       - run: node scripts/sync-steering.js
 
