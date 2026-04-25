@@ -1,60 +1,46 @@
 <!-- generated from skills/ by sync-steering.js -->
 # Codex Tool Mapping
 
-Skills use current Claude Code tool names. Claude Code renamed `Task` to `Agent` in v2.1.63; older `Task` references still mean the same subagent-dispatch tool. When you encounter these in a skill, use your platform equivalent:
+SpecPowers skills usually name Claude Code tools. In Codex, translate them as follows.
 
-| Skill references | Codex equivalent |
-|-----------------|------------------|
-| `Agent` tool (dispatch subagent) | `spawn_agent` (see [Named agent dispatch](#named-agent-dispatch)) |
-| Multiple `Agent` calls (parallel) | Multiple `spawn_agent` calls |
-| Agent returns result | `wait_agent` |
-| Agent completes automatically | `close_agent` to free slot |
-| `TodoWrite` (task tracking) | `update_plan` |
-| `Skill` tool (invoke a skill) | Skills load natively — just follow the instructions |
-| `Read`, `Write`, `Edit` (files) | Use your native file tools |
-| `Bash` (run commands) | Use your native shell tools |
+| Skill reference | Codex equivalent |
+| --- | --- |
+| `Skill` | Native skill discovery/load. Follow the loaded skill content. |
+| `Agent` or legacy `Task` | `spawn_agent`. Use `wait_agent` for results and `close_agent` when finished. |
+| Multiple `Agent` calls | Multiple `spawn_agent` calls, then `wait_agent` for each. |
+| `TodoWrite` | `update_plan`. |
+| `Read`, `Write`, `Edit` | Native file tools. |
+| `Bash` | Native shell tool. |
 
-## Native subagent support
+If a Codex environment does not expose subagent tools, do not invent a prerequisite. Use the fallback path in the active skill, or perform the work serially and disclose the limitation only if it changes the result.
 
-Codex supports subagent dispatch natively. Use `spawn_agent`, `wait_agent`, and
-`close_agent` when a skill asks you to delegate work. If a particular Codex
-environment does not expose subagent tools, follow the fallback path described
-in that skill instead of inventing a new prerequisite step.
+## Named Agent Dispatch
 
-## Named agent dispatch
+Claude Code skills may reference named agents such as `specpowers:code-reviewer`. Codex does not have a named SpecPowers agent registry. Dispatch named agents manually:
 
-Claude Code skills reference named agent types like `specpowers:code-reviewer`.
-Codex does not have a named agent registry — `spawn_agent` creates generic agents
-from built-in roles (`default`, `explorer`, `worker`).
+1. Find the referenced prompt file, for example `skills/requesting-code-review/code-reviewer-prompt.md`.
+2. Read the prompt content.
+3. Fill all template placeholders such as `{BASE_SHA}` and `{WHAT_WAS_IMPLEMENTED}`.
+4. Spawn a `worker` agent with the filled prompt as the message.
+5. Wait for the result and close the agent slot.
 
-When a skill says to dispatch a named agent type:
+| Skill instruction | Codex execution |
+| --- | --- |
+| `Agent tool (specpowers:code-reviewer)` | `spawn_agent(agent_type="worker", message=<filled code-reviewer prompt>)` |
+| `Agent tool (general-purpose)` with inline prompt | `spawn_agent(message=<same inline prompt>)` |
 
-1. Find the agent's prompt file (e.g., `skills/requesting-code-review/code-reviewer-prompt.md`)
-2. Read the prompt content
-3. Fill any template placeholders (`{BASE_SHA}`, `{WHAT_WAS_IMPLEMENTED}`, etc.)
-4. Spawn a `worker` agent with the filled content as the `message`
+## Message Framing for Subagents
 
-| Skill instruction | Codex equivalent |
-|-------------------|------------------|
-| `Agent tool (specpowers:code-reviewer)` | `spawn_agent(agent_type="worker", message=...)` with `code-reviewer-prompt.md` content |
-| `Agent tool (general-purpose)` with inline prompt | `spawn_agent(message=...)` with the same prompt |
+The `message` parameter is user-level input. Frame it as a concrete task, not as a persona prompt:
 
-### Message framing
-
-The `message` parameter is user-level input, not a system prompt. Structure it
-for maximum instruction adherence:
-
-```
+```text
 Your task is to perform the following. Follow the instructions below exactly.
 
 <agent-instructions>
-[filled prompt content from the agent's .md file]
+[filled prompt content]
 </agent-instructions>
 
-Execute this now. Output ONLY the structured response following the format
-specified in the instructions above.
+Execute this now. Output ONLY the structured response format requested above.
 ```
 
-- Use task-delegation framing ("Your task is...") rather than persona framing ("You are...")
-- Wrap instructions in XML tags — the model treats tagged blocks as authoritative
-- End with an explicit execution directive to prevent summarization of the instructions
+Use XML tags around the instructions and end with an explicit execution directive so the subagent performs the task rather than summarizing the prompt.

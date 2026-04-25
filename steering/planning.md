@@ -1,183 +1,271 @@
 <!-- generated from skills/ by sync-steering.js -->
 ---
 name: planning
-description: "Use when the behavior and design are agreed and the work needs to be broken into small test-first tasks for implementation."
+description: "Use after specs and design are approved to convert them into a traceable, bite-sized, test-first implementation plan."
 ---
 
-# Planning Tasks
+# Planning Skill
 
-Break the design into bite-sized, TDD-driven tasks. Each task maps back to a specific Spec scenario.
+Use this skill when requirements/spec scenarios and the design direction are already agreed, and the next step is to create an implementation plan made of small, test-first tasks.
 
-**Announce at start:** "I'm using the planning skill to create the implementation plan."
+**Start announcement:** "I'm using the planning skill to create the implementation plan."
 
-**Role: Tech Lead.** You decompose work into executable steps. Every step is complete, tested, specific.
+**Role:** Tech Lead. Break approved specs and design into executable, independently verifiable tasks. Each task must be specific enough for another engineer or agent to implement without guessing.
 
-<HARD-GATE>
-Every Task MUST include a `Covers specs:` field mapping to a Spec Scenario.
-Every step MUST include concrete acceptance criteria, file paths, or spec references — no vague placeholders.
-Do NOT proceed to execution without user confirmation.
-</HARD-GATE>
+**Primary output:** `specs/changes/<change-name>/tasks.md`
 
-## Checklist
+## Hard Gates
 
-1. **Read specs AND design** — understand requirements and technical approach
-2. **Read existing code** — understand types, interfaces, naming conventions
-3. **Map file structure** — which files to create/modify per the design
-4. **Decompose into Tasks** — each Task covers one or more Spec Scenarios
-5. **Check Task granularity** — apply size heuristics (see below)
-6. **Order Tasks by dependency** — independent first, dependent later
-7. **Write TDD steps** — failing test → verify red → implement → verify green
-8. **Self-review** — spec coverage, placeholder scan, consistency check, size check
-9. **User confirms** — wait for explicit approval
-10. **Transition** — invoke `spec-driven-development` skill (Kiro: readSteering → spec-driven-development.md)
+- Do **not** write implementation code in this skill.
+- Do **not** proceed to implementation without explicit user aapproval of the plan.
+- Read the relevant specs, design, and existing code before writing tasks. If a required source cannot be found, ask one focused question instead of inventing details.
+- Every task must include a `Covers specs:` field.
+- Business-logic, validation, error-handling, integration, and UI tasks must map to at least one concrete Spec Scenario.
+- Pure infrastructure tasks are allowed only when needed to enable later behavior. Mark them as `Covers specs: Infrastructure — enables <specific scenario/task>`.
+- Every behavior task must start with a failing test step and include RED/GREEN verification.
+- Every task must list concrete file paths, test command(s), and acceptance criteria.
+- No placeholders: never write `TBD`, `TODO`, `implement later`, `similar to above`, or vague instructions such as "add validation" without exact acceptance criteria.
 
-## Task Granularity Heuristics
+## Required Inputs
 
-**Each Task should be:**
-- Completable in **5-15 minutes**
-- Testable with **1-3 test cases**
-- Describable in **one sentence**
-- Producible with **one commit**
+Before planning, identify or infer:
 
-**A Task is TOO LARGE if:**
-- It touches more than 3 files (excluding test files)
-- It has more than 5 steps
-- You can't describe what it does in one sentence
-- It covers more than 2 Spec Scenarios
-- It mixes infrastructure setup with business logic
+- **Change name:** used for `specs/changes/<change-name>/tasks.md`.
+- **Spec files:** scenario definitions, requirements, acceptance criteria, or GIVEN/WHEN/THEN statements.
+- **Design files:** architecture, API choices, data model, interfaces, constraints, or implementation approach.
+- **Repository context:** source layout, naming conventions, test framework, existing commands.
+- **Execution constraints:** user preferences, language rules, CI expectations, backwards-compatibility constraints.
 
-**Split large Tasks:** Break into sub-tasks, each with their own `Covers specs:` mapping. Infrastructure tasks (project config, type definitions) come first.
+If multiple interpretations are possible, prefer the one most directly supported by the provided specs/design. State any assumption in the plan under `Assumptions`.
 
-**A Task is TOO SMALL if:**
-- It only renames a variable or adds an import
-- It has no testable behavior change
-- It would produce a meaningless commit
+## Planning Workflow
 
-**Merge small Tasks:** Combine related micro-changes into one meaningful Task.
+1. **Read specs and design**
+    - Extract every Spec Scenario into a scenario inventory.
+    - Capture each scenario's preconditions, action, expected result, and edge cases.
 
-## Task Ordering and Dependencies
+2. **Read existing code**
+    - Identify existing modules, interfaces, test conventions, fixtures, mocks, and command patterns.
+    - Reuse established naming and structure where possible.
 
-Tasks MUST be ordered so each builds on the previous:
+3. **Map files**
+    - Decide exactly which files will be created or modified.
+    - Separate production files from test files.
+    - Note dependencies between files and tasks.
 
+4. **Decompose into tasks**
+    - Each task should implement one coherent behavior or one enabling infrastructure unit.
+    - Business behavior must trace back to Spec Scenarios.
+    - Edge cases and error handling are first-class behavior, not afterthoughts.
+
+5. **Order by dependency**
+    - Foundation first: configuration, types, interfaces, fixtures.
+    - Core behavior next: business rules and domain logic.
+    - Integration/wiring next: API routes, adapters, handlers, UI wiring.
+    - Edge cases, error paths, and regression coverage as soon as their dependencies exist.
+
+6. **Write TDD steps**
+    - RED: write a failing test with a specific name and expected failure reason.
+    - GREEN: implement the smallest production change that satisfies the test.
+    - VERIFY: run the concrete test command and expected result.
+
+7. **Self-review and repair**
+    - Check traceability, granularity, dependency order, file paths, commands, and placeholder language.
+    - Fix issues in the plan before presenting it.
+
+8. **Stop for approval**
+    - Present or save the plan.
+    - Ask the user to choose an execution mode.
+    - Do not invoke implementation until the user approves.
+
+## Scenario Inventory Format
+
+Before the task list, include a concise inventory so coverage can be audited:
+
+```markdown
+## Spec Coverage Summary
+
+| Spec Scenario | Requirement | Covered by Task(s) | Notes |
+| --- | --- | --- | --- |
+| `specs/<domain>/spec.md` → Scenario "<name>" | "<requirement name>" | Task 1.1 | <important constraint or edge case> |
 ```
-1. Infrastructure/types/interfaces (foundation)
-2. Core logic with tests (business rules)
-3. Integration/wiring (connecting pieces)
-4. Edge cases and error handling
-```
 
-**Dependency rules:**
-- If Task B imports from Task A's output, Task A comes first
-- If Task B modifies a file created by Task A, document this
-- Each Task should produce code that compiles and passes tests independently — no "this won't work until Task 4" steps
+Every scenario must appear in this table. If a scenario cannot be planned because the spec is missing or contradictory, list it under `Open Planning Blockers` instead of silently omitting it.
 
-## Bite-Sized Step Granularity
+## Task Granularity Rules
 
-**Each step within a Task is one action (2-5 minutes):**
-- "Write the failing test" — step
-- "Run it to make sure it fails" — step
-- "Implement the minimal code to make the test pass" — step
-- "Run the tests and make sure they pass" — step
+A good task is:
+
+- Completable in one short implementation pass.
+- Testable with 1-3 focused tests.
+- Describable in one sentence.
+- Suitable for one meaningful commit.
+- Independently compilable and testable after completion.
+
+A task is **too large** if any of these are true:
+
+- It touches more than 3 production files.
+- It has more than 5 steps.
+- It covers more than 2 Spec Scenarios.
+- It mixes unrelated concerns, such as schema changes, business rules, and API wiring.
+- It cannot be summarized in one sentence.
+
+A task is **too small** if any of these are true:
+
+- It only renames a variable or adds an import.
+- It has no observable behavior, compile, or test impact.
+- It would produce a meaningless commit.
+
+When a task is too large, split it by behavior, dependency, or boundary. When tasks are too small, merge them with the nearest related behavior task.
+
+## Dependency Rules
+
+Tasks must be ordered so that each completed task leaves the project in a working state.
+
+- If Task B imports or calls something created in Task A, Task A comes first.
+- If Task B modifies a file created by Task A, mention that dependency explicitly.
+- If a task needs a fixture, mock, schema, or interface, create it in an earlier infrastructure task or within the same small task.
+- Never write a task that intentionally leaves compilation or tests broken until a later task.
 
 ## Task Format
 
-Use `## 1. [Module Name]` to define one feature group boundary. Each nested `Task N.M` entry is a subtask within that feature group.
+Use `## N. [Module or Feature Boundary]` for a feature group. Use `### Task N.M: [Specific behavior]` for each task.
 
 ````markdown
 # Tasks
 
-## 1. [Module Name]
+## Assumptions
+
+- [Only include assumptions that are necessary and grounded in the specs/design.]
+
+## Spec Coverage Summary
+
+| Spec Scenario | Requirement | Covered by Task(s) | Notes |
+| --- | --- | --- | --- |
+| `specs/<domain>/spec.md` → Scenario "<name>" | "<requirement name>" | Task 1.1 | <constraint> |
+
+## 1. [Module or Feature Boundary]
 
 ### Task 1.1: [Specific Behavior]
-**Covers specs:** `specs/[domain]/spec.md` → Requirement "[Name]" → Scenario "[Name]"
-**Depends on:** [none / Task N.M]
-**Files:** [list of files touched]
+**Type:** behavior | infrastructure | integration | error-path | regression
+**Covers specs:** `specs/<domain>/spec.md` → Requirement "<name>" → Scenario "<name>"
+**Depends on:** none | Task N.M
+**Files:**
+- `path/to/test_file.ext` — add/modify focused tests
+- `path/to/source_file.ext` — implement the required behavior
+**Test command:** `<exact command>`
+
+**Acceptance criteria:**
+- GIVEN <specific precondition> WHEN <specific action> THEN <specific expected result>
+- GIVEN <specific edge case> WHEN <specific action> THEN <specific expected result>
 
 - [ ] **Step 1: Write failing test**
-  Acceptance from spec: GIVEN [precondition] WHEN [action] THEN [expected]
-  Test name: `[descriptive test name from Spec scenario]`
+  File: `path/to/test_file.ext`
+  Test name: `<descriptive test name>`
+  Expected RED result: FAIL because `<specific missing behavior or assertion failure>`
 
-- [ ] **Step 2: Run test, verify RED**
-  Run: `[test command]`
-  Expected: FAIL — "[specific failure reason]"
+- [ ] **Step 2: Verify RED**
+  Run: `<exact command>`
+  Expected: FAIL for `<specific reason>`, not because of compile/setup errors.
 
 - [ ] **Step 3: Implement minimal code**
-  File: `[exact file path]`
-  Responsibility: [what this code does, not how]
+  File: `path/to/source_file.ext`
+  Responsibility: `<what behavior this code must provide>`
 
-- [ ] **Step 4: Run test, verify GREEN**
-  Run: `[test command]`
+- [ ] **Step 4: Verify GREEN**
+  Run: `<exact command>`
   Expected: PASS
 ````
 
-## No Placeholders
+### Infrastructure Task Variant
 
-Every step must contain concrete, actionable content. These are **plan failures** — never write them:
-- "TBD", "TODO", "implement later", "fill in details"
-- "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without specifying GIVEN/WHEN/THEN)
-- "Similar to Task N" (repeat the spec references — tasks may be read independently)
-- Steps that lack acceptance criteria or file paths
+Use this only for setup that enables later behavior tasks.
 
-**Plans describe WHAT to build and WHERE, not HOW.** Actual test code and implementation code are written by the implementer during the TDD cycle, following `test-driven-development` and `rules-{language}` disciplines.
+````markdown
+### Task 1.0: [Specific infrastructure setup]
+**Type:** infrastructure
+**Covers specs:** Infrastructure — enables Task 1.1 for `specs/<domain>/spec.md` → Scenario "<name>"
+**Depends on:** none | Task N.M
+**Files:**
+- `path/to/file.ext` — create shared type/interface/config/fixture
+**Test command:** `<compile, lint, or smoke-test command>`
 
-## Spec-Task Mapping Contract
+**Acceptance criteria:**
+- GIVEN the project is checked out WHEN `<command>` runs THEN it completes successfully.
+- GIVEN Task 1.1 starts WHEN it imports this artifact THEN the referenced file/type/function exists.
 
-**This is the core innovation of SpecPowers.**
+- [ ] **Step 1: Create infrastructure artifact**
+  File: `path/to/file.ext`
+  Responsibility: `<specific enabling responsibility>`
 
-Every Task MUST declare which Spec Scenario(s) it covers via `Covers specs:`. This creates a traceable chain:
+- [ ] **Step 2: Verify infrastructure**
+  Run: `<exact command>`
+  Expected: PASS
+````
 
-```
-Spec Scenario → Task → Test → Implementation
-```
+## No-Placeholder Rules
 
-After writing all tasks, verify:
-- **Every Spec Scenario has at least one Task covering it**
-- **No Task exists without a Spec Scenario mapping** (except pure infrastructure tasks like "create project config")
+These are plan failures and must be rewritten before presenting the plan:
 
+- `TBD`, `TODO`, `later`, `future work`, `fill in details`.
+- `Add proper error handling` without a named error condition and expected behavior.
+- `Add validation` without exact invalid inputs and expected outputs.
+- `Write tests` without test file, test name, GIVEN/WHEN/THEN, and expected RED reason.
+- `Implement the logic` without source file and responsibility.
+- `Same as previous task`, `similar to Task N`, or references that force the reader to infer missing details.
+- A file path that is approximate instead of exact.
+- A command that is approximate instead of exact.
+
+## Self-Review Checklist
+
+After drafting the complete plan, perform this review and include the result at the end.
+
+```markdown
 ## Self-Review
 
-After writing the complete plan:
+- [ ] **Spec coverage:** Every Spec Scenario appears in `Spec Coverage Summary` and maps to at least one Task.
+- [ ] **No unmapped behavior:** Every non-infrastructure task has a concrete Spec Scenario mapping.
+- [ ] **Infrastructure justified:** Every infrastructure task names the behavior task or scenario it enables.
+- [ ] **No placeholders:** The plan contains no `TBD`, `TODO`, vague validation/error handling, or inferred steps.
+- [ ] **Test-first:** Every behavior, integration, error-path, and regression task starts with a failing test.
+- [ ] **Concrete commands:** Every task has an exact test, compile, lint, or smoke-test command.
+- [ ] **Concrete files:** Every task lists exact file paths and responsibilities.
+- [ ] **Granularity:** No task has more than 5 steps, more than 3 production files, or more than 2 Spec Scenarios.
+- [ ] **Dependency order:** Tasks are ordered so the project compiles and relevant tests pass after each task.
+- [ ] **Consistency:** Later tasks reference files, types, and responsibilities created by earlier tasks accurately.
+```
 
-1. **Spec coverage:** For each Scenario in the specs, can you point to a Task? List any gaps.
-2. **Placeholder scan:** Search for red flags — any patterns from "No Placeholders" above. Fix them.
-3. **Interface consistency:** Do the file paths, responsibilities, and spec references in later tasks align with earlier tasks?
-4. **Test-first check:** Does every Task start with writing a failing test?
-5. **Size check:** Does any Task have more than 5 steps or touch more than 3 files? Split it.
-6. **Dependency check:** Are Tasks ordered so each one compiles independently?
-7. **Dependency coherence:** Do later Tasks reference files and responsibilities defined in earlier Tasks correctly?
+If any item fails, revise the plan before presenting it.
 
-Fix issues inline. If you find a Spec Scenario with no Task, add the Task.
+## Red Flags and Corrections
 
-## Red Flags
+| Red Flag | Correction |
+| --- | --- |
+| "This is one big task, but it is all related." | Split by behavior, file boundary, or scenario. |
+| "The implementation details can be decided later." | Planning defines what behavior changes and where. Do not specify internal algorithms unless the design requires them. |
+| "Tests are obvious." | Write the GIVEN/WHEN/THEN and expected RED reason. |
+| "Dependency order does not matter." | Reorder tasks until each task can pass independently. |
+| "Error handling can be a later task." | Error handling is behavior. Map it to the relevant scenario or create a scenario-backed error-path task. |
+| "This infrastructure task has no spec mapping." | Mark it as infrastructure and name the scenario or task it enables. |
 
-| Thought | Reality |
-|---------|---------|
-| "This Task is big but it's all related" | If you can't describe what it does in one sentence, split it. |
-| "I'll figure out the details during implementation" | The plan defines WHAT and WHERE. If you write "implement the logic" without spec references and file paths, you haven't planned. |
-| "Tests for this are obvious, no need to specify acceptance criteria" | If they're obvious, the GIVEN/WHEN/THEN takes 30 seconds to write. No excuses. |
-| "The dependency order doesn't matter, I'll sort it out" | Wrong order = compile errors = wasted time = bad experience for the user. |
-| "This infrastructure task doesn't need a Spec mapping" | Correct — mark it as infrastructure. But don't use this as an excuse for unmapped business logic. |
-| "I'll add error handling as a separate Task later" | Error handling IS the behavior. Spec scenarios include edge cases. Plan them now. |
+## Final Response After Planning
 
-## Common Rationalizations
+After saving or presenting the plan, respond with:
 
-| Excuse | Reality |
-|--------|---------|
-| "The plan is too detailed, it slows things down" | Detailed plans execute faster than vague ones. Every minute of planning saves 10 of debugging. |
-| "I can't know the exact acceptance criteria without running it" | The spec defines the criteria. Translate GIVEN/WHEN/THEN into the plan. |
-| "6 steps per Task is too many, I'll condense" | Each step is 2-5 minutes. 6 steps = 15 minutes. That's the right granularity. |
+```markdown
+Implementation plan saved to `specs/changes/<change-name>/tasks.md`.
 
-## After Planning
+Summary:
+- [N] tasks
+- [M] Spec Scenarios covered
+- [K] infrastructure tasks
+- [0 or list] open planning blockers
 
-Save to `specs/changes/<change-name>/tasks.md`.
+Two execution modes are available:
+1. **Step-by-Step Mode** — implement one task at a time; review and commit after each task.
+2. **Fast Mode** — implement tasks continuously; review all completed work at the end.
 
-> "Implementation plan saved. [N] Tasks covering [M] Spec Scenarios.
->
-> Two execution modes available:
-> 1. **Step-by-Step Mode** (default) — one Task at a time, two-stage review, you review + commit after each
-> 2. **Fast Mode** — all Tasks continuously, two-stage review per Task, you review everything at the end
->
-> Which mode?"
+Which mode should be used?
+```
 
-Wait for user choice. Then invoke `spec-driven-development` skill (Kiro: readSteering → spec-driven-development.md).
+After the user chooses a mode, transition to the implementation skill, such as `spec-driven-development` or the repository's configured execution skill. For Kiro-style flows: read steering first, then invoke `spec-driven-development.md`.

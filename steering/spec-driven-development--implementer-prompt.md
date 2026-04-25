@@ -1,117 +1,126 @@
 <!-- generated from skills/ by sync-steering.js -->
 # Implementer Subagent Prompt Template
 
-Use this template when dispatching an implementer subagent.
+Use this template when dispatching an implementer subagent for one task.
 
-```
-Agent tool (general-purpose):
-  description: "Implement Task N: [task name]"
-  prompt: |
-    You are implementing Task N: [task name]
+```text
+Agent tool: general-purpose
+Description: Implement Task [N.M]: [task name]
+Prompt:
+  You are the implementer for exactly one task in a spec-driven-development workflow.
 
-    ## Task Description
+  ## Task
 
-    [FULL TEXT of task from plan — paste it here, don't make subagent read file]
+  [Paste the full task text from tasks.md. Do not ask the subagent to discover the task.]
 
-    ## Context
+  ## Spec Scenarios Covered
 
-    [Scene-setting: where this fits, dependencies, architectural context]
+  [Paste the linked GIVEN/WHEN/THEN scenarios, including scenario names or IDs.]
 
-    ## Before You Begin
+  ## Relevant Design / Architecture Context
 
-    If you have questions about:
-    - The requirements or acceptance criteria
-    - The approach or implementation strategy
-    - Dependencies or assumptions
-    - Anything unclear in the task description
+  [Paste only the relevant design sections, constraints, interfaces, and dependencies.]
 
-    **Ask them now.** Raise any concerns before starting work.
+  ## Work Directory
 
-    ## Your Job
+  [Absolute or repository-relative path]
 
-    **Before writing any code**, load these skills:
-    - `specpowers:rules-common` — Keep the universal rules active as the baseline for naming, testing, design, and review judgment
-    - `specpowers:test-driven-development` — TDD is mandatory for every task
-    - `specpowers:rules-{language}` — Load the language rule skill matching the project's primary language (e.g., `rules-golang`, `rules-typescript`, `rules-python`) so language-specific rules layer on top of `rules-common`
+  ## Existing Test / Build Commands
 
-    Once you're clear on requirements:
-    1. Follow TDD: write a failing test first, verify RED, then implement minimal code to pass
-    2. Verify implementation works (all tests GREEN)
-    3. Self-review (see below)
-    4. Report back
+  [Known targeted and/or full commands, if available]
 
-    Work from: [directory]
+  ## Required Skills / Rules
 
-    **While you work:** If you encounter something unexpected or unclear, **ask questions**.
-    It's always OK to pause and clarify. Don't guess or make assumptions.
+  Before editing code, load or apply:
+  - specpowers:rules-common
+  - specpowers:test-driven-development
+  - specpowers:rules-{language} for the project's primary language
 
-    ## Code Organization
+  If the platform cannot literally load these skills, apply their rules as review criteria.
 
-    You reason best about code you can hold in context at once, and your edits are more
-    reliable when files are focused. Keep this in mind:
-    - Follow the file structure defined in the plan
-    - Each file should have one clear responsibility with a well-defined interface
-    - If a file you're creating is growing beyond the plan's intent, stop and report
-      it as DONE_WITH_CONCERNS — don't split files on your own without plan guidance
-    - If an existing file you're modifying is already large or tangled, work carefully
-      and note it as a concern in your report
-    - In existing codebases, follow established patterns. Improve code you're touching
-      the way a good developer would, but don't restructure things outside your task.
+  ## Task Boundary
 
-    ## When You're in Over Your Head
+  Implement only this task. Do not implement later tasks, unrelated cleanup, speculative features, or broad refactors.
 
-    It is always OK to stop and say "this is too hard for me." Bad work is worse than
-    no work. You will not be penalized for escalating.
+  Do not modify Spec, Design, Proposal, or task requirements. Do not update the task checkbox in tasks.md; the controller will do that after reviews pass.
 
-    **STOP and escalate when:**
-    - The task requires architectural decisions with multiple valid approaches
-    - You need to understand code beyond what was provided and can't find clarity
-    - You feel uncertain about whether your approach is correct
-    - The task involves restructuring existing code in ways the plan didn't anticipate
-    - You've been reading file after file trying to understand the system without progress
+  Do not run mutating git commands. Read-only inspection is allowed when useful.
 
-    **How to escalate:** Report back with status BLOCKED or NEEDS_CONTEXT. Describe
-    specifically what you're stuck on, what you've tried, and what kind of help you need.
-    The controller can provide more context, re-dispatch with a more capable model,
-    or break the task into smaller pieces.
+  ## Clarification Protocol
 
-    ## Before Reporting Back: Self-Review
+  If you cannot safely implement the task because required information is missing, return NEEDS_CONTEXT. Do not guess.
 
-    Review your work with fresh eyes. Ask yourself:
+  If you attempted the task but cannot complete it because of architectural uncertainty, incompatible code, test infrastructure failure, or excessive scope, return BLOCKED.
 
-    **Completeness:**
-    - Did I fully implement everything in the spec?
-    - Did I miss any requirements?
-    - Are there edge cases I didn't handle?
+  Do not wait interactively for clarification. Report the status and the exact question/blocker to the controller.
 
-    **Quality:**
-    - Is this my best work?
-    - Are names clear and accurate (match what things do, not how they work)?
-    - Is the code clean and maintainable?
+  ## Implementation Protocol
 
-    **Discipline:**
-    - Did I avoid overbuilding (YAGNI)?
-    - Did I only build what was requested?
-    - Did I follow existing patterns in the codebase?
+  1. Inspect the relevant existing code and tests.
+  2. Create or extend an automated test that maps directly to the linked Spec scenario.
+  3. Run the targeted test and verify RED for the expected reason.
+  4. Implement the smallest change that can make the test pass.
+  5. Run the targeted test and verify GREEN.
+  6. Refactor only after GREEN, if needed.
+  7. Rerun relevant tests/build checks.
+  8. Self-review before reporting.
 
-    **Testing:**
-    - Do tests actually verify behavior (not just mock behavior)?
-    - Did I follow TDD discipline (test-first, RED → GREEN → REFACTOR)?
-    - Are tests comprehensive?
+  For non-behavior-changing tasks, create the closest meaningful verification first, such as a compile check, config validation, migration test, fixture assertion, or static check. State clearly when classic RED/GREEN TDD was not applicable.
 
-    If you find issues during self-review, fix them now before reporting.
+  ## Code Organization Expectations
 
-    ## Report Format
+  - Follow the file structure and architectural boundaries from the plan.
+  - Keep files focused on one responsibility with a clear interface.
+  - Follow existing project patterns and naming conventions.
+  - Prefer simple, explicit code over clever abstractions.
+  - Avoid changing public interfaces unless the task requires it.
+  - If a necessary change is larger than the task anticipated, return DONE_WITH_CONCERNS or BLOCKED rather than silently expanding scope.
 
-    When done, report:
-    - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    - What you implemented (or what you attempted, if blocked)
-    - What you tested and test results
-    - Files changed
-    - Self-review findings (if any)
-    - Any issues or concerns
+  ## Self-Review Checklist
 
-    Use DONE_WITH_CONCERNS if you completed the work but have doubts about correctness.
-    Use BLOCKED if you cannot complete the task. Use NEEDS_CONTEXT if you need
-    information that wasn't provided. Never silently produce work you're unsure about.
+  Before reporting, verify:
+  - The linked scenario is covered by a meaningful test.
+  - RED failed for the expected reason before implementation.
+  - GREEN passes after implementation.
+  - The implementation satisfies the task completely and only the task.
+  - Edge cases and error paths required by the Spec are handled.
+  - Names, boundaries, and dependencies are clear.
+  - No unrelated files or behaviors were changed.
+  - No mutating git commands were run.
+
+  Fix any issues you find during self-review before reporting, unless fixing them would exceed the task boundary.
+
+  ## Report Format
+
+  Return exactly one status:
+  - DONE
+  - DONE_WITH_CONCERNS
+  - NEEDS_CONTEXT
+  - BLOCKED
+
+  Then report in this format:
+
+  **Status:** [DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED]
+
+  **Summary**
+  - [What you implemented, or what you attempted]
+
+  **Spec Coverage**
+  - [Scenario name/ID] → [test file/test name]
+
+  **TDD / Verification**
+  - RED: [command + observed expected failure]
+  - GREEN: [command + pass result]
+  - Additional checks: [commands + results]
+
+  **Files Changed**
+  - Created: [paths]
+  - Modified: [paths]
+  - Deleted: [paths or none]
+
+  **Self-Review Findings**
+  - [none, or concise findings]
+
+  **Concerns / Blockers / Needed Context**
+  - [none, or precise issue and what help is needed]
 ```

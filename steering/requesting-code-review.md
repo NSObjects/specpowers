@@ -1,184 +1,212 @@
 <!-- generated from skills/ by sync-steering.js -->
 ---
 name: requesting-code-review
-description: Use for standalone reviews before merge, after major features, or when the user explicitly asks for review
+description: Use when the user asks for a standalone code review, before merge, after a major feature, after a risky fix, or when a fresh review would reduce implementation risk.
 ---
 
 # Requesting Code Review
 
-Dispatch specpowers:code-reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history. This keeps the reviewer focused on the work product, not your thought process, and preserves your own context for continued work.
+Use this skill to run a standalone code review through the single user-facing review entrypoint. The main agent owns orchestration, sends a bounded review package to the reviewer, integrates any specialist findings, and returns one consolidated decision to the user.
 
-This is the **single surfaced entrypoint** for review work. Specialist reviewer roles are optional deep dives behind this entrypoint, not parallel user-facing workflows. The main agent owns orchestration and returns a **single final conclusion** after integrating any specialist reviewer findings.
+The reviewer receives only the packaged review context, not the full session history. This keeps review focused on the implementation, specification, and changed code rather than on the main agent's reasoning process.
 
-> **Scope:** This skill is for standalone/manual reviews outside the built-in two-stage per-Task review in `spec-driven-development`.
->
-> **Platform dispatch:**
-> - Claude Code: use `Agent` tool with `specpowers:code-reviewer` (`Task` remains a compatible legacy alias)
-> - Kiro: use `invokeSubAgent(name="general-task-execution", prompt=...)` with `./code-reviewer-prompt.md`
-> - Codex: use `spawn_agent(agent_type="worker", message=...)` with filled `./code-reviewer-prompt.md`
-> - Cursor, Gemini CLI, OpenCode: no review subagent dispatch; perform the same review inline in the main agent and keep the single surfaced entrypoint
+## Scope
 
-**Core principle:** Review early, review often.
+Use this skill for manual or standalone reviews outside the built-in review checkpoints of `spec-driven-development`.
+
+Use it when:
+
+- The user explicitly asks for code review.
+- A major feature or risky fix has just been completed.
+- The change is ready for merge or release gating.
+- The main agent is stuck and a bounded second opinion would help.
+- A refactor needs a baseline check before or after implementation.
+
+Do not use this skill as a replacement for normal implementation, testing, or the per-task review flow already performed by `spec-driven-development`.
 
 ## Unified Review Model
 
-This skill owns unified review orchestration for standalone code review:
+1. Run the general `specpowers:code-reviewer` review over the full requested scope.
+2. Escalate to a specialist reviewer only when there is a concrete risk hypothesis.
+3. Deduplicate and reconcile all findings in the main agent.
+4. Return one final user-facing conclusion: `APPROVED` or `NEEDS_CHANGES`.
 
-1. Run the general reviewer across the full requested scope.
-2. Escalate to a specialist reviewer only when a concrete risk area deserves deeper analysis.
-3. Synthesize all findings in the main agent and return one user-facing decision.
+Specialist reviewers deepen a scoped risk area. They do not become separate user-facing workflows.
 
-The user should not have to choose between multiple peer review skills for the same request. Specialist reviewer roles deepen this review; they do not replace the single surfaced entrypoint.
+## Platform Dispatch
 
-## When to Request Review
+Use the platform's closest equivalent review mechanism:
 
-**Typical uses:**
-- After completing a major feature
-- Before merge to main
-- When the user explicitly asks for a standalone review
+| Platform | Dispatch method |
+|---|---|
+| Claude Code | Use `Agent` with `specpowers:code-reviewer`. Treat legacy `Task` references as compatible aliases. |
+| Kiro | Use `invokeSubAgent(name="general-task-execution", prompt=...)` with the filled `./code-reviewer-prompt.md`. |
+| Codex | Use `spawn_agent(agent_type="worker", message=...)` with the filled `./code-reviewer-prompt.md`. |
+| Cursor, Gemini CLI, OpenCode | No review subagent dispatch. Perform the same review inline and preserve the single surfaced entrypoint. |
 
-**Optional but valuable:**
-- When stuck (fresh perspective)
-- Before refactoring (baseline check)
-- After fixing complex bug
+## Review Package Requirements
 
-## When to Escalate Review Depth
+Before dispatching, build a compact review package. The reviewer should receive enough context to evaluate the change without reading the full conversation.
 
-Use the general reviewer by default. Add a specialist reviewer only when there is a clear reason:
+Required fields:
 
-- Security-sensitive changes touching authentication, authorization, secrets, external inputs, or data exposure:
-  use `../dispatching-parallel-agents/security-reviewer-prompt.md`
-- Cross-cutting changes where the general review identifies a risk area but lacks confidence for a deep assessment:
-  scope the specialist reviewer to that exact concern rather than broadening the whole review
-- Large or risky diffs where one domain could hide subtle issues:
-  keep the general reviewer for breadth, then add the specialist reviewer for depth
+- `{WHAT_WAS_IMPLEMENTED}` — factual summary of the completed change
+- `{SPEC_SCENARIOS}` — GIVEN / WHEN / THEN scenarios or `None provided`
+- `{BASE_SHA}` — starting commit, merge base, or explicit review base
+- `{HEAD_SHA}` — ending commit or explicit review head
+- `{DESCRIPTION}` — purpose, constraints, known risks, relevant test results, and anything intentionally out of scope
 
-If there is no concrete risk area, do not escalate just because the diff is large.
+Useful preflight commands:
 
-## How to Request
-
-**1. Choose review scope and get git SHAs:**
 ```bash
-# Whole branch / before merge review
+git status --short
 BASE_SHA=$(git merge-base HEAD origin/main)
 HEAD_SHA=$(git rev-parse HEAD)
+git diff --stat "$BASE_SHA..$HEAD_SHA"
 ```
 
-For a narrower review, set `BASE_SHA` to the commit right before the change you want reviewed.
-Do not default to `merge-base` if you only want feedback on one task or one follow-up fix.
+For a narrow task review, set `BASE_SHA` to the commit immediately before that task. Do not default to the branch merge base when the user requested review of only one fix or follow-up change.
 
-**2. Dispatch code-reviewer subagent:**
+If the change includes uncommitted work, either commit it before review or explicitly include the working-tree diff/context in `{DESCRIPTION}` and label `{HEAD_SHA}` as `WORKTREE`. Do not claim a review covers uncommitted changes unless the reviewer receives them.
 
-Use `Agent tool (specpowers:code-reviewer)` and fill the reviewer template from `./code-reviewer-prompt.md`.
-If an older Claude Code prompt or doc says `Task`, treat it as the same tool.
-On Kiro and Codex, translate that dispatch using the platform mappings above.
+## How to Request Review
 
-**Placeholders:**
-- `{WHAT_WAS_IMPLEMENTED}` - What you just built
-- `{SPEC_SCENARIOS}` - The GIVEN/WHEN/THEN scenarios from the spec that this code should satisfy
-- `{BASE_SHA}` - Starting commit
-- `{HEAD_SHA}` - Ending commit
-- `{DESCRIPTION}` - Brief summary
+1. **Determine scope.** Confirm whether the review is for the whole branch, one task, one commit range, or the current working tree.
+2. **Collect specification context.** Include the relevant Spec Scenarios. If none exist, write `None provided` and instruct the reviewer to assess against the description and tests.
+3. **Collect implementation context.** Summarize what changed, why it changed, and any known limitations.
+4. **Collect test context.** Include relevant test commands already run and their results. If no tests were run, state that plainly.
+5. **Fill `./code-reviewer-prompt.md`.** Replace all placeholders with concrete values.
+6. **Dispatch or review inline.** Use the platform dispatch table above.
+7. **Synthesize findings.** Return one consolidated result to the user.
 
-**3. Escalate to a specialist reviewer only when warranted:**
+## Specialist Escalation
 
-On platforms with subagents, dispatch the specialist reviewer with the same bounded-review discipline:
+Use the general reviewer by default. Add a specialist reviewer only when a clear risk area exists.
 
-- Claude Code: use `Agent` with the filled specialist template
-- Kiro: use `invokeSubAgent(name="general-task-execution", prompt=...)` with the specialist template
-- Codex: use `spawn_agent(agent_type="worker", message=...)` with the filled specialist template
+Security escalation is warranted when the diff touches:
 
-Current specialist deep-dive template:
+- authentication or authorization
+- secrets, tokens, credentials, or key material
+- permissions, roles, access checks, or tenant boundaries
+- untrusted input, parsing, deserialization, uploads, or external callbacks
+- sensitive data flows, logging, telemetry, or privacy boundaries
+- externally exposed API behavior or attack surface
+
+Specialist template:
+
 - Security deep review: `../dispatching-parallel-agents/security-reviewer-prompt.md`
 
-On Cursor, Gemini CLI, OpenCode, perform the same specialist deep check inline in the main agent. Do not create a second visible workflow.
+When escalating, scope the specialist prompt to the exact concern. Do not ask the specialist to re-review the entire diff unless the entire diff is security-sensitive.
 
-**4. Synthesize and act on feedback** (see also: `receiving-code-review` skill):
-- Main agent responsibilities:
-  - Deduplicate overlapping findings across the general reviewer and each specialist reviewer
-  - Reconcile disagreements and call out which concerns are actually blocking
-  - Return a single final conclusion to the user, even if multiple reviewers contributed
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
-- Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
-- If fixes are non-trivial, re-request review after fixing (re-review loop)
+On Cursor, Gemini CLI, and OpenCode, perform the same specialist check inline rather than creating a second visible workflow.
+
+## Synthesis Rules
+
+The main agent must integrate review output before responding to the user.
+
+- Deduplicate overlapping issues.
+- Reconcile disagreements between general and specialist reviewers.
+- Promote or demote severity only with clear reasoning.
+- Put blocking findings first.
+- Include file paths, line numbers, scenario names, and evidence where available.
+- Do not paste raw reviewer output as the final answer.
+- Do not present separate final decisions from different reviewers.
+
+Final user-facing result should include:
+
+```markdown
+## Review Result
+**Decision:** APPROVED / NEEDS_CHANGES
+**Why:** [short synthesis]
+
+## Blocking Issues
+- [Critical or Important issues, or "None"]
+
+## Non-Blocking Notes
+- [Minor issues or follow-ups, or "None"]
+
+## Specialist Review
+- `none` — no specialist review was needed
+- `security-reviewer` — [summary, only if performed or recommended]
+
+## Next Step
+[fix, re-review, merge, or continue]
+```
+
+## Re-Review Loop
+
+After fixes:
+
+1. Use the previous review head as the new base when only reviewing the fixes.
+2. Include the prior blocking findings in `{DESCRIPTION}`.
+3. Ask the reviewer to verify that the fixes address those findings and do not introduce regressions.
+4. Repeat until no Critical or Important issues remain.
+
+## Decision Policy
+
+- Any Critical issue => `NEEDS_CHANGES`.
+- Any Important issue => `NEEDS_CHANGES`.
+- Minor issues only => usually `APPROVED` with notes.
+- Missing or incomplete Spec Scenarios do not automatically block the review, but missing tests for provided required scenarios are Critical.
+- If the reviewer is wrong, push back with code, tests, or specification evidence.
 
 ## Example
 
-```
-[Just completed a major feature and want a standalone review before merge]
-
-You: Let me request code review before proceeding.
+```text
+Context: completed a branch-level review before merge.
 
 BASE_SHA=$(git merge-base HEAD origin/main)
 HEAD_SHA=$(git rev-parse HEAD)
 
-[Dispatch specpowers:code-reviewer subagent]
-  WHAT_WAS_IMPLEMENTED: Verification and repair functions for conversation index
-  SPEC_SCENARIOS: |
-    Scenario: Detect orphaned entries
-      GIVEN an index with references to deleted files
-      WHEN verifyIndex() runs
-      THEN it reports orphaned entries with file paths
-    Scenario: Repair orphaned entries
-      GIVEN verifyIndex() found orphaned entries
-      WHEN repairIndex() runs
-      THEN orphaned entries are removed from the index
-  BASE_SHA: a7981ec
-  HEAD_SHA: 3df7661
-  DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
+Dispatch specpowers:code-reviewer with:
 
-[Subagent returns]:
-  Spec Compliance: 2/2 scenarios covered ✅
-  Strengths: Clean architecture, real tests
-  Issues:
-    Important: Missing progress indicators
-    Minor: Magic number (100) for reporting interval
-  Assessment: NEEDS_CHANGES
+WHAT_WAS_IMPLEMENTED:
+  Added verifyIndex() and repairIndex() for conversation index maintenance.
 
-You: [If the diff touches a sensitive boundary, dispatch `security-reviewer-prompt.md` for a scoped deep dive]
-[Main agent deduplicates findings and returns one user-facing result]
-[Fix progress indicators, re-request review]
-[Reviewer returns APPROVED]
-[Proceed to merge or next manual checkpoint]
+SPEC_SCENARIOS:
+  Scenario: Detect orphaned entries
+    GIVEN an index with references to deleted files
+    WHEN verifyIndex() runs
+    THEN it reports orphaned entries with file paths
+
+  Scenario: Repair orphaned entries
+    GIVEN verifyIndex() found orphaned entries
+    WHEN repairIndex() runs
+    THEN orphaned entries are removed from the index
+
+BASE_SHA:
+  a7981ec
+
+HEAD_SHA:
+  3df7661
+
+DESCRIPTION:
+  Added verification and repair support for four issue types.
+  Tests run: npm test -- index-maintenance.test.ts — passed.
+  Known risk: repair mutates persistent index state.
+
+Reviewer result:
+  Decision: NEEDS_CHANGES
+  Blocking issue: Important — repairIndex() removes orphaned entries but does not report repair count.
+
+Main agent response:
+  Consolidate the issue, fix it, and re-request review for the fix range.
 ```
-
-## Integration with Workflows
-
-**Spec-Driven Development:**
-- `spec-driven-development` already performs its own per-Task spec review and code quality review
-- Use this skill only when you want an extra standalone/manual review outside that flow
-
-**Ad-Hoc Development:**
-- Review before merge
-- Review when stuck
-
-## Single Conclusion Contract
-
-When this skill uses multiple reviewers, the main agent still owns the final user-facing report.
-
-- Do not dump raw reviewer outputs without synthesis.
-- Do not present specialist reviewer assessments as separate final decisions.
-- Do present one consolidated outcome with blocking issues first, supporting detail second.
-- Do keep specialist reviewer output scoped to its risk domain instead of re-reviewing the entire diff.
 
 ## Red Flags
 
-**Never:**
-- Skip review because "it's simple"
-- Split one review request into multiple peer review workflows the user must choose between
-- Launch specialist reviewers without a concrete risk hypothesis
-- Ignore Critical issues
-- Proceed with unfixed Important issues
-- Argue with valid technical feedback
+Never:
 
-**If reviewer wrong:**
-- Push back with technical reasoning
-- Show code/tests that prove it works
-- Request clarification
+- Claim a review covered code that was not included in the diff or package.
+- Skip a requested review because the change appears simple.
+- Split one review request into multiple user-facing review workflows.
+- Launch specialist reviewers without a concrete risk hypothesis.
+- Ignore Critical issues.
+- Proceed with unresolved Important issues unless the user explicitly accepts the risk.
+- Treat reviewer output as final without main-agent synthesis.
 
 See also:
+
 - Reviewer template: `./code-reviewer-prompt.md`
 - Specialist deep-dive template: `../dispatching-parallel-agents/security-reviewer-prompt.md`
 - Handling feedback: `receiving-code-review` skill

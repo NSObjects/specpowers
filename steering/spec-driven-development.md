@@ -1,221 +1,341 @@
 <!-- generated from skills/ by sync-steering.js -->
 ---
 name: spec-driven-development
-description: "Use when there is an approved implementation plan with concrete tasks and the work should now be executed in the current session."
+summary: Execute an approved specification plan task-by-task with TDD, spec traceability, staged review, and user-controlled commits.
+description: "Use when a change already has an approved task plan, usually specs/changes/<change-name>/tasks.md, and the user wants implementation to begin or resume. This skill is for execution, not planning, proposal editing, or spec rewriting."
 ---
 
 # Spec-Driven Development
 
-Execute implementation tasks with TDD discipline, Spec traceability, and user-controlled pacing.
+Execute an approved implementation plan with test-first discipline, explicit traceability to the Spec, and strict review gates.
 
-**Announce at start:** "I'm using the spec-driven-development skill to implement the plan."
+**User-facing start announcement:**
+> I'm using the spec-driven-development skill to implement the approved plan.
 
-**Role: Engineer.** You write code, tests, and verify against specs.
+**Role:** Engineering controller. You coordinate implementation, verification, and reporting. You may write code directly or dispatch subagents, but you remain responsible for the final result.
+
+## Non-Negotiable Gates
 
 <HARD-GATE>
-Do NOT modify specs, design, or proposal during implementation. If something is wrong, stop and discuss with the user.
-Do NOT skip TDD — every Task starts with a failing test.
-Do NOT auto-commit. Git is managed by the user.
+- Do **not** change the Spec, Design, Proposal, or acceptance criteria during implementation. If they appear wrong or incomplete, stop and explain the conflict to the user.
+- Do **not** skip TDD for behavior-changing work. Each implementation task starts by creating or extending a failing automated test that maps to the linked Spec scenario.
+- Do **not** run mutating git commands: no `git add`, `git commit`, `git push`, `git reset`, `git checkout`, `git rebase`, `git merge`, or stash operations. Read-only inspection commands such as `git status` or `git diff` are allowed when useful.
+- Do **not** proceed to the next task in Step-by-Step mode without the user's explicit continuation instruction.
 </HARD-GATE>
 
-## Two Execution Modes
+The only permitted edit to `tasks.md` during this skill is changing a completed task checkbox from `- [ ]` to `- [x]` after that task has passed all required gates.
 
-### Step-by-Step Mode (Default)
+## Definitions
 
-Each Task completes → two-stage review → pause → user reviews + commits → user says "Continue" → next Task.
+- **Change:** The active spec change being implemented, usually under `specs/changes/<change-name>/`.
+- **Task:** One unchecked item in `tasks.md`. A task is the smallest unit of uninterrupted execution.
+- **Feature group:** A group of tasks that share the same top-level number, for example `1.1`, `1.2`, and `1.3` belong to feature group `1`. If tasks are organized by headings instead of numbers, treat each heading section as a feature group.
+- **Linked Spec Scenarios:** The GIVEN/WHEN/THEN scenarios explicitly referenced by the task. If a task does not list scenario references, infer the closest scenarios from the Spec and state the inference in the task report.
+- **Controller:** The main agent running this skill.
+- **Worker:** A subagent or the controller acting directly to implement a task.
+
+## Execution Modes
+
+### Step-by-Step Mode — Default
+
+Execute exactly one task, complete all gates, mark the task checkbox, report results, then pause. The user reviews the changes and commits manually. Continue only after the user explicitly says to continue.
 
 ### Fast Mode
 
-All Tasks execute continuously with two-stage review per Task → unified report → user reviews all changes at once.
+Execute all unchecked tasks continuously. Each task still gets TDD, Stage 1 spec compliance review, Stage 2 code quality review, task checkbox update, and milestone verification. Report once at the end.
+
+Use Fast Mode only when the user explicitly asks for it. Otherwise use Step-by-Step Mode.
+
+## Startup Procedure
+
+1. Announce the skill.
+2. Identify the active change and task file. Prefer the change or task file named by the user; otherwise inspect `specs/changes/` and choose the single active change if unambiguous.
+3. Read, at minimum:
+   - `tasks.md`
+   - the linked Spec scenarios
+   - relevant Design sections
+   - relevant existing code and tests
+4. Determine execution mode:
+   - explicit user request for Fast Mode → Fast Mode
+   - otherwise → Step-by-Step Mode
+5. Determine execution mechanism:
+   - if the platform supports subagents, dispatch workers/reviewers using the prompt templates in this skill directory
+   - otherwise execute and review inline using the self-checks below
+6. Find the first unchecked task. If no unchecked tasks remain, run the final completion checks and report that implementation is complete.
 
 ## Subagent Dispatch
 
-**If the platform supports subagents** (Claude Code, Codex, Kiro Autopilot): dispatch a fresh subagent per Task using the implementer prompt template (`./implementer-prompt.md`). This keeps context clean and prevents pollution between Tasks.
+Use subagents when the platform supports them. Dispatch a fresh worker per task to reduce context contamination.
 
-**If the platform does NOT support subagents** (Cursor, Gemini CLI, OpenCode): the main agent executes Tasks directly. The two-stage review still applies — just run the checks inline instead of dispatching reviewer subagents.
+- Implementer worker: `./implementer-prompt.md`
+- Stage 1 reviewer: `./spec-reviewer-prompt.md`
+- Stage 2 reviewer: `./code-quality-reviewer-prompt.md`
 
-## Two-Stage Review
+If subagents are unavailable, the controller performs the same work inline. Do not skip either review stage merely because subagents are unavailable.
 
-After each Task completes (both modes), run two review stages in order:
+## Worker Status Handling
 
-### Stage 1: Spec Compliance Review
+Workers must report one of these statuses:
 
-Verify the implementation matches the spec — nothing more, nothing less.
+| Status | Meaning | Controller action |
+|---|---|---|
+| `DONE` | Task implemented and self-reviewed | Start Stage 1 review |
+| `DONE_WITH_CONCERNS` | Task implemented, but worker has doubts | Read concerns before review; resolve correctness/scope concerns before Stage 1 |
+| `NEEDS_CONTEXT` | Worker cannot safely continue without missing information | Provide missing context and retry, or ask the user if only the user can decide |
+| `BLOCKED` | Worker attempted the task but cannot complete it | Diagnose blocker; retry with narrower scope, stronger context, or escalate to the user |
 
-**With subagents:** Dispatch spec reviewer subagent using `./spec-reviewer-prompt.md`.
-**Without subagents:** Self-check against the linked Spec Scenarios (see Spec Compliance Self-Check below).
+Never ignore `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED`. Treat them as control signals, not narrative details.
 
-If issues found → fix → re-review. Do NOT proceed to Stage 2 until Stage 1 passes.
-
-### Stage 2: Code Quality Review
-
-Verify the implementation is well-built (clean, tested, maintainable).
-
-**With subagents:** Dispatch code quality reviewer subagent using `./code-quality-reviewer-prompt.md` (which delegates to `../requesting-code-review/code-reviewer-prompt.md`).
-**Without subagents:** Self-review for naming, complexity, duplication, error handling, test quality.
-
-If issues found → fix → re-review. Do NOT report Task as complete until Stage 2 passes.
-
-## Handling Implementer Status (Subagent Mode)
-
-When using subagents, implementers report one of four statuses:
-
-**DONE:** Proceed to Stage 1 review.
-
-**DONE_WITH_CONCERNS:** Read concerns first. If about correctness/scope, address before review. If observations, note and proceed.
-
-**NEEDS_CONTEXT:** Provide missing context and re-dispatch.
-
-**BLOCKED:** Assess the blocker:
-1. Context problem → provide more context, re-dispatch
-2. Task too complex → re-dispatch with more capable model
-3. Task too large → break into smaller pieces
-4. Plan is wrong → escalate to user
-
-**Never** ignore an escalation. If the implementer is stuck, something needs to change.
-
-## Execution Flow — Step-by-Step Mode
+## Task Execution Protocol
 
 <CRITICAL>
-**One Task = one uninterrupted execution unit.** Execute ALL steps within a Task continuously without pausing. Only pause AFTER the entire Task is complete (all TDD steps done, two-stage review passed). Do NOT stop between steps within a Task.
+One task is one uninterrupted execution unit. Do not pause between RED, GREEN, refactor, and review. The only valid pause points are:
+- before starting a task, if required context is missing;
+- after a task has passed all gates and has been reported;
+- when a blocker or spec conflict prevents safe progress.
 </CRITICAL>
 
-For each unchecked Task in tasks.md:
+For each task:
 
-1. **Announce:** "Starting Task N.M: [name]" with its `Covers specs:` reference
-2. **Build context:** Read the Task text + referenced Spec Scenarios + relevant Design sections
-3. **Execute Task** (subagent or main agent):
-   - Write failing test (from Spec's GIVEN/WHEN/THEN)
-   - Run test, verify RED
-   - Implement minimal code
-   - Run test, verify GREEN
-   - Follow TDD skill discipline throughout
-   - **Do NOT pause between these steps — complete them all in one go**
-4. **Two-stage review:** Stage 1 (spec compliance) → Stage 2 (code quality)
-   > **Feature-group milestone verification:** Run `verification-loop` when the current Task is the last subtask in a feature group. Intermediate subtasks do not trigger `verification-loop` by count alone.
-5. **Feature-group handoff gate:** Before starting the next feature group, confirm the current feature group has a `verification-loop` result. If that result is missing or failed, do not proceed to the next feature group.
-6. **If either review returns issues:** Fix before reporting to user.
-7. **ONLY NOW report and pause:**
+1. **Announce task start**
+
+   ```markdown
+   Starting Task N.M: [Task Name]
+   Covers specs: [Scenario IDs or names]
+   Mode: [Step-by-Step | Fast]
+   ```
+
+2. **Build task context**
+
+   Read the task text, linked scenarios, relevant Design sections, and relevant existing code/tests. Keep the task boundary explicit: implement only what this task requests.
+
+3. **Run TDD implementation**
+
+   - Write or extend a test that fails for the linked scenario.
+   - Run the targeted test and confirm **RED** for the expected reason.
+   - Implement the smallest change that can satisfy the test.
+   - Run the targeted test and confirm **GREEN**.
+   - Refactor only after GREEN, then rerun relevant tests.
+   - Avoid unrelated cleanup, broad rewrites, and speculative features.
+
+   For tasks that are genuinely not behavior-changing, create the closest meaningful verification first, such as a compile check, configuration validation, migration test, or fixture-based assertion. Do not pretend TDD occurred; state the verification strategy clearly.
+
+4. **Stage 1: Spec Compliance Review**
+
+   Purpose: verify the implementation matches the requested Spec exactly — complete, no missing requirements, no extra behavior.
+
+   - With subagents: dispatch `./spec-reviewer-prompt.md`.
+   - Without subagents: run the Spec Compliance Self-Check below.
+
+   If Stage 1 finds issues, fix them, rerun relevant tests, and repeat Stage 1. Do not start Stage 2 until Stage 1 passes.
+
+5. **Stage 2: Code Quality Review**
+
+   Purpose: verify the implementation is maintainable, idiomatic, tested, and safe.
+
+   - With subagents: dispatch `./code-quality-reviewer-prompt.md`.
+   - Without subagents: run the Code Quality Self-Check below.
+
+   If Stage 2 finds blocking issues, fix them, rerun relevant tests, and repeat Stage 2. If a Stage 2 fix changes behavior or public interfaces, rerun Stage 1 as well.
+
+6. **Milestone verification**
+
+   If this task is the final task in its feature group, run `specpowers:verification-loop` for that feature group. Do not start the next feature group until the verification result exists and passes.
+
+7. **Mark task complete**
+
+   After TDD, Stage 1, Stage 2, and any required feature-group verification pass, update `tasks.md` for this task from `- [ ]` to `- [x]`.
+
+8. **Report**
+
+   Use the Step-by-Step or Fast Mode report format below.
+
+## Step-by-Step Mode Flow
+
+For the first unchecked task only:
+
+1. Execute the full Task Execution Protocol.
+2. Mark the task checkbox complete.
+3. Report the completed task.
+4. Stop. Do not begin the next task.
+5. Wait for user instruction.
+
+When the user says to continue, resume from the first unchecked task. Do not re-run or re-mark the previous task unless the user requests changes.
+
+### Step-by-Step Report Format
 
 ```markdown
 ✅ Task N.M Complete: [Task Name]
 
-**Output:**
-- Created: path/to/new-file.ts
-- Modified: path/to/modified-file.ts
-- Tests: X/X passing
+**Output**
+- Created: path/to/new-file.ext
+- Modified: path/to/modified-file.ext
+- Task tracking: `tasks.md` updated (`- [ ]` → `- [x]`)
 
-**Spec Coverage:**
-- ✅ Scenario "[name]" — GIVEN/WHEN/THEN fully covered
+**Tests**
+- RED: `[command]` failed for the expected reason before implementation
+- GREEN: `[command]` passed after implementation
+- Additional checks: `[command]` passed
 
-**Code Review:**
-- Stage 1 (Spec Compliance): ✅
-- Stage 2 (Code Quality): [APPROVED / NEEDS_CHANGES]
-- [Issues found, if any]
+**Spec Coverage**
+- ✅ Scenario "[name]" — GIVEN/WHEN/THEN covered by `[test name or file]`
 
-**Waiting for your action:**
-1. Review the code changes and review results above
-2. If satisfied, manually git commit
-3. Say "Continue" to execute the next Task, or provide feedback
+**Reviews**
+- Stage 1 — Spec Compliance: ✅ Passed
+- Stage 2 — Code Quality: ✅ Passed
+- Fixed review issues: [none | summary]
+
+**Verification**
+- Feature-group verification: [not due | ✅ passed | details]
+
+**Waiting for your action**
+1. Review the code changes and results above.
+2. Manually commit if satisfied.
+3. Say "Continue" to execute the next task, or provide feedback.
 ```
 
-8. **Wait for user instruction.** Do NOT proceed until user explicitly says to continue.
-9. **Mark Task as complete** (check the checkbox in tasks.md `- [ ]` → `- [x]`) when user says "Continue" or confirms.
+## Fast Mode Flow
 
-## Execution Flow — Fast Mode
+Execute every unchecked task using the full Task Execution Protocol.
 
-Execute all unchecked Tasks continuously:
+Before entering a new feature group, confirm the previous feature group has passed `verification-loop`. After all tasks are complete, run a final global `verification-loop`.
 
-1. For each Task: build context → execute (subagent or main agent) → two-stage review → fix if needed → mark complete
-2. When the current Task is the last subtask in a feature group: run `verification-loop` before treating that feature group as complete
-3. Before starting the next feature group: confirm the current feature group's `verification-loop` result exists and is ready; if it is missing or failed, do not proceed to the next feature group
-4. After all feature groups are complete: run a final `verification-loop` before the final completion report.
-5. After ALL Tasks: produce unified report:
+### Fast Mode Final Report Format
 
 ```markdown
-🎉 All Tasks Complete!
+🎉 All Tasks Complete
 
-| Task | Status | Output Files | Spec Coverage |
-|------|--------|--------------|---------------|
-| 1.1 [Name] | ✅ | file1.ts, test1.ts | Scenario "X" ✅ |
-| 1.2 [Name] | ✅ | file2.ts, test2.ts | Scenario "Y" ✅ |
+| Task | Status | Output Files | Spec Coverage | Verification |
+|---|---:|---|---|---|
+| 1.1 [Name] | ✅ | file1.ext, test1.ext | Scenario "X" ✅ | not due |
+| 1.2 [Name] | ✅ | file2.ext, test2.ext | Scenario "Y" ✅ | group 1 ✅ |
 
-**Tests:** N/N passing
-**Spec Coverage:** M/M scenarios, 100%
+**Tests**
+- Passing: [summary]
+- Commands run: [commands]
 
-**Reviews:** All Tasks passed two-stage review (spec compliance + code quality)
-**Verification:** Each feature group passed its `verification-loop`, and the final global `verification-loop` passed
+**Reviews**
+- Stage 1 Spec Compliance: ✅ all tasks passed
+- Stage 2 Code Quality: ✅ all tasks passed
 
-Please review all code changes, then manually commit if satisfied.
-When finished, you can say 'Archive' to merge Delta Specs into the main specifications.
+**Verification**
+- Feature groups: ✅ all passed
+- Final global verification-loop: ✅ passed
+
+All task checkboxes in `tasks.md` have been updated. Please review all code changes, then manually commit if satisfied.
+When finished, you can say "Archive" to merge Delta Specs into the main specifications.
 ```
 
 ## Resuming Progress
 
-If the user returns to a conversation or starts a new session:
-1. Read `specs/changes/<change-name>/tasks.md`
-2. Find the first unchecked `- [ ]` Task
-3. If no execution mode has been established for the current change, ask the user to choose `Step-by-Step` or `Fast` before resuming
-4. Announce: "Resuming from Task N.M: [name]"
-5. Continue from there
+When resuming a change:
+
+1. Read the active `tasks.md`.
+2. Find the first unchecked task.
+3. Use the previously established mode if known; otherwise default to Step-by-Step Mode unless the user explicitly requests Fast Mode.
+4. Announce:
+
+   ```markdown
+   Resuming from Task N.M: [Task Name]
+   Covers specs: [Scenario IDs or names]
+   ```
+
+5. Continue with the Task Execution Protocol.
+
+If the previous task appears implemented but its checkbox is unchecked, inspect the code and review artifacts before deciding. Do not blindly mark it complete.
 
 ## Spec Compliance Self-Check
 
-When subagents are unavailable, verify against linked Spec Scenarios after each Task:
+Use this inline when a spec reviewer subagent is unavailable.
 
+For each linked scenario:
+
+```text
+Scenario: [name]
+GIVEN [precondition]
+  - Test setup matches? yes/no
+WHEN [action]
+  - Test triggers the actual behavior? yes/no
+THEN [expected result]
+  - Assertion verifies the expected observable result? yes/no
+Negative constraints
+  - No unrequested behavior added? yes/no
+Implementation evidence
+  - Files/lines inspected: [file:line]
+Result
+  - PASS / NEEDS_CHANGES
 ```
-For each linked Scenario:
-  ✅ GIVEN [condition] — Is the precondition correctly set up in the test?
-  ✅ WHEN [action] — Does the test trigger the correct action?
-  ✅ THEN [expected] — Does the assertion match the expected outcome?
-  ❌ MISSING — Scenario X has no corresponding test
-```
 
-If any check fails, fix before reporting the Task as complete.
+Stage 1 fails if any linked scenario lacks implementation evidence, lacks test coverage, is only partially implemented, or includes behavior outside the Spec.
 
-## Prompt Templates
+## Code Quality Self-Check
 
-When using subagents, use these templates:
-- `./implementer-prompt.md` — Dispatch implementer subagent per Task
-- `./spec-reviewer-prompt.md` — Dispatch spec compliance reviewer (Stage 1)
-- `./code-quality-reviewer-prompt.md` — Dispatch code quality reviewer (Stage 2)
+Use this inline when a code quality reviewer subagent is unavailable.
+
+Check at minimum:
+
+- **Correctness risks:** edge cases, invalid inputs, concurrency/resource handling, error paths.
+- **Maintainability:** clear names, small units, low coupling, no unnecessary abstractions.
+- **Architecture fit:** follows existing project patterns and the file structure from the plan.
+- **Test quality:** tests assert behavior, cover meaningful edge cases, and are not over-mocked.
+- **Scope control:** no unrelated refactors, no speculative features, no broad cleanup outside the task.
+- **Operational safety:** no secret leakage, unsafe defaults, surprising side effects, or avoidable performance regressions.
+
+Stage 2 fails on any Critical or Important issue. Minor issues may be reported but should not block completion unless they accumulate into a maintainability risk.
+
+## Existing Failures and Blockers
+
+If tests fail before the task's RED test is introduced:
+
+1. Identify whether the failure is pre-existing and unrelated.
+2. Do not hide or rewrite unrelated failures.
+3. Continue only if the task can be verified independently and the unrelated failure is clearly documented.
+4. Stop and ask the user when the failure prevents reliable verification.
+
+If implementation reveals a Spec/Design conflict:
+
+1. Stop implementation.
+2. State the exact conflict with file/section references.
+3. Propose options, but do not edit the Spec/Design/Proposal until the user authorizes a planning/spec update workflow.
 
 ## Iron Laws
 
-- **NEVER pause in the middle of a Task.** Execute all TDD steps within a Task continuously. The pause point is AFTER the Task is complete, not between steps.
-- **NEVER start the next Task without user's explicit "Continue" in Step-by-Step mode.**
-- **NEVER execute git commands.** No `git add`, `git commit`, `git push`. Git is the user's domain.
-- **NEVER ignore user feedback.** If user says "this is wrong", stop and fix before continuing.
-- **NEVER skip TDD.** Every Task starts with a failing test. Use `specpowers:test-driven-development` discipline (Kiro: readSteering → test-driven-development.md).
-- **NEVER modify specs/design/proposal during implementation.** If you discover the spec is wrong, stop and discuss.
-- **NEVER skip Stage 1 (spec compliance) before Stage 2 (code quality).** Wrong order = reviewing code that doesn't meet spec.
-- **NEVER proceed with unfixed review issues.** Both stages must pass before Task is complete.
+- Never pause halfway through a task for routine progress updates. Finish the task unit or stop only for a real blocker.
+- Never start the next task in Step-by-Step Mode without explicit user continuation.
+- Never run mutating git commands. The user owns commits and branch management.
+- Never skip TDD for behavior-changing work.
+- Never modify Spec, Design, or Proposal during implementation.
+- Never skip Stage 1 before Stage 2.
+- Never report a task complete while Stage 1, Stage 2, required tests, or due milestone verification are failing.
+- Never treat a worker report as proof. Verify code and tests directly.
+- Never ignore user feedback. If the user says the result is wrong, stop the normal flow and address it.
 
 ## Red Flags
 
-| Thought | Reality |
-|---------|---------|
-| "This Task is simple, do the next one too" | In Step-by-Step mode, one Task at a time. Period. |
-| "Let me pause between TDD steps to ask the user" | Execute all steps within a Task continuously. Only pause after the entire Task is done. |
-| "Let me commit for the user" | Git is the user's domain. You never touch git. |
-| "User forgot to say continue, I'll proceed" | No explicit instruction = no action. |
-| "This Task failed, let me skip to the next" | Fix the current Task first. No skipping. |
-| "The spec is wrong, let me adjust it" | Stop implementation. Discuss the spec issue with the user. |
-| "I'll write the test after since I know what to build" | Test-first. Always. Use the TDD skill. |
-| "Skip spec review, code quality review is enough" | Spec compliance first. Always. Wrong order = reviewing wrong code. |
-| "Close enough on spec compliance" | Reviewer found issues = not done. Fix and re-review. |
+| Temptation | Correct response |
+|---|---|
+| "This task is simple; do the next one too." | In Step-by-Step Mode, stop after one completed task. |
+| "The task passed tests, so skip spec review." | Stage 1 is mandatory. Tests can encode the wrong behavior. |
+| "The code looks fine, so skip code review." | Stage 2 is mandatory. Spec-compliant code can still be fragile. |
+| "The reviewer found a small blocking issue; mention it and move on." | Fix blocking issues and rerun the relevant review. |
+| "The Spec is slightly wrong; patch it while implementing." | Stop and discuss the Spec conflict with the user. |
+| "Mark the task after the user commits." | Mark it after gates pass, before reporting, so the user's manual commit captures the completed state. |
+| "Use git commit to checkpoint." | Do not commit. Report clearly and let the user commit. |
+| "Subagents are unavailable, so skip reviews." | Run self-checks inline. |
 
 ## Integration
 
-**Required skills:**
-- **specpowers:test-driven-development** — Follow TDD for every Task (Kiro: readSteering → test-driven-development.md)
-- **specpowers:planning** — Creates the task plan this skill executes (Kiro: readSteering → planning.md)
+**Required skills**
+- `specpowers:test-driven-development` — mandatory for behavior-changing tasks.
+- `specpowers:planning` — produces the task plan this skill executes.
 
-**Related skills (ad-hoc use, NOT part of the two-stage review):**
-- **specpowers:requesting-code-review** — For manual reviews outside spec-driven-development (e.g., before merge, when stuck). The two-stage review above is the per-task automated flow; requesting-code-review is for standalone review requests.
-- **specpowers:verification-loop** — Run the 6-stage verification pipeline after completing tasks or at milestones (Kiro: readSteering → verification-loop.md)
+**Supporting skills**
+- `specpowers:rules-common` — universal engineering rules for implementation and review.
+- `specpowers:rules-{language}` — language-specific rules, for example `rules-golang`, `rules-typescript`, or `rules-python`.
+- `specpowers:verification-loop` — milestone and final verification pipeline.
+- `specpowers:requesting-code-review` — optional standalone review workflow outside this per-task flow.
+- `specpowers:archiving` — used only after all tasks are complete and the user asks to archive.
 
-**After all Tasks complete:**
-> "All Tasks complete. You can say 'Archive' to merge Delta Specs into the main specifications."
+After all tasks complete, tell the user:
 
-Then invoke `archiving` skill (Kiro: readSteering → archiving.md) when user requests it.
+> All tasks are complete. You can say "Archive" to merge Delta Specs into the main specifications.

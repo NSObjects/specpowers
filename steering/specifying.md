@@ -1,63 +1,112 @@
 <!-- generated from skills/ by sync-steering.js -->
 ---
 name: specifying
-description: "Use when the change intent is accepted and the expected behavior still needs to be defined precisely with testable scenarios before design or coding."
+description: "Use after a change intent or proposal has been accepted, before design or coding, when expected system behavior must be defined as precise, reviewable, testable requirements with GIVEN/WHEN/THEN scenarios. Produces specs under specs/changes/<change-name>/specs/."
 ---
 
 # Specifying Behavior
 
-Define **what** the system should do using structured requirements and testable scenarios. This is the most critical artifact — every downstream task maps back to these specs.
+Define **what the system must do**, not how it will be built. The output is a behavioral contract that downstream design, implementation, and tests must trace back to.
 
 **Announce at start:** "I'm using the specifying skill to define behavioral specifications."
 
-**Role: QA Architect.** You define observable behavior contracts. You do NOT think about implementation.
+**Role:** QA Architect. Focus on observable behavior, acceptance criteria, edge cases, and reviewability. Do **not** design or implement the solution.
 
-<HARD-GATE>
-Do NOT include class names, function names, framework names, or any implementation details.
-Do NOT use vague language: "should work correctly", "handles various cases", "appropriate error handling".
-Every Requirement MUST have at least one Scenario.
-Every Scenario MUST use GIVEN/WHEN/THEN format.
-Do NOT proceed to designing without user confirmation of specs.
-</HARD-GATE>
+## Non-Negotiable Gates
 
-## Checklist
+- Do **not** include implementation details: class names, function names, framework names, database tables, internal algorithms, data structures, test tools, package names, or code-level architecture.
+- Do **not** use vague language such as "works correctly", "handles various cases", "appropriate error handling", "seamless", "robust", "intuitive", or "etc.".
+- Every active Requirement in `ADDED` or `MODIFIED` sections MUST have testable scenarios.
+- Every active Requirement MUST include at least one happy-path scenario and one edge/error scenario.
+- Every Scenario MUST use `GIVEN` / `WHEN` / `THEN`. Use `AND` only for additional observable outcomes.
+- Do **not** proceed to design, implementation, or test writing until the user explicitly confirms the specifications.
 
-1. **Detect project type** — check if `specs/specs/` has existing specs (brownfield → Delta format)
-2. **Read the proposal** — understand intent, scope, success criteria
-3. **Identify domains** — which behavioral domains does this change touch?
-4. **Write specs** — one spec file per domain, in `specs/changes/<change-name>/specs/<domain>/spec.md`
-5. **Self-review** — testability, coverage, ambiguity, implementation leakage
-6. **User confirms** — wait for explicit approval
-7. **Transition** — invoke `designing` skill (Kiro: readSteering → designing.md)
+## Inputs to Establish
 
-## Greenfield Format (New Project, no specs yet)
+Use the accepted proposal and repository context to determine:
+
+- `change-name`: use the provided change name; otherwise derive a short kebab-case name from the proposal.
+- Affected behavioral domains.
+- In-scope behavior, out-of-scope behavior, success criteria, actors, triggers, business rules, permissions, validations, notifications, and failure modes.
+- Existing specs under `specs/specs/`, if any.
+
+If a behavior is underspecified but not blocking, make a conservative assumption and list it in the final summary for user confirmation. Ask a clarification question only when a testable spec cannot be written without it.
+
+## Workflow
+
+1. **Read the accepted proposal**
+   - Extract user-visible outcomes, rules, boundaries, and exclusions.
+   - Convert intent into observable behavior.
+
+2. **Detect project/spec mode**
+   - If `specs/specs/` has no existing specs: use **Greenfield Format**.
+   - If `specs/specs/` has existing specs: use **Delta Format** for every affected domain.
+   - Before writing a Delta spec, read the current spec for the affected domain when it exists.
+   - For a new domain in an existing project, still use Delta Format with `ADDED Requirements`.
+
+3. **Identify domains**
+   - Create one spec file per behavioral domain.
+   - Prefer existing domain names when modifying existing specs.
+   - Use concise, stable, behavior-oriented domain names such as `authentication`, `billing`, `notifications`, or `data-export`.
+
+4. **Write requirements**
+   - Each Requirement describes one externally observable behavior contract.
+   - Start requirement statements with `The system SHALL ...` unless a weaker RFC 2119 keyword is intentionally justified.
+   - Keep Requirement titles behavior-oriented, not implementation-oriented.
+
+5. **Write scenarios**
+   - Each Scenario must be independently testable.
+   - `GIVEN` states preconditions and relevant data.
+   - `WHEN` states a single trigger, action, or event.
+   - `THEN` states the primary observable result.
+   - `AND` states additional observable outcomes, state changes, visibility rules, notifications, or constraints.
+
+6. **Self-review and fix inline**
+   - Remove ambiguity, implementation leakage, duplication, and untestable claims.
+   - Confirm every in-scope proposal item maps to at least one Requirement.
+   - Confirm every active Requirement has both happy-path and edge/error coverage.
+
+7. **Save and request confirmation**
+   - Save files to `specs/changes/<change-name>/specs/<domain>/spec.md`.
+   - Summarize changed files, Requirement count, Scenario count, assumptions, and any intentionally excluded behavior.
+   - Ask the user to review and explicitly confirm.
+
+8. **Transition only after approval**
+   - After explicit user confirmation, invoke the `designing` skill.
+   - For Kiro workflows: read steering context, then use `designing.md`.
+
+## Greenfield Format
+
+Use this format only when the project has no existing behavioral specs.
 
 ```markdown
 # [Domain] Specification
 
 ## Purpose
-[What this domain is responsible for]
+[One sentence describing what this domain is responsible for.]
 
 ## Requirements
 
 ### Requirement: [Behavior Name]
-The system SHALL [observable behavior description].
+The system SHALL [specific observable behavior].
 
-#### Scenario: [Scenario Name]
-- GIVEN [precondition]
-- WHEN [trigger action]
-- THEN [expected outcome]
-- AND [additional expectation]
+#### Scenario: [Happy Path Name]
+- GIVEN [precondition, actor, and relevant data]
+- WHEN [single trigger/action/event]
+- THEN [observable expected outcome]
+- AND [additional observable outcome, if needed]
 
-#### Scenario: [Edge Case Name]
-- GIVEN [edge case precondition]
-- WHEN [trigger action]
-- THEN [expected outcome]
+#### Scenario: [Edge or Error Case Name]
+- GIVEN [edge/error precondition]
+- WHEN [single trigger/action/event]
+- THEN [observable expected outcome]
 ```
 
-## Brownfield Format (Existing Project, Delta Approach)
+## Delta Format
 
-When `specs/specs/` already contains spec files, use Delta format:
+Use this format when `specs/specs/` contains existing specs. Delta specs describe only the behavior added, changed, or removed by the accepted change.
+
+Read `delta-format-guide.md` when writing Delta specs.
 
 ```markdown
 # Delta for [Domain]
@@ -65,89 +114,109 @@ When `specs/specs/` already contains spec files, use Delta format:
 ## ADDED Requirements
 
 ### Requirement: [New Behavior]
-The system SHALL [behavior].
+The system SHALL [specific observable behavior].
 
-#### Scenario: [Scenario Name]
+#### Scenario: [Happy Path Name]
 - GIVEN [precondition]
+- WHEN [trigger]
+- THEN [outcome]
+
+#### Scenario: [Edge or Error Case Name]
+- GIVEN [edge/error precondition]
 - WHEN [trigger]
 - THEN [outcome]
 
 ## MODIFIED Requirements
 
-### Requirement: [Changed Behavior]
-The system SHALL [new behavior].
-(Previously: [old behavior])
+### Requirement: [Existing Behavior Name]
+The system SHALL [complete updated behavior].
+(Previously: [behavior from the current spec that is being replaced])
 
-#### Scenario: [Updated Scenario]
+#### Scenario: [Happy Path Name]
 - GIVEN [precondition]
 - WHEN [trigger]
-- THEN [new expected outcome]
+- THEN [updated outcome]
+
+#### Scenario: [Edge or Error Case Name]
+- GIVEN [edge/error precondition]
+- WHEN [trigger]
+- THEN [updated outcome]
 
 ## REMOVED Requirements
 
 ### Requirement: [Deprecated Behavior]
-(Reason: [why this is being removed])
+(Reason: [specific reason this behavior is removed])
 ```
 
-### Delta Sections
+### Delta Rules
 
-| Section | Meaning | What Happens on Archive |
-|---------|---------|------------------------|
-| `## ADDED Requirements` | New behavior | Appended to main spec |
-| `## MODIFIED Requirements` | Changed behavior | Replaces existing requirement |
-| `## REMOVED Requirements` | Deprecated behavior | Deleted from main spec |
+- Include only sections that apply; omit empty sections.
+- `ADDED` contains complete new Requirements.
+- `MODIFIED` contains the complete updated Requirement, not only changed fragments. If the updated Requirement should retain existing scenarios, restate them.
+- `MODIFIED` MUST include `(Previously: ...)` using the current spec as the source whenever available.
+- A change that adds, removes, or changes scenarios for an existing Requirement is a `MODIFIED` Requirement.
+- `REMOVED` entries require a specific reason and do not need scenarios.
+- Do not restate unchanged Requirements.
 
-## RFC 2119 Keywords
+## RFC 2119 Keyword Use
 
-Use these keywords to communicate requirement strength:
+| Keyword | Use |
+|---|---|
+| **SHALL / MUST** | Mandatory behavior with no allowed exception. Prefer `SHALL` for requirements. |
+| **SHOULD** | Recommended behavior with known exceptions. State or imply the exception clearly. |
+| **MAY** | Optional behavior. Use sparingly for explicitly allowed choices. |
 
-| Keyword | Meaning |
-|---------|---------|
-| **MUST / SHALL** | Absolute requirement |
-| **SHOULD** | Recommended, but exceptions exist |
-| **MAY** | Optional |
+## Quality Bar
 
-## Iron Laws
+A specification is acceptable only when:
 
-- **No implementation details in specs.** If you can change the implementation without changing the spec, the spec is correct. If you can't, the spec contains implementation details — remove them.
-- **Every Requirement is testable.** If you can't write a test for it, it's too vague.
-- **Every Scenario has GIVEN/WHEN/THEN.** No exceptions. No "the system works correctly" hand-waving.
-- **Edge cases are mandatory.** Every Requirement MUST have at least one happy path AND one edge case / error scenario.
+- A tester can write pass/fail tests from the scenarios without asking how the system is implemented.
+- A designer can propose multiple implementations that still satisfy the same specs.
+- A reviewer can trace each in-scope proposal item to a Requirement.
+- A future maintainer can tell exactly which behavior changed, especially in Delta specs.
+- No Requirement depends on hidden internal mechanics.
 
-## Self-Review
+## Self-Review Checklist
 
-After writing specs:
+Before saving, verify:
 
-1. **Testability scan:** For each Scenario, could you write an automated test? If not, make it more concrete.
-2. **Coverage check:** Does every item in the proposal's "In scope" have a corresponding Requirement?
-3. **Ambiguity check:** Could any Requirement be interpreted two different ways? If so, pick one and make it explicit.
-4. **Implementation leakage:** Are there class names, function names, or framework references? Remove them.
-5. **Edge case check:** Does every Requirement have at least one non-happy-path Scenario?
+1. **Behavioral focus:** Does every Requirement describe externally observable behavior?
+2. **Testability:** Can each Scenario be tested with clear pass/fail criteria?
+3. **Coverage:** Does every in-scope proposal item have a corresponding Requirement?
+4. **Edge cases:** Does every active Requirement include happy-path and edge/error coverage?
+5. **Ambiguity:** Could any Requirement or Scenario be interpreted in two valid ways?
+6. **Implementation leakage:** Are there code, framework, database, package, or architecture references?
+7. **Delta integrity:** For Delta specs, are unchanged Requirements omitted, modified Requirements complete, and removed Requirements justified?
 
-Fix issues inline. No need to re-review — just fix and move on.
+Fix issues immediately before presenting the specs.
 
-## Red Flags
+## Red Flags and Corrections
 
-| Thought | Reality |
-|---------|---------|
-| "This requirement is obvious, no need for scenarios" | If it's obvious, the scenario takes 30 seconds to write. Write it. |
-| "I'll add the edge cases later" | You won't. Edge cases discovered during specifying save hours during implementation. |
-| "The system should handle errors appropriately" | WHAT errors? WHAT handling? Be specific or delete it. |
-| "I need to know the framework to write good specs" | No. Specs describe behavior, not implementation. Framework is irrelevant. |
-| "This is just a small change, full specs are overkill" | Small changes with unspecified behavior cause the most bugs. Write the spec. |
+| Red Flag | Correction |
+|---|---|
+| "The system should handle errors appropriately." | Name the exact error condition and expected observable result. |
+| "The feature works for all users." | Define which actors, permissions, states, and exclusions apply. |
+| "Various edge cases are supported." | Write a separate scenario for each relevant edge/error condition. |
+| "The implementation validates the input." | Specify the invalid input and what the user/system observes. |
+| "This is a small change, no spec needed." | Small changes still need at least one Requirement with scenarios. |
+| "Only one scenario is enough." | Add happy-path and edge/error coverage. |
+| "This modified Requirement only needs the changed scenario." | In Delta Format, include the complete updated Requirement because it replaces the old one on archive. |
 
-## Common Rationalizations
+## Final Response Template
 
-| Excuse | Reality |
-|--------|---------|
-| "Tests will define the behavior" | Tests without specs test what you built, not what you should have built. |
-| "The proposal is clear enough" | Proposals describe intent. Specs describe verifiable behavior. Different things. |
-| "Delta format is too verbose for this change" | Delta format prevents you from accidentally redefining existing behavior. Use it. |
+After saving specs, respond with:
 
-## After Specifying
+```text
+Behavioral specifications saved.
 
-Save specs to `specs/changes/<change-name>/specs/<domain>/spec.md`.
+Files:
+- specs/changes/<change-name>/specs/<domain>/spec.md
 
-> "Behavioral specifications saved. [N] Requirements with [M] Scenarios defined. Please review and confirm, then I'll create the technical design."
+Summary:
+- Requirements: [N]
+- Scenarios: [M]
+- Assumptions: [brief list or "None"]
+- Excluded behavior: [brief list or "None"]
 
-Wait for user confirmation. Then invoke `designing` skill (Kiro: readSteering → designing.md).
+Please review and confirm the specifications. After confirmation, I will create the technical design.
+```
