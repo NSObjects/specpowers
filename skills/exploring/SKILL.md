@@ -1,139 +1,214 @@
 ---
 name: exploring
-description: "Use when the request is vague, requirements are incomplete, or more context is needed before deciding what should be built."
+description: "Use when a request is vague, incomplete, strategically ambiguous, or needs project context before deciding what should be built."
 ---
 
 # Exploring Ideas
 
-Help turn vague ideas into clear understanding through natural collaborative dialogue.
+Turn an unclear idea into shared, actionable understanding through a short collaborative dialogue. Use the minimum exploration necessary: enough to avoid wrong assumptions, not enough to become a design phase.
 
-Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what needs to be built, hand off to the `proposing` skill.
+**Announce once at start:** "I'm using the exploring skill to understand what we're building."
 
-**Announce at start:** "I'm using the exploring skill to understand what we're building."
+## Hard Gate
 
-<HARD-GATE>
-Do NOT create any artifacts (proposal.md, specs, design, tasks) during exploring. The ONLY output of this skill is shared understanding in the conversation.
-Do NOT invoke any implementation skill. The terminal state is invoking `proposing` (Kiro: readSteering → proposing.md).
-</HARD-GATE>
+During `exploring`, the agent MUST NOT:
 
-## Anti-Pattern: "This Is Too Simple To Explore"
+- create or edit project artifacts such as `proposal.md`, specs, design docs, task lists, tickets, or implementation files;
+- invoke implementation, design, task-planning, or coding skills;
+- start building while requirements are still being discovered;
+- treat implementation research as a separate visible workflow stage.
 
-Every non-trivial project benefits from exploration. "Simple" projects are where unexamined assumptions cause the most wasted work. The exploration can be brief (2-3 questions for truly simple projects), but you MUST understand intent before proposing.
+The only visible output is conversational: questions, summaries, trade-offs, recommendations, and alignment checks.
 
-## Checklist
+The terminal transition is `proposing` only after the user confirms the explored direction. For Kiro, this means `readSteering → proposing.md`.
 
-1. **Explore project context** — check files, docs, recent commits, existing specs
-2. **Detect project type** — check if `specs/specs/` exists (brownfield) or not (greenfield)
-3. **Assess scope** — is this one feature or multiple independent subsystems?
-4. **Decompose if too large** — help user break into sub-projects (see below)
-5. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-6. **Use implementation research when warranted** — research existing implementations inside `exploring` when approach quality depends on real evidence
-7. **Propose 2-3 approaches** — with trade-offs and your recommendation
-8. **Get user alignment** — confirm direction before moving on
-9. **Transition** — invoke `proposing` skill (Kiro: readSteering → proposing.md)
+## When To Use
 
-## The Process
+Use `exploring` when any of these are true:
 
-**Understanding the idea:**
-- Check the current project state first (files, docs, recent commits)
-- Before asking detailed questions, assess scope first (see Scope Assessment below)
-- Ask questions one at a time to refine the idea
-- Prefer multiple choice questions when possible
-- Only one question per message
-- Focus on understanding: purpose, constraints, success criteria
+- The user describes a goal but not the concrete outcome.
+- Requirements, constraints, users, success criteria, or scope are missing.
+- The request may include several independent features or subsystems.
+- The right approach depends on existing codebase patterns, dependencies, integrations, or prior art.
+- The user asks for a solution but multiple valid solution shapes are plausible.
 
-**Scope Assessment (BEFORE detailed questions):**
+Do not overuse this skill for already-specific implementation requests. If the requested change is concrete and bounded, hand off to the appropriate next skill instead.
 
-If the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
+## Operating Loop
 
-```
-IF request contains multiple independent subsystems:
-  STOP detailed questions
-  TELL user: "This looks like [N] independent features. Let's break it into sub-projects."
-  HELP decompose: what are the pieces, how do they relate, what order to build?
-  THEN explore the FIRST sub-project through the normal flow
-  Each sub-project gets its own specs/changes/<name>/ cycle
-```
+1. **Inspect available context**
+    - Check existing files, docs, recent commits, project structure, and existing specs when available.
+    - Identify whether this is greenfield or brownfield work.
+    - Check for existing behavior specifications, especially under known spec directories such as `specs/`, `.kiro/specs/`, or `specs/specs/` when present.
 
-**Exploring approaches:**
-- Propose 2-3 different approaches with trade-offs
-- Treat implementation research as part of `exploring`, not as a separate workflow stage.
-- When an approach depends on understanding existing implementations, dependencies, or prior art, perform implementation research before finalizing the trade-offs.
-- For simple requests, skip implementation research and continue the normal exploration conversation.
-- For complex requests, a bounded subagent MAY gather implementation research if the platform supports it; the main agent remains responsible for synthesizing findings, recommending an approach, and aligning with the user.
-- Present options conversationally with your recommendation and reasoning
-- Lead with your recommended option and explain why
+2. **Assess scope before details**
+    - Decide whether the request is one feature, one workflow, or multiple independent subsystems.
+    - If the request is too broad, decompose before asking detailed product questions.
+
+3. **Clarify one thing at a time**
+    - Ask one question per message.
+    - Prefer multiple-choice questions when they reduce effort for the user.
+    - Focus on purpose, users, constraints, exclusions, success criteria, and acceptable trade-offs.
+    - Do not ask questions already answered by available context.
+
+4. **Research only when it changes the decision**
+    - First search the current codebase.
+    - Then check relevant external sources only if codebase context is insufficient and external evidence would materially affect the recommendation.
+    - Keep research bounded and synthesize it into the exploration conversation.
+
+5. **Present options**
+    - Once context is sufficient, propose 2-3 viable approaches.
+    - Lead with the recommended approach.
+    - For each option, summarize trade-offs, risk, complexity, and fit with existing patterns.
+
+6. **Confirm alignment**
+    - Restate the agreed problem, scope, non-goals, constraints, and recommended direction.
+    - Ask whether to proceed to `proposing`.
+
+7. **Transition**
+    - Only after the user confirms, invoke `proposing`.
+    - Do not invoke implementation skills from `exploring`.
+
+## Scope Assessment
+
+Before detailed clarification, classify the request:
+
+| Scope | Signal | Action |
+|---|---|---|
+| Single feature | One user goal, one main workflow, clear boundary | Continue normal exploration |
+| Compound feature | One goal with several dependent parts | Clarify dependencies and minimal first slice |
+| Multiple subsystems | Separate domains such as auth, billing, analytics, chat, storage, admin, integrations | Stop detailed questioning and decompose first |
+| Platform/product | Broad product vision or many user roles/workflows | Define phases and choose the first sub-project |
+
+If decomposition is needed, say this directly:
+
+> "This looks like several independent features. Let's break it into sub-projects before refining details."
+
+Then help identify:
+
+- the independent pieces;
+- how they depend on each other;
+- the smallest valuable first slice;
+- which sub-project should enter the spec cycle first.
+
+Each sub-project should get its own `specs/changes/<name>/` cycle when the workflow supports that structure.
+
+## Questioning Guidelines
+
+Good exploration questions are specific and decision-oriented.
+
+Prefer:
+
+> "Should this be optimized for speed of delivery, long-term extensibility, or lowest operational risk?"
+
+Avoid:
+
+> "Tell me more about what you want."
+
+Use questions to discover:
+
+- **Outcome:** what should be true when the work is done;
+- **User:** who uses or benefits from it;
+- **Workflow:** what happens before, during, and after the feature;
+- **Constraints:** technology, security, performance, budget, schedule, compliance;
+- **Success criteria:** observable acceptance conditions;
+- **Non-goals:** what should explicitly stay out of scope.
 
 ## Implementation Research Inside Exploring
 
-Use implementation research only when it improves the quality of the exploration outcome.
+Implementation research is allowed only to improve exploration quality. It does not change the visible stage.
 
-**Good triggers:**
-- Choosing between adopting an existing solution and building custom code
-- Comparing new dependencies, integrations, or architectural patterns
-- Understanding how similar behavior is already implemented in the current codebase
+### Use research when
 
-**Not required:**
-- Simple requests that can be clarified through normal questioning
-- Cases where the existing codebase patterns already make the direction obvious
+- choosing between adopting an existing solution and building custom code;
+- comparing dependencies, integrations, or architectural patterns;
+- checking whether similar behavior already exists in the current codebase;
+- evaluating risk, compatibility, migration cost, or maintenance burden;
+- validating assumptions that would materially affect the recommended approach.
 
-**Research order:**
-1. Search the current codebase first
-2. Then check the most relevant external sources for the project's language or runtime
-3. Synthesize the evidence back into the approach trade-offs
+### Skip research when
 
-**Platform dispatch:**
-- Claude Code: use the `Agent` tool (general-purpose) with the filled `./implementation-researcher-prompt.md` template. Claude Code renamed `Task` to `Agent` in v2.1.63; older `Task` references remain compatible aliases.
-- Kiro: use `invokeSubAgent(name="general-task-execution", prompt=...)` with the filled `./implementation-researcher-prompt.md` template
-- Codex: use `spawn_agent(message=...)` with the filled `./implementation-researcher-prompt.md` template
-- Cursor, Gemini CLI, OpenCode: no research subagent dispatch; perform the same implementation research inline in the main agent and continue `exploring`
+- the request can be clarified through normal questioning;
+- existing project patterns clearly determine the direction;
+- the result would not change the recommendation;
+- the question belongs in design or implementation rather than exploration.
 
-**Important:** Implementation research never changes the visible workflow stage. The user is still in `exploring`.
+### Research order
 
-**Working in existing codebases:**
-- Explore the current structure before proposing changes
-- Follow existing patterns
-- Check `specs/specs/` for existing behavior specifications
-- Where existing code has problems that affect the work, note them for the design phase — don't propose unrelated refactoring
+1. Search the current codebase first.
+2. Check internal docs/specs next.
+3. Use external sources only when needed.
+4. Return concise evidence and translate it into trade-offs.
+
+### Platform dispatch
+
+Use the filled `./implementation-researcher-prompt.md` template when delegating research.
+
+- **Claude Code:** use `Agent` with the general-purpose agent. `Task` may exist as a backward-compatible alias in older environments.
+- **Kiro:** use `invokeSubAgent(name="general-task-execution", prompt=...)`.
+- **Codex:** use `spawn_agent(message=...)`.
+- **Cursor, Gemini CLI, OpenCode:** if no subagent dispatch is available, perform the same bounded research inline.
+
+The main agent remains responsible for synthesis, recommendation, and user alignment.
+
+## Completion Criteria
+
+Exploration is complete only when all of these are true:
+
+- The problem statement is clear.
+- The user and primary workflow are clear enough to propose against.
+- Scope and non-goals are explicit.
+- Major constraints and risks are known or deliberately deferred.
+- A recommended approach has been presented with alternatives.
+- The user has agreed to proceed to `proposing`.
 
 ## Red Flags
 
-If you catch yourself thinking any of these, STOP:
+If any of these thoughts appear, stop and return to exploration:
 
-| Thought | Reality |
-|---------|---------|
-| "I already know what they want" | You don't. Ask. Your assumptions are the #1 source of wasted work. |
-| "Let me just start building, we can figure it out" | Building without understanding = rebuilding. Every time. |
-| "This is just like [other project]" | No two projects are the same. The differences matter more than the similarities. |
-| "The user will tell me if something's wrong" | Users don't know what you assumed. They can't correct invisible mistakes. |
-| "One more question would be annoying" | One wrong assumption is more annoying than one more question. |
-| "I'll explore while implementing" | Exploring during implementation = scope creep + rework. Separate the phases. |
-| "This scope is fine, no need to decompose" | If you can't describe it in one sentence, it needs decomposition. |
+| Thought | Corrective action |
+|---|---|
+| "I already know what they want." | Ask or verify the missing assumption. |
+| "I'll explore while implementing." | Do not implement; clarify first. |
+| "The scope is probably fine." | Classify scope before details. |
+| "This is too simple to explore." | Use a shorter exploration, not zero exploration. |
+| "The user will correct me later." | Make assumptions visible now. |
+| "One more question would be annoying." | Ask only the highest-value next question. |
+| "Research would be interesting." | Research only if it can change the decision. |
 
 ## Common Rationalizations
 
 | Excuse | Reality |
-|--------|---------|
-| "The user said 'just build it'" | Instructions say WHAT, not HOW. You still need to understand WHAT. |
-| "I'll figure out the details as I go" | 'Details' = requirements. Figuring them out during coding = bugs. |
-| "Asking too many questions wastes time" | Building the wrong thing wastes more time. Every question has ROI. |
+|---|---|
+| "The user said just build it." | That clarifies urgency, not requirements. |
+| "I'll figure out details as I go." | Details are requirements; guessing creates rework. |
+| "Asking questions wastes time." | Building the wrong thing wastes more. |
+| "This resembles another project." | Similarity is useful, but differences define the work. |
 
-## After Exploring
+## Handoff To Proposing
 
-**Transition to proposing:**
+When ready, summarize in conversation:
+
+- agreed problem;
+- target users/workflow;
+- scope and non-goals;
+- constraints and risks;
+- recommended approach;
+- open questions that can safely be resolved during proposing.
+
+Then ask:
 
 > "I have a clear understanding of what we're building. Ready to create a proposal. Shall I proceed?"
 
-Wait for user confirmation, then invoke the `proposing` skill (Kiro: readSteering → proposing.md).
-
-**The terminal state is invoking proposing (Kiro: readSteering → proposing.md).** Do NOT invoke any implementation skill.
+After confirmation, invoke `proposing` and do not invoke implementation skills.
 
 ## Key Principles
 
-- **One question at a time** — Don't overwhelm with multiple questions
-- **Multiple choice preferred** — Easier to answer than open-ended
-- **YAGNI ruthlessly** — Remove unnecessary features from consideration
-- **Explore alternatives** — Always propose 2-3 approaches before settling
-- **No artifacts yet** — Exploring produces understanding, not documents
-- **Scope before details** — Assess project size before diving into specifics
-- **Decompose large projects** — Each sub-project gets its own spec cycle
+- Scope before details.
+- One question at a time.
+- Multiple choice when helpful.
+- Prefer the smallest valuable first slice.
+- Make assumptions explicit.
+- Explore alternatives before committing.
+- Research only when evidence changes the decision.
+- No artifacts during `exploring`.

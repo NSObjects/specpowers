@@ -1,195 +1,237 @@
 ---
 name: dispatching-parallel-agents
-description: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies
+description: Use when a request can be split into 2+ independent workstreams that can run concurrently without shared mutable state, file ownership conflicts, or sequential dependencies.
 ---
 
 # Dispatching Parallel Agents
 
-## Overview
+## Purpose
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+Use this skill to coordinate multiple isolated specialist agents when a task has independent problem domains. The orchestrator remains the single owner of the user-facing answer, task decomposition, integration, verification, and final judgment.
 
-When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
+Sub-agents do **not** inherit the current conversation, hidden assumptions, or each other's work. Every dispatched task must include the exact context, scope, constraints, and expected output needed for that agent to succeed independently.
 
-For review work, parallel specialists should sit behind a **unified review orchestration** layer rather than becoming separate user-facing entrypoints. Use `requesting-code-review` as the surfaced review entrypoint, then dispatch specialists only when that unified review flow truly needs them.
+**Core principle:** dispatch one agent per independent domain, then integrate their findings through a single orchestration layer.
 
-**Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
+## Activation Criteria
 
-## When to Use
+Use this skill only when all of the following are true:
 
-```dot
-digraph when_to_use {
-    "Multiple failures?" [shape=diamond];
-    "Are they independent?" [shape=diamond];
-    "Single agent investigates all" [shape=box];
-    "One agent per problem domain" [shape=box];
-    "Can they work in parallel?" [shape=diamond];
-    "Sequential agents" [shape=box];
-    "Parallel dispatch" [shape=box];
+- There are **2 or more separable workstreams**.
+- Each workstream has a clear boundary, such as a file, subsystem, feature slice, test group, or review dimension.
+- No workstream needs another workstream's result before it can begin.
+- Agents can avoid editing the same files or mutating the same external state.
+- The orchestrator can inspect, reconcile, and verify the returned work.
 
-    "Multiple failures?" -> "Are they independent?" [label="yes"];
-    "Are they independent?" -> "Single agent investigates all" [label="no - related"];
-    "Are they independent?" -> "Can they work in parallel?" [label="yes"];
-    "Can they work in parallel?" -> "Parallel dispatch" [label="yes"];
-    "Can they work in parallel?" -> "Sequential agents" [label="no - shared state"];
-}
-```
+Prefer this skill for:
 
-**Use when:**
-- 3+ test files failing with different root causes
-- Multiple subsystems broken independently
-- Each problem can be understood without context from others
-- No shared state between investigations
+- Multiple failing test files with likely different causes.
+- Independent bugs in separate modules or services.
+- Large investigations that can be split by subsystem, API, package, platform, or concern.
+- Mixed expert analysis where each specialist has a bounded role, such as planning, security review, test strategy, and implementation review.
 
-**Don't use when:**
-- Failures are related (fix one might fix others)
-- Need to understand full system state
-- Agents would interfere with each other
+Do **not** use this skill when:
 
-## The Pattern
+- Failures may share a root cause and should be diagnosed together first.
+- The task requires a single coherent mental model of the whole system.
+- Agents would edit the same files, migrations, generated artifacts, dependency manifests, or global configuration.
+- The work is exploratory and the boundaries are not yet known.
+- The task is small enough that orchestration overhead would exceed the benefit.
 
-### 1. Identify Independent Domains
+If independence is uncertain, first do a short triage pass. Dispatch read-only planning agents before writer agents when boundaries are unclear.
 
-Group failures by what's broken:
-- File A tests: Tool approval flow
-- File B tests: Batch completion behavior
-- File C tests: Abort functionality
+## Parallel Readiness Checklist
 
-Each domain is independent — fixing tool approval doesn't affect abort tests.
+Before dispatching, answer these questions:
 
-### 2. Create Focused Agent Tasks
+| Check | Ready Signal | If Not Ready |
+|------|--------------|--------------|
+| Domain boundary | Each agent owns a distinct file set, subsystem, or concern | Do a triage/planning pass first |
+| Dependency order | Agents do not need each other's outputs to start | Run sequentially or split into phases |
+| Write conflicts | Writable paths do not overlap | Assign one writer and make others read-only |
+| Shared state | No shared test database, service, branch state, or generated artifact conflict | Serialize the risky steps |
+| Verification | You know how to validate each result and the integrated result | Define focused and full verification first |
 
-Each agent gets:
-- **Specific scope:** One test file or subsystem
-- **Clear goal:** Make these tests pass
-- **Constraints:** Don't change other code
-- **Expected output:** Summary of what you found and fixed
+## Workflow
 
-### 3. Dispatch in Parallel
+### 1. Partition the Work
 
-```typescript
-// In Claude Code / AI environment
-Agent("Fix agent-tool-abort.test.ts failures")
-Agent("Fix batch-completion-behavior.test.ts failures")
-Agent("Fix tool-approval-race-conditions.test.ts failures")
-// All three run concurrently
-```
+Group the request by independent problem domain:
 
-### 4. Review and Integrate
+- failing test file or test category
+- module, package, service, or API boundary
+- platform or environment
+- review concern, such as security, correctness, performance, or testability
+- delivery phase, such as planning, implementation, verification, or review
 
-When agents return:
-- Read each summary
-- Verify fixes don't conflict
-- Run full test suite
-- Integrate all changes
+For each domain, record:
 
-## Agent Prompt Structure
+- owner agent role
+- allowed scope
+- forbidden scope
+- expected deliverable
+- verification method
+- possible integration conflicts
 
-Good agent prompts are:
-1. **Focused** — One clear problem domain
-2. **Self-contained** — All context needed to understand the problem
-3. **Specific about output** — What should the agent return?
+### 2. Choose the Agent Type
+
+Use the smallest specialist role that can complete the domain:
+
+| Role | Template | Use When |
+|------|----------|----------|
+| Planner | [`./planner-agent-prompt.md`](./planner-agent-prompt.md) | You need read-only codebase analysis, dependency mapping, implementation sequencing, or risk assessment before editing. |
+| Security Reviewer | [`./security-reviewer-prompt.md`](./security-reviewer-prompt.md) | You need a security-focused read-only review with severity, evidence, confidence, and coverage boundaries. Usually invoke through `requesting-code-review`. |
+| TDD Guide | [`./tdd-guide-prompt.md`](./tdd-guide-prompt.md) | You need a test-first plan, behavior matrix, or red-green-refactor coaching for a feature. |
+| Code Reviewer | [`../requesting-code-review/code-reviewer-prompt.md`](../requesting-code-review/code-reviewer-prompt.md) | You need general code quality review. Invoke through `requesting-code-review`, not as a separate user-facing flow. |
+| Debug/Fix Agent | Inline prompt | You need a bounded implementation or investigation against one file, subsystem, or failing test group. |
+
+### 3. Build a Self-Contained Dispatch Packet
+
+Every agent prompt must include:
+
+- **Objective:** the concrete outcome for this agent.
+- **Scope:** files, directories, tests, modules, or concerns it owns.
+- **Context:** relevant errors, requirements, constraints, diffs, assumptions, and prior findings.
+- **Allowed actions:** read-only, write-limited, test-running permissions, or other tool constraints.
+- **Forbidden actions:** files not to edit, behaviors not to change, commands not to run.
+- **Success criteria:** how the agent knows the work is complete.
+- **Return contract:** the exact summary format the orchestrator needs.
+
+Use this template for ad hoc agents:
 
 ```markdown
-Fix the 3 failing tests in src/agents/agent-tool-abort.test.ts:
+You are a focused sub-agent working on one independent domain.
 
-1. "should abort tool with partial output capture" — expects 'interrupted at' in message
-2. "should handle mixed completed and aborted tools" — fast tool aborted instead of completed
-3. "should properly track pendingToolCount" — expects 3 results but gets 0
+## Objective
+[Concrete task]
 
-These are timing/race condition issues. Your task:
+## Scope
+- Own: [files/directories/tests/concerns]
+- Do not touch: [out-of-scope areas]
 
-1. Read the test file and understand what each test verifies
-2. Identify root cause — timing issues or actual bugs?
-3. Fix by:
-   - Replacing arbitrary timeouts with event-based waiting
-   - Fixing bugs in abort implementation if found
-   - Adjusting test expectations if testing changed behavior
+## Context
+[Paste all relevant errors, requirements, design notes, and constraints. Do not assume access to the parent conversation.]
 
-Do NOT just increase timeouts — find the real issue.
+## Working Rules
+- [Allowed tools/actions]
+- [Forbidden tools/actions]
+- [Behavior-preserving constraints]
+- [Conflict-avoidance constraints]
 
-Return: Summary of what you found and what you fixed.
+## Success Criteria
+- [Measurable completion condition]
+- [Focused verification command or evidence, if applicable]
+
+## Return Format
+### Outcome
+[Done / Partial / Blocked]
+
+### Root Cause or Key Findings
+[Concise evidence-based explanation]
+
+### Changes Made or Recommendations
+- `[file]`: [change or recommendation]
+
+### Verification
+[Commands run, results, or why verification was not possible]
+
+### Risks and Follow-ups
+[Remaining concerns, integration risks, or open questions]
 ```
+
+### 4. Dispatch Concurrently
+
+Dispatch agents in parallel only after the scopes are separated. Treat the following as shared resources owned by the orchestrator unless explicitly assigned:
+
+- dependency manifests and lockfiles
+- global config files
+- migrations
+- generated files
+- test snapshots
+- build scripts
+- shared fixtures
+- public interfaces used by multiple domains
+
+If two agents may need the same shared file, make one agent read-only or sequence the edits.
+
+### 5. Integrate the Results
+
+When agents return:
+
+1. Read each summary before accepting any change.
+2. Check whether any files, assumptions, or interfaces overlap.
+3. Inspect diffs or recommendations for behavior regressions.
+4. Resolve contradictions explicitly.
+5. Run focused verification for each domain when possible.
+6. Run the broadest practical integration verification.
+7. Apply the AI-generated code review checklist before presenting the final result.
+
+Do not blindly concatenate sub-agent outputs. The orchestrator must produce one coherent final conclusion.
+
+### 6. Report to the User
+
+The final response should include:
+
+- what workstreams were split out
+- the integrated result
+- important fixes or findings
+- verification performed
+- unresolved risks or incomplete parts
+
+Avoid exposing raw sub-agent transcripts unless the user asks for detailed logs.
+
+## Review Orchestration Boundary
+
+Review-oriented specialists should sit behind a **unified review orchestration** layer. Use `requesting-code-review` as the user-facing review entrypoint. Dispatch security, general code quality, or other review specialists only as internal helpers for that unified review flow.
+
+The user should receive one review conclusion, not separate uncoordinated reviewer opinions.
+
+## AI-Generated Code Review Checklist
+
+Apply these checks to code or recommendations produced by sub-agents:
+
+- **Behavior regression:** compare before/after behavior for affected call sites.
+- **Security assumptions:** ensure validations, authorization checks, trust boundaries, and secret handling were not weakened.
+- **Hidden coupling:** look for new dependencies on globals, shared state, timing, ordering, or environment.
+- **Over-broad edits:** reject changes outside the assigned scope unless justified.
+- **Unnecessary complexity:** remove abstractions, helpers, or layers that do not pay for themselves.
+- **Verification gaps:** separate verified claims from unverified assumptions.
+
+## Examples
+
+### Good Parallel Dispatch
+
+Scenario: six test failures across three unrelated files after a refactor.
+
+- Agent 1 owns `agent-tool-abort.test.ts` timing failures.
+- Agent 2 owns `batch-completion-behavior.test.ts` event-shape failures.
+- Agent 3 owns `tool-approval-race-conditions.test.ts` async completion failures.
+
+Each agent receives the failing test names, error messages, relevant scope, constraints, and return contract. The orchestrator later inspects the changes, checks for file overlap, and runs the full suite.
+
+### Bad Parallel Dispatch
+
+Scenario: several failures all involve the same request lifecycle state machine.
+
+Do not dispatch separate writer agents by failing test file. First investigate the shared state machine as one domain. After the root cause is understood, split only independent follow-up work.
 
 ## Common Mistakes
 
-**❌ Too broad:** "Fix all the tests" — agent gets lost
-**✅ Specific:** "Fix agent-tool-abort.test.ts" — focused scope
+| Mistake | Why It Fails | Better Approach |
+|--------|--------------|-----------------|
+| “Fix all tests” | Too broad; agent loses focus | Assign one failing file or root-cause domain |
+| Missing error context | Agent repeats discovery work or guesses | Include test names, errors, logs, and relevant constraints |
+| Overlapping write scope | Agents produce conflicts or inconsistent behavior | Assign exclusive writable ownership |
+| No return contract | Orchestrator cannot integrate results reliably | Require outcome, findings, changes, verification, risks |
+| Skipping verification | Parallel fixes may conflict silently | Run focused checks and integration checks |
 
-**❌ No context:** "Fix the race condition" — agent doesn't know where
-**✅ Context:** Paste the error messages and test names
+## Verification Protocol
 
-**❌ No constraints:** Agent might refactor everything
-**✅ Constraints:** "Do NOT change production code" or "Fix tests only"
+After all agents return, complete as much of this protocol as practical:
 
-**❌ Vague output:** "Fix it" — you don't know what changed
-**✅ Specific:** "Return summary of root cause and changes"
-
-## When NOT to Use
-
-**Related failures:** Fixing one might fix others — investigate together first.
-**Need full context:** Understanding requires seeing entire system.
-**Exploratory debugging:** You don't know what's broken yet.
-**Shared state:** Agents would interfere (editing same files, using same resources).
-
-## Real Example
-
-**Scenario:** 6 test failures across 3 files after major refactoring
-
-**Failures:**
-- agent-tool-abort.test.ts: 3 failures (timing issues)
-- batch-completion-behavior.test.ts: 2 failures (tools not executing)
-- tool-approval-race-conditions.test.ts: 1 failure (execution count = 0)
-
-**Decision:** Independent domains — abort logic separate from batch completion separate from race conditions
-
-**Dispatch:**
-```
-Agent 1 → Fix agent-tool-abort.test.ts
-Agent 2 → Fix batch-completion-behavior.test.ts
-Agent 3 → Fix tool-approval-race-conditions.test.ts
-```
-
-**Results:**
-- Agent 1: Replaced timeouts with event-based waiting
-- Agent 2: Fixed event structure bug (threadId in wrong place)
-- Agent 3: Added wait for async tool execution to complete
-
-**Integration:** All fixes independent, no conflicts, full suite green
-
-## Key Benefits
-
-1. **Parallelization** — Multiple investigations happen simultaneously
-2. **Focus** — Each agent has narrow scope, less context to track
-3. **Independence** — Agents don't interfere with each other
-4. **Speed** — 3 problems solved in time of 1
-
-## Role Agent Templates
-
-Specialized prompt templates live alongside this skill. Each defines a role with scoped tool permissions and a structured output format. Dispatch them as sub-agents when the task calls for focused expertise.
-
-**Review orchestration boundary:** review-oriented specialist roles stay behind `requesting-code-review`, which owns unified review orchestration and the single user-facing review conclusion. Use the role templates here as internal helpers, not as new peer review workflows.
-
-| Role | Template | When to dispatch |
-|------|----------|-----------------|
-| Planner | [`./planner-agent-prompt.md`](./planner-agent-prompt.md) | Read-only codebase analysis and implementation planning. Use when you need a structured plan before starting work. |
-| Security Reviewer | [`./security-reviewer-prompt.md`](./security-reviewer-prompt.md) | Security-focused code review with severity grading. Usually invoked through `requesting-code-review` when unified review orchestration needs a scoped security deep dive. |
-| TDD Guide | [`./tdd-guide-prompt.md`](./tdd-guide-prompt.md) | Test-driven development coaching. Use when implementing complex features that benefit from structured test-first guidance. |
-| Code Reviewer | [`../requesting-code-review/code-reviewer-prompt.md`](../requesting-code-review/code-reviewer-prompt.md) | General code quality review. Already exists; use via the `requesting-code-review` skill as the primary reviewer inside unified review orchestration. |
-
-### AI-Generated Code Review Checklist
-
-When reviewing AI-generated code (from any agent or LLM), apply these additional checks on top of the standard review:
-
-- **Behavior regression** — Does the change break existing behavior? Compare before/after for all call sites.
-- **Security assumptions** — Are security boundaries maintained? Watch for removed validations, exposed internals, or weakened auth checks.
-- **Hidden coupling** — Does the change create unexpected dependencies between modules, globals, or shared state that didn't exist before?
-- **Unnecessary complexity** — Is the solution simpler than it needs to be? AI-generated code often over-abstracts or adds layers that aren't warranted.
-
-## Verification
-
-After agents return:
-1. **Review each summary** — Understand what changed
-2. **Check for conflicts** — Did agents edit same code?
-3. **Run full suite** — Verify all fixes work together
-4. **Spot check** — Agents can make systematic errors
+1. Confirm each domain's success criteria.
+2. Inspect changed files or recommendations against the original scope.
+3. Check for overlapping edits and shared-interface drift.
+4. Run targeted tests for each changed domain.
+5. Run full test suite or broad integration check when feasible.
+6. Document any verification that could not be performed.
