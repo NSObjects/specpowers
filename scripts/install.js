@@ -590,13 +590,14 @@ export function getMissingLanguageModules(installedModuleIds, detectedSkills) {
 }
 
 /**
- * Determine whether a module is within the auto-install scope.
- * Only modules with kind === "rules" and id starting with "rules-" qualify.
+ * Determine whether a module is eligible for installer-managed language-rule
+ * helper flows. Only modules with kind === "rules" and id starting with
+ * "rules-" qualify.
  *
  * @param {string} moduleId - Module ID to check.
- * @returns {boolean} true if the module can be auto-installed without user confirmation.
+ * @returns {boolean} true if the module can be installed by a helper flow without user confirmation.
  */
-export function isAutoInstallable(moduleId) {
+export function isInstallHelperEligible(moduleId) {
   const catalog = JSON.parse(
     readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
   );

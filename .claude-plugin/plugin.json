@@ -16,5 +16,7 @@
     "workflows",
     "debugging",
     "planning"
-  ]
+  ],
+  "skills": "./.claude/skills/",
+  "hooks": "./hooks/hooks.json"
 }

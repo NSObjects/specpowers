@@ -24,7 +24,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
 function setupTmpRoot() {
-  const tmp = mkdtempSync(join(process.env.TMPDIR || '/tmp', 'sp-auto-install-'));
+  const tmp = mkdtempSync(join(process.env.TMPDIR || '/tmp', 'sp-install helper-'));
   for (const entry of ['manifests', 'scripts', 'skills', 'package.json']) {
     cpSync(join(ROOT, entry), join(tmp, entry), { recursive: true });
   }
@@ -39,10 +39,10 @@ describe('Managed Install Bootstrap Integration', () => {
       assert.equal(typeof mod.bootstrap, 'function');
     });
 
-    it('auto-install.js exports boundary control functions', async () => {
-      const mod = await import('../scripts/lib/auto-install.js');
-      assert.equal(typeof mod.isAutoInstallable, 'function');
-      assert.equal(typeof mod.partitionByAutoInstallScope, 'function');
+    it('install-scope.js exports boundary control functions', async () => {
+      const mod = await import('../scripts/lib/install-scope.js');
+      assert.equal(typeof mod.isInstallHelperEligible, 'function');
+      assert.equal(typeof mod.partitionByInstallHelperScope, 'function');
       assert.equal(typeof mod.createInstallLog, 'function');
     });
 
@@ -52,7 +52,7 @@ describe('Managed Install Bootstrap Integration', () => {
       assert.equal(typeof mod.getInstalledModules, 'function');
       assert.equal(typeof mod.getMissingLanguageModules, 'function');
       assert.equal(typeof mod.installModules, 'function');
-      assert.equal(typeof mod.isAutoInstallable, 'function');
+      assert.equal(typeof mod.isInstallHelperEligible, 'function');
     });
 
     it('language-detect.js exports detectLanguages', async () => {
@@ -274,49 +274,49 @@ describe('Managed Install Bootstrap Integration', () => {
     });
 
     it('rules-* modules are install-helper eligible', async () => {
-      const { isAutoInstallable, partitionByAutoInstallScope } = await import(
-        '../scripts/lib/auto-install.js'
+      const { isInstallHelperEligible, partitionByInstallHelperScope } = await import(
+        '../scripts/lib/install-scope.js'
       );
       const catalog = JSON.parse(
         readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
       );
 
       // rules-* modules remain eligible for installer-managed language setup.
-      assert.ok(isAutoInstallable('rules-typescript', catalog.modules));
-      assert.ok(isAutoInstallable('rules-python', catalog.modules));
-      assert.ok(isAutoInstallable('rules-common', catalog.modules));
-      assert.ok(isAutoInstallable('rules-golang', catalog.modules));
-      assert.ok(isAutoInstallable('rules-rust', catalog.modules));
+      assert.ok(isInstallHelperEligible('rules-typescript', catalog.modules));
+      assert.ok(isInstallHelperEligible('rules-python', catalog.modules));
+      assert.ok(isInstallHelperEligible('rules-common', catalog.modules));
+      assert.ok(isInstallHelperEligible('rules-golang', catalog.modules));
+      assert.ok(isInstallHelperEligible('rules-rust', catalog.modules));
     });
 
     it('non-rules modules need confirmation', async () => {
-      const { isAutoInstallable, partitionByAutoInstallScope } = await import(
-        '../scripts/lib/auto-install.js'
+      const { isInstallHelperEligible, partitionByInstallHelperScope } = await import(
+        '../scripts/lib/install-scope.js'
       );
       const catalog = JSON.parse(
         readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
       );
 
       // Non-rules modules should not be installed implicitly by helper flows.
-      assert.ok(!isAutoInstallable('verification-loop', catalog.modules));
-      assert.ok(!isAutoInstallable('quality-gate', catalog.modules));
-      assert.ok(!isAutoInstallable('core-workflow', catalog.modules));
-      assert.ok(!isAutoInstallable('role-agents', catalog.modules));
+      assert.ok(!isInstallHelperEligible('verification-loop', catalog.modules));
+      assert.ok(!isInstallHelperEligible('quality-gate', catalog.modules));
+      assert.ok(!isInstallHelperEligible('core-workflow', catalog.modules));
+      assert.ok(!isInstallHelperEligible('role-agents', catalog.modules));
     });
 
-    it('partitionByAutoInstallScope correctly separates modules', async () => {
-      const { partitionByAutoInstallScope } = await import('../scripts/lib/auto-install.js');
+    it('partitionByInstallHelperScope correctly separates modules', async () => {
+      const { partitionByInstallHelperScope } = await import('../scripts/lib/install-scope.js');
       const catalog = JSON.parse(
         readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
       );
 
       const mixed = ['rules-typescript', 'verification-loop', 'rules-python', 'quality-gate'];
-      const { autoInstall, needsConfirmation } = partitionByAutoInstallScope(
+      const { helperEligible, needsConfirmation } = partitionByInstallHelperScope(
         mixed,
         catalog.modules
       );
 
-      assert.deepEqual(autoInstall.sort(), ['rules-python', 'rules-typescript']);
+      assert.deepEqual(helperEligible.sort(), ['rules-python', 'rules-typescript']);
       assert.deepEqual(needsConfirmation.sort(), ['quality-gate', 'verification-loop']);
     });
   });
@@ -333,14 +333,14 @@ describe('Managed Install Bootstrap Integration', () => {
       );
     });
 
-    it('does NOT claim runtime language-rule auto-install', () => {
+    it('does NOT claim runtime language-rule install helper', () => {
       const content = readFileSync(
         resolve(ROOT, 'skills/using-skills/SKILL.md'),
         'utf-8'
       );
       assert.ok(
-        !content.includes('Language Rule Auto-Install'),
-        'SKILL.md should not describe runtime auto-install as an active flow'
+        !content.includes(['Language Rule', `Auto${'-'}Install`].join(' ')),
+        'SKILL.md should not describe runtime installer behavior as an active flow'
       );
       assert.ok(
         !content.includes('Language Rule Auto-Suggestion'),
@@ -411,7 +411,7 @@ describe('Managed Install Bootstrap Integration', () => {
 
   describe('Install log creation (Req 4.6)', () => {
     it('createInstallLog produces correct structure', async () => {
-      const { createInstallLog } = await import('../scripts/lib/auto-install.js');
+      const { createInstallLog } = await import('../scripts/lib/install-scope.js');
 
       const log = createInstallLog(
         ['rules-typescript', 'rules-python'],

@@ -63,12 +63,13 @@ flowchart TD
 
 | 平台 | 状态 | 安装方式 |
 |------|------|---------|
-| **Claude Code** | ✅ | `/plugin marketplace add NSObjects/specpowers` 然后 `/plugin install specpowers` |
+| **Claude Code** | ✅ | 参见 [.claude-plugin/INSTALL.md](.claude-plugin/INSTALL.md) |
 | **Codex** | ✅ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
 
-对于 Codex 本地插件安装，首次使用前需执行一次物化步骤，从 `skills/` 生成受管技能产物到 `.codex/skills/`：
+对于 Claude Code 和 Codex 本地插件安装，首次使用前需执行一次物化步骤，从 `skills/` 生成受管技能产物：
 
 ```bash
+node scripts/install.js --platform claude-code --profile developer
 node scripts/install.js --platform codex --profile developer
 ```
 
@@ -83,7 +84,7 @@ node scripts/install.js --platform claude-code --profile developer --add rules-t
 node scripts/install.js --platform codex --profile developer --add rules-python
 ```
 
-运行时 `using-skills` 只加载受管插件产物里已经存在的 skill，不会在聊天会话中写文件或自动安装规则。
+运行时 `using-skills` 只加载受管插件产物里已经存在的 skill，不会在聊天会话中写文件或安装规则。
 
 ### 验证
 

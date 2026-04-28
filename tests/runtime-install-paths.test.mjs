@@ -15,6 +15,14 @@ test('runtime entrypoints use managed install directories', async (t) => {
     assert.equal(manifest.skills, './.codex/skills/');
   });
 
+  await t.test('Claude Code plugin manifest points at managed skills and hooks', () => {
+    const manifest = JSON.parse(
+      readFileSync(resolve(ROOT, '.claude-plugin/plugin.json'), 'utf-8'),
+    );
+    assert.equal(manifest.skills, './.claude/skills/');
+    assert.equal(manifest.hooks, './hooks/hooks.json');
+  });
+
   await t.test('session-start hook uses the managed Claude Code skills payload', () => {
     const content = readFileSync(resolve(ROOT, 'hooks/session-start'), 'utf-8');
     assert.ok(content.includes('.claude/skills/using-skills/SKILL.md'));
@@ -27,9 +35,16 @@ test('runtime entrypoints use managed install directories', async (t) => {
     assert.ok(content.includes('node scripts/install.js --platform codex --profile developer'));
   });
 
+  await t.test('Claude Code install docs include the managed install bootstrap step', () => {
+    const content = readFileSync(resolve(ROOT, '.claude-plugin/INSTALL.md'), 'utf-8');
+    assert.ok(content.includes('node scripts/install.js --platform claude-code --profile developer'));
+    assert.ok(content.includes('not source content'));
+  });
+
   await t.test('README documents the Codex managed install bootstrap step', () => {
     const content = readFileSync(resolve(ROOT, 'README.md'), 'utf-8');
     assert.ok(content.includes('node scripts/install.js --platform codex --profile developer'));
+    assert.ok(content.includes('node scripts/install.js --platform claude-code --profile developer'));
   });
 
   await t.test('.gitignore excludes generated Codex managed skills', () => {

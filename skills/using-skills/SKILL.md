@@ -129,7 +129,7 @@ Support skills are not primary routes:
 
 ## Language Rule Activation
 
-`using-skills` is a runtime routing skill, not an installer. During a chat session it must not write files, regenerate plugin payloads, or auto-install language rules.
+`using-skills` is a runtime routing skill, not an installer. During a chat session it must not write files, regenerate plugin payloads, or install language rules.
 
 Runtime rule handling:
 

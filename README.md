@@ -59,16 +59,17 @@ flowchart TD
 
 ## Install
 
-> Requires Node.js for language rule auto-install and selective install.
+> Requires Node.js for language-rule payload generation and selective install.
 
 | Platform | Status | How to install |
 |----------|--------|---------------|
-| **Claude Code** | ✅ | `/plugin marketplace add NSObjects/specpowers` then `/plugin install specpowers` |
+| **Claude Code** | ✅ | Follow [.claude-plugin/INSTALL.md](.claude-plugin/INSTALL.md) |
 | **Codex** | ✅ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
 
-For Codex local-plugin installs, bootstrap the managed skills payload once from the cloned repo before first use:
+For Claude Code and Codex local-plugin installs, generate the managed skills payload once from the cloned repo before first use:
 
 ```bash
+node scripts/install.js --platform claude-code --profile developer
 node scripts/install.js --platform codex --profile developer
 ```
 
@@ -83,7 +84,7 @@ node scripts/install.js --platform claude-code --profile developer --add rules-t
 node scripts/install.js --platform codex --profile developer --add rules-python
 ```
 
-At runtime, `using-skills` loads only skills that already exist in the managed plugin payload. It does not write files or auto-install rules during a chat session.
+At runtime, `using-skills` loads only skills that already exist in the managed plugin payload. It does not write files or install rules during a chat session.
 
 ### Verify
 
