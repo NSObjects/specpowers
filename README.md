@@ -65,10 +65,6 @@ flowchart TD
 |----------|--------|---------------|
 | **Claude Code** | ✅ | `/plugin marketplace add NSObjects/specpowers` then `/plugin install specpowers` |
 | **Codex** | ✅ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
-| **Kiro IDE** | ✅ | Powers panel → Add power from GitHub → `NSObjects/specpowers` |
-| **Cursor** | ❌ | `/add-plugin https://github.com/NSObjects/specpowers` |
-| **Gemini CLI** | ❌ | `gemini extensions install https://github.com/NSObjects/specpowers` |
-| **OpenCode** | ❌ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
 
 For Codex local-plugin installs, bootstrap the managed skills payload once from the cloned repo before first use:
 

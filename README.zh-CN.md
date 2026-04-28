@@ -65,10 +65,6 @@ flowchart TD
 |------|------|---------|
 | **Claude Code** | ✅ | `/plugin marketplace add NSObjects/specpowers` 然后 `/plugin install specpowers` |
 | **Codex** | ✅ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
-| **Kiro IDE** | ✅ | Powers 面板 → Add power from GitHub → `NSObjects/specpowers` |
-| **Cursor** | ❌ | `/add-plugin https://github.com/NSObjects/specpowers` |
-| **Gemini CLI** | ❌ | `gemini extensions install https://github.com/NSObjects/specpowers` |
-| **OpenCode** | ❌ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.opencode/INSTALL.md` |
 
 对于 Codex 本地插件安装，首次使用前需执行一次物化步骤，从 `skills/` 生成受管技能产物到 `.codex/skills/`：
 
