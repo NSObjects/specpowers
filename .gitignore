@@ -4,3 +4,5 @@ node_modules/
 .claude/
 specs/
 .codex/skills/
+manifests/install-state.json
+manifests/install-state/*.json

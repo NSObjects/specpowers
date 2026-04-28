@@ -33,6 +33,9 @@ node scripts/install.js --platform codex --profile developer
 This creates `.codex/skills/` from `skills/`. Do not maintain `.codex/skills/`
 by hand.
 
+The install command also writes local state under `manifests/install-state/`.
+That state records your generated plugin payload and is not source content.
+
 ### 3. Register in a marketplace
 
 Codex supports two marketplace scopes. Choose one based on your needs:

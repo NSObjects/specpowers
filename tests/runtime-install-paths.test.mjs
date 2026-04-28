@@ -35,6 +35,7 @@ test('runtime entrypoints use managed install directories', async (t) => {
   await t.test('.gitignore excludes generated Codex managed skills', () => {
     const gitignore = readFileSync(resolve(ROOT, '.gitignore'), 'utf-8');
     assert.ok(gitignore.includes('.codex/skills/'));
+    assert.ok(gitignore.includes('manifests/install-state/*.json'));
   });
 
   await t.test('README describes Codex skills as materialized content', () => {
@@ -50,6 +51,7 @@ test('runtime entrypoints use managed install directories', async (t) => {
   await t.test('.codex/INSTALL.md describes materialization not manual maintenance', () => {
     const install = readFileSync(resolve(ROOT, '.codex/INSTALL.md'), 'utf-8');
     assert.match(install, /materializ|generated|managed skills/i);
+    assert.ok(install.includes('not source content'));
     assert.ok(!install.includes('Symlink the skills'));
     assert.ok(!install.includes('~/.codex/skills'));
     assert.ok(!install.match(/manually maintain|hand.maintain/i),

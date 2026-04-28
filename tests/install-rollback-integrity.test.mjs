@@ -73,7 +73,7 @@ test('install rollback integrity', async (t) => {
     const tmp = setupTmpRoot();
     try {
       const { install } = await loadInstallApi(tmp);
-      const statePath = join(tmp, 'manifests/install-state.json');
+      const statePath = join(tmp, 'manifests/install-state/claude-code.json');
 
       await install({
         platform: 'claude-code',
@@ -108,7 +108,7 @@ test('install rollback integrity', async (t) => {
     const tmp = setupTmpRoot();
     try {
       const { install, installModules } = await loadInstallApi(tmp);
-      const statePath = join(tmp, 'manifests/install-state.json');
+      const statePath = join(tmp, 'manifests/install-state/claude-code.json');
 
       await install({
         platform: 'claude-code',

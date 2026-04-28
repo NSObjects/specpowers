@@ -7,7 +7,7 @@ description: Use when installing, updating, diagnosing, or removing SpecPowers m
 
 ## Overview
 
-SpecPowers is modular. Not every project needs every skill. The selective install system lets you pick a profile (core, developer, security, full) and optionally add or exclude individual modules. It tracks what's installed so you can diagnose drift, repair broken installs, and cleanly uninstall.
+SpecPowers is modular. Not every project needs every skill. The selective install system lets you pick a profile (core, developer, security, full) and optionally add or exclude individual modules. It tracks the locally generated plugin payload so you can diagnose drift, repair broken installs, and cleanly uninstall.
 
 **Core principle:** Install only what you need. Know exactly what's installed. Keep it healthy.
 
@@ -48,7 +48,7 @@ node scripts/install.js --platform claude-code --profile full --exclude rules-ru
 
 ### `list` — Show installed modules
 
-Read the install state file and display what's currently installed:
+Read the local install state file and display what's currently installed:
 
 ```
 Installed Modules (profile: developer, platform: claude-code)
@@ -66,7 +66,7 @@ Excluded modules: (none)
 
 ### `doctor` — Detect state drift
 
-Compare the install state against what's actually on disk. Detect:
+Compare the local install state against what's actually on disk. Detect:
 
 - **Missing files**: Module listed in state but files not found on disk
 - **Extra files**: SpecPowers files on disk not tracked in state
@@ -92,7 +92,7 @@ Re-copy module files from the SpecPowers source to the platform target directory
 
 Remove only files that SpecPowers installed (tracked in install state). If a file has been modified by the user since installation, prompt for confirmation before deleting.
 
-After uninstall, the state file is cleared but preserved (so `doctor` can report "no modules installed" rather than "state file missing").
+After uninstall, the local state file is cleared but preserved (so `doctor` can report "no modules installed" rather than "state file missing").
 
 ---
 
@@ -101,8 +101,8 @@ After uninstall, the state file is cleared but preserved (so `doctor` can report
 | Red Flag | Why It's Bad | What To Do Instead |
 |----------|-------------|-------------------|
 | Installing `full` profile on a single-language project | Bloats context with irrelevant language rules | Use `developer` + `--add rules-<language>` for your language |
-| Manually copying skill files instead of using install script | State file won't track them; `doctor` will report drift | Always use `install.js` or `--add` flag |
-| Deleting files from the platform directory by hand | State drift — `doctor` will flag missing files | Use `uninstall` command |
+| Manually copying skill files instead of using install script | Local state file won't track them; `doctor` will report drift | Always use `install.js` or `--add` flag |
+| Deleting files from the platform directory by hand | Local state drift — `doctor` will flag missing files | Use `uninstall` command |
 | Ignoring `doctor` warnings | Drift accumulates; repairs get harder | Run `doctor` periodically, fix issues early |
 | Skipping `--platform` flag | Install script won't know where to put files | Always specify the target platform |
 

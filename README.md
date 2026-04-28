@@ -72,6 +72,8 @@ For Codex local-plugin installs, bootstrap the managed skills payload once from 
 node scripts/install.js --platform codex --profile developer
 ```
 
+Generated plugin payloads and `manifests/install-state/` files are local install artifacts, not authored source.
+
 ### Language Rules
 
 Plugin payloads are generated at install time. The `developer` profile includes `rules-common`; add language-specific rules explicitly when generating the managed payload:

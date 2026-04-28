@@ -72,6 +72,8 @@ flowchart TD
 node scripts/install.js --platform codex --profile developer
 ```
 
+生成的插件技能产物和 `manifests/install-state/` 状态文件属于本地安装产物，不是源码。
+
 ### 语言规则
 
 插件技能产物在安装阶段生成。`developer` 配置默认包含 `rules-common`；语言特定规则需要在生成受管产物时显式加入：
