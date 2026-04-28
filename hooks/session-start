@@ -6,23 +6,18 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-resolve_skills_root() {
-    if [ -n "${CURSOR_PLUGIN_ROOT:-}" ] && [ -f "${PLUGIN_ROOT}/.cursor-plugin/skills/using-skills/SKILL.md" ]; then
-        printf '%s' "${PLUGIN_ROOT}/.cursor-plugin/skills"
-        return
-    fi
+SKILLS_ROOT="${PLUGIN_ROOT}/.claude/skills"
+USING_SKILLS_PATH="${SKILLS_ROOT}/using-skills/SKILL.md"
 
-    if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -f "${PLUGIN_ROOT}/.claude/skills/using-skills/SKILL.md" ]; then
-        printf '%s' "${PLUGIN_ROOT}/.claude/skills"
-        return
-    fi
-
-    printf '%s' "${PLUGIN_ROOT}/skills"
-}
-
-# Read using-skills content
-SKILLS_ROOT="$(resolve_skills_root)"
-using_skills_content=$(cat "${SKILLS_ROOT}/using-skills/SKILL.md" 2>&1 || echo "Error reading using-skills skill")
+# Claude Code plugin installs use the managed .claude/skills payload generated
+# from manifests/install-modules.json. Do not fall back to the source skills/
+# tree here; that bypasses the install manifest and can expose unsupported
+# skills that were not selected for the plugin payload.
+if [ -f "$USING_SKILLS_PATH" ]; then
+    using_skills_content=$(cat "$USING_SKILLS_PATH")
+else
+    using_skills_content="Error: SpecPowers managed Claude Code skills were not found at ${USING_SKILLS_PATH}. Run: node scripts/install.js --platform claude-code --profile developer"
+fi
 
 # Escape string for JSON embedding
 escape_for_json() {
@@ -39,12 +34,8 @@ using_skills_escaped=$(escape_for_json "$using_skills_content")
 session_context="<EXTREMELY_IMPORTANT>\nYou have specpowers.\n\n**Below is the full content of your 'specpowers:using-skills' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_skills_escaped}\n</EXTREMELY_IMPORTANT>"
 
 # Output context injection as JSON.
-# Cursor hooks expect additional_context (snake_case).
 # Claude Code hooks expect hookSpecificOutput.additionalContext (nested).
-# Copilot CLI and others expect additionalContext (top-level, SDK standard).
-if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
-  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
-elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
   printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
 else
   printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"

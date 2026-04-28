@@ -29,8 +29,8 @@ test('requesting-code-review keeps one surfaced entrypoint while allowing specia
     'requesting-code-review should reference a specialist reviewer template',
   );
   assert.ok(
-    content.includes('Cursor, Gemini CLI, OpenCode'),
-    'requesting-code-review should define inline fallback for platforms without subagents',
+    content.includes('Claude Code') && content.includes('Codex'),
+    'requesting-code-review should document the supported review dispatch platforms',
   );
 });
 

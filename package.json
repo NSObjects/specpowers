@@ -3,9 +3,7 @@
   "version": "0.7.0",
   "type": "module",
   "description": "Spec-driven development workflow for AI coding assistants. Merges OpenSpec's structured artifact system with Superpowers' behavioral shaping engine.",
-  "scripts": {
-    "sync-steering": "node scripts/sync-steering.js"
-  },
+  "scripts": {},
   "devDependencies": {
     "fast-check": "^4.6.0"
   }

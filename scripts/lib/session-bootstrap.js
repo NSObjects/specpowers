@@ -1,9 +1,12 @@
 /**
- * Session Bootstrap
+ * Managed Install Bootstrap Helper
  *
- * Executes the full session bootstrap flow: detects project languages,
- * checks install state, and installs missing language rule modules.
- * Handles both first-run (no Install_State) and incremental scenarios.
+ * Programmatic helper for installer-managed setup: detects project languages,
+ * checks install state, and installs missing language rule modules when called
+ * explicitly by an installer or repair flow.
+ *
+ * This module is not wired into chat-session runtime hooks. Runtime skills
+ * should load only the managed plugin payload that already exists on disk.
  */
 
 import { resolve, dirname } from 'node:path';
@@ -51,7 +54,7 @@ function formatSummary(action, installedModules, profile) {
  */
 
 /**
- * Execute the full session bootstrap flow.
+ * Execute the managed install bootstrap flow.
  *
  * @param {Object} options
  * @param {string} options.platform - Current platform name

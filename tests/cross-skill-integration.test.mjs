@@ -36,16 +36,8 @@ test('exploring embeds implementation research and optional delegation', () => {
     'exploring should mention Claude Code dispatch',
   );
   assert.ok(
-    content.includes('Kiro'),
-    'exploring should mention Kiro dispatch',
-  );
-  assert.ok(
     content.includes('Codex'),
     'exploring should mention Codex dispatch',
-  );
-  assert.ok(
-    content.includes('Cursor, Gemini CLI, OpenCode'),
-    'exploring should document inline fallback on platforms without subagents',
   );
   assert.ok(
     content.includes('implementation-researcher-prompt.md'),

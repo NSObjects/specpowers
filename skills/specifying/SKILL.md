@@ -72,7 +72,7 @@ If a behavior is underspecified but not blocking, make a conservative assumption
 
 8. **Transition only after approval**
    - After explicit user confirmation, invoke the `designing` skill.
-   - For Kiro workflows: read steering context, then use `designing.md`.
+   - Continue with the `designing` skill after the behavior contract is accepted.
 
 ## Greenfield Format
 

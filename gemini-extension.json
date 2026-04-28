@@ -1,6 +1,0 @@
-{
-  "name": "specpowers",
-  "description": "Spec-driven development workflow: structured artifacts, TDD, and behavioral shaping",
-  "version": "0.6.0",
-  "contextFileName": "GEMINI.md"
-}

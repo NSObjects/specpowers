@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use when implementing any feature or bugfix, before writing implementation code
+description: Use when an active implementation workflow explicitly reaches a TDD step or a subagent prompt asks for TDD coaching; this is supporting guidance, not a standalone feature entrypoint
 ---
 
 # Test-Driven Development (TDD)

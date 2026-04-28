@@ -39,9 +39,7 @@ Use the platform's closest equivalent review mechanism:
 | Platform | Dispatch method |
 |---|---|
 | Claude Code | Use `Agent` with `specpowers:code-reviewer`. Treat legacy `Task` references as compatible aliases. |
-| Kiro | Use `invokeSubAgent(name="general-task-execution", prompt=...)` with the filled `./code-reviewer-prompt.md`. |
 | Codex | Use `spawn_agent(agent_type="worker", message=...)` with the filled `./code-reviewer-prompt.md`. |
-| Cursor, Gemini CLI, OpenCode | No review subagent dispatch. Perform the same review inline and preserve the single surfaced entrypoint. |
 
 ## Review Package Requirements
 
@@ -97,7 +95,7 @@ Specialist template:
 
 When escalating, scope the specialist prompt to the exact concern. Do not ask the specialist to re-review the entire diff unless the entire diff is security-sensitive.
 
-On Cursor, Gemini CLI, and OpenCode, perform the same specialist check inline rather than creating a second visible workflow.
+When specialist escalation is needed, keep it behind the same surfaced review entrypoint and return one consolidated conclusion.
 
 ## Synthesis Rules
 

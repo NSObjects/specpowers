@@ -13,21 +13,13 @@ import test from 'node:test';
 import fc from 'fast-check';
 
 import * as claudeCode from '../scripts/adapters/claude-code.js';
-import * as cursor from '../scripts/adapters/cursor.js';
-import * as geminiCli from '../scripts/adapters/gemini-cli.js';
-import * as kiroIde from '../scripts/adapters/kiro-ide.js';
 import * as codex from '../scripts/adapters/codex.js';
-import * as opencode from '../scripts/adapters/opencode.js';
 
 // --- All adapters keyed by platform name ---
 
 const ADAPTERS = {
   'claude-code': claudeCode,
-  'cursor': cursor,
-  'gemini-cli': geminiCli,
-  'kiro-ide': kiroIde,
   'codex': codex,
-  'opencode': opencode,
 };
 
 const PLATFORM_NAMES = Object.keys(ADAPTERS);
@@ -135,14 +127,14 @@ test('Property 10: Platform Adapter Path Generation', async (t) => {
   );
 
   await t.test(
-    'all 6 platforms have distinct target directories',
+    'all supported platforms have distinct target directories',
     () => {
       const targetDirs = PLATFORM_NAMES.map((name) => ADAPTERS[name].getTargetDir());
       const uniqueDirs = new Set(targetDirs);
       assert.equal(
         uniqueDirs.size,
         PLATFORM_NAMES.length,
-        `All ${PLATFORM_NAMES.length} platforms should have distinct target directories`,
+        `All ${PLATFORM_NAMES.length} supported platforms should have distinct target directories`,
       );
     },
   );

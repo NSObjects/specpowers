@@ -53,13 +53,6 @@ const languageSkills = [
   'rules-golang',
   'rules-rust',
   'rules-java',
-  'rules-kotlin',
-  'rules-cpp',
-  'rules-swift',
-  'rules-php',
-  'rules-perl',
-  'rules-csharp',
-  'rules-dart',
 ];
 
 // Pre-extract common rule IDs for cross-referencing

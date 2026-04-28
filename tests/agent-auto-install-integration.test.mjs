@@ -1,11 +1,11 @@
 /**
- * End-to-end integration smoke test for the agent auto-install flow.
+ * End-to-end integration smoke test for the managed install bootstrap helper.
  *
  * Exercises:
- * 1. First-run bootstrap (no install-state.json) with TypeScript files
- * 2. Incremental bootstrap (add Python files)
+ * 1. First-run bootstrap helper (no install-state.json) with TypeScript files
+ * 2. Incremental bootstrap helper (add Python files)
  * 3. Up-to-date bootstrap (all modules already installed)
- * 4. Auto-install boundary: rules-* auto-install, non-rules need confirmation
+ * 4. Installer boundary: rules-* install helpers, non-rules need confirmation
  * 5. CLI backward compatibility
  * 6. SKILL.md content verification
  * 7. Import resolution verification
@@ -32,7 +32,7 @@ function setupTmpRoot() {
   return tmp;
 }
 
-describe('Agent Auto-Install Integration', () => {
+describe('Managed Install Bootstrap Integration', () => {
   describe('Import resolution', () => {
     it('session-bootstrap.js exports bootstrap function', async () => {
       const mod = await import('../scripts/lib/session-bootstrap.js');
@@ -250,7 +250,7 @@ describe('Agent Auto-Install Integration', () => {
     });
   });
 
-  describe('Auto-install boundary (Req 4.1, 4.4)', () => {
+  describe('Installer boundary (Req 4.1, 4.4)', () => {
     it('module catalog no longer exposes search-first as a standalone module', () => {
       const catalog = JSON.parse(
         readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
@@ -273,7 +273,7 @@ describe('Agent Auto-Install Integration', () => {
       );
     });
 
-    it('rules-* modules are auto-installable', async () => {
+    it('rules-* modules are install-helper eligible', async () => {
       const { isAutoInstallable, partitionByAutoInstallScope } = await import(
         '../scripts/lib/auto-install.js'
       );
@@ -281,7 +281,7 @@ describe('Agent Auto-Install Integration', () => {
         readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
       );
 
-      // rules-* modules should be auto-installable
+      // rules-* modules remain eligible for installer-managed language setup.
       assert.ok(isAutoInstallable('rules-typescript', catalog.modules));
       assert.ok(isAutoInstallable('rules-python', catalog.modules));
       assert.ok(isAutoInstallable('rules-common', catalog.modules));
@@ -297,7 +297,7 @@ describe('Agent Auto-Install Integration', () => {
         readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
       );
 
-      // Non-rules modules should NOT be auto-installable
+      // Non-rules modules should not be installed implicitly by helper flows.
       assert.ok(!isAutoInstallable('verification-loop', catalog.modules));
       assert.ok(!isAutoInstallable('quality-gate', catalog.modules));
       assert.ok(!isAutoInstallable('core-workflow', catalog.modules));
@@ -322,21 +322,25 @@ describe('Agent Auto-Install Integration', () => {
   });
 
   describe('SKILL.md content verification (Req 3.1, 3.3)', () => {
-    it('contains "Language Rule Auto-Install" section', () => {
+    it('contains "Language Rule Activation" section', () => {
       const content = readFileSync(
         resolve(ROOT, 'skills/using-skills/SKILL.md'),
         'utf-8'
       );
       assert.ok(
-        content.includes('Language Rule Auto-Install'),
-        'SKILL.md should contain "Language Rule Auto-Install"'
+        content.includes('Language Rule Activation'),
+        'SKILL.md should contain "Language Rule Activation"'
       );
     });
 
-    it('does NOT contain old "Language Rule Auto-Suggestion" text', () => {
+    it('does NOT claim runtime language-rule auto-install', () => {
       const content = readFileSync(
         resolve(ROOT, 'skills/using-skills/SKILL.md'),
         'utf-8'
+      );
+      assert.ok(
+        !content.includes('Language Rule Auto-Install'),
+        'SKILL.md should not describe runtime auto-install as an active flow'
       );
       assert.ok(
         !content.includes('Language Rule Auto-Suggestion'),
@@ -344,64 +348,63 @@ describe('Agent Auto-Install Integration', () => {
       );
     });
 
-    it('mentions auto-install boundary rules', () => {
+    it('mentions runtime installer boundary rules', () => {
       const content = readFileSync(
         resolve(ROOT, 'skills/using-skills/SKILL.md'),
         'utf-8'
       );
       assert.ok(
-        content.includes('Auto-Install Boundary'),
-        'SKILL.md should describe auto-install boundary'
+        content.includes('must not write files'),
+        'SKILL.md should make runtime no-write behavior explicit'
       );
       assert.ok(
-        content.includes('rules-*'),
-        'SKILL.md should mention rules-* modules'
+        content.includes('Do not call `scripts/install.js`'),
+        'SKILL.md should tell runtime routing not to invoke installers implicitly'
       );
     });
 
-    it('mentions first-run detection', () => {
-      const content = readFileSync(
-        resolve(ROOT, 'skills/using-skills/SKILL.md'),
-        'utf-8'
-      );
-      assert.ok(
-        content.includes('First-Run Detection'),
-        'SKILL.md should describe first-run detection'
-      );
-      assert.ok(
-        content.includes('developer'),
-        'SKILL.md should mention developer profile'
-      );
-    });
-
-    it('references session-bootstrap.js and install.js', () => {
+    it('states session-bootstrap is not an active runtime hook', () => {
       const content = readFileSync(
         resolve(ROOT, 'skills/using-skills/SKILL.md'),
         'utf-8'
       );
       assert.ok(
         content.includes('session-bootstrap.js'),
-        'SKILL.md should reference session-bootstrap.js'
+        'SKILL.md should still name the bootstrap helper'
+      );
+      assert.ok(
+        content.includes('not an active runtime hook'),
+        'SKILL.md should clarify that bootstrap is not wired as a runtime hook'
+      );
+    });
+
+    it('references installer and language detection helpers with clear ownership', () => {
+      const content = readFileSync(
+        resolve(ROOT, 'skills/using-skills/SKILL.md'),
+        'utf-8'
       );
       assert.ok(
         content.includes('install.js'),
         'SKILL.md should reference install.js'
       );
+      assert.ok(
+        content.includes('language-detect.js'),
+        'SKILL.md should reference language-detect.js'
+      );
     });
 
-    it('describes bootstrap flow consistent with session-bootstrap.js interface', () => {
+    it('describes runtime loading as dependent on the managed plugin payload', () => {
       const content = readFileSync(
         resolve(ROOT, 'skills/using-skills/SKILL.md'),
         'utf-8'
       );
-      // SKILL.md should mention the key functions that session-bootstrap.js uses
       assert.ok(
-        content.includes('detectLanguages'),
-        'SKILL.md should mention detectLanguages'
+        content.includes('managed plugin payload'),
+        'SKILL.md should tie runtime availability to the generated plugin payload'
       );
       assert.ok(
-        content.includes('installModules'),
-        'SKILL.md should mention installModules'
+        content.includes('continue with `rules-common`'),
+        'SKILL.md should define fallback behavior when language rules are absent'
       );
     });
   });

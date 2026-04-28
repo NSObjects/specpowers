@@ -1,6 +1,6 @@
 ---
 name: quality-gate
-description: Use when code editing is complete and you need to run automated formatting, lint, and type checks — auto-detects language and toolchain, runs the appropriate quality commands, and protects configuration files from accidental modification
+description: Use when the user explicitly asks for automated quality checks or an active implementation workflow reaches its quality-check checkpoint; do not trigger as a separate workflow phase
 ---
 
 # Quality Gate

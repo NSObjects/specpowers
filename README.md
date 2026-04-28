@@ -74,9 +74,14 @@ node scripts/install.js --platform codex --profile developer
 
 ### Language Rules
 
-When the agent activates the `using-skills` skill at session start, it scans your project files and auto-installs matching language rules — e.g., `.ts` files trigger `rules-typescript`, `.py` triggers `rules-python`. No manual setup needed for language rules.
+Plugin payloads are generated at install time. The `developer` profile includes `rules-common`; add language-specific rules explicitly when generating the managed payload:
 
-If it's the first session after install (no prior install state), the agent also runs the `developer` profile setup automatically.
+```bash
+node scripts/install.js --platform claude-code --profile developer --add rules-typescript
+node scripts/install.js --platform codex --profile developer --add rules-python
+```
+
+At runtime, `using-skills` loads only skills that already exist in the managed plugin payload. It does not write files or auto-install rules during a chat session.
 
 ### Verify
 
@@ -109,7 +114,7 @@ Start a new session and say "I want to build X". The agent should begin with `ex
 
 Auto-detected from your project files. `rules-common` loads first, then language-specific rules layer on top.
 
-TypeScript · Python · Go · Rust · Java · Kotlin · C++ · Swift · PHP · Perl · C# · Dart
+TypeScript · Python · Go · Rust · Java
 
 ### Collaboration
 
@@ -176,8 +181,8 @@ For fine-grained control (most users don't need this):
 
 ```bash
 node scripts/install.js --platform claude-code --profile developer
-node scripts/install.js --platform kiro-ide --add rules-typescript
-node scripts/install.js --platform cursor --profile full --exclude rules-rust
+node scripts/install.js --platform codex --profile developer
+node scripts/install.js --platform claude-code --add rules-typescript
 ```
 
 Profiles: `core` (minimal) · `developer` (recommended) · `security` · `full` (everything).
@@ -186,7 +191,7 @@ Module lifecycle commands (`list`, `doctor`, `repair`, `uninstall`) are in the `
 
 ## Contributing
 
-Issues and PRs welcome. If you're adding a new skill, use the `writing-skills` meta-skill — it enforces the skill template structure.
+Issues and PRs welcome. Keep authored skill content in `skills/`; plugin payloads are generated from the install manifest.
 
 ## Acknowledgments
 

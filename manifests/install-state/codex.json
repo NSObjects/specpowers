@@ -28,8 +28,7 @@
         ".codex/skills/dispatching-parallel-agents",
         ".codex/skills/requesting-code-review",
         ".codex/skills/receiving-code-review",
-        ".codex/skills/verification-before-completion",
-        ".codex/skills/writing-skills"
+        ".codex/skills/verification-before-completion"
       ]
     },
     {

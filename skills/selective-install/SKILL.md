@@ -20,7 +20,7 @@ SpecPowers is modular. Not every project needs every skill. The selective instal
 node scripts/install.js --platform <platform> --profile <profile>
 
 # Add a module on top of a profile
-node scripts/install.js --platform kiro-ide --profile developer --add rules-typescript
+node scripts/install.js --platform claude-code --profile developer --add rules-typescript
 
 # Exclude a module from a profile
 node scripts/install.js --platform claude-code --profile full --exclude rules-rust
@@ -31,11 +31,7 @@ node scripts/install.js --platform claude-code --profile full --exclude rules-ru
 | Platform | Target Directory | Adapter |
 |----------|-----------------|---------|
 | `claude-code` | `.claude/` | `scripts/adapters/claude-code.js` |
-| `cursor` | `.cursor-plugin/` | `scripts/adapters/cursor.js` |
-| `gemini-cli` | `.gemini/` | `scripts/adapters/gemini-cli.js` |
-| `kiro-ide` | `.kiro/` | `scripts/adapters/kiro-ide.js` |
 | `codex` | `.codex/` | `scripts/adapters/codex.js` |
-| `opencode` | `.opencode/` | `scripts/adapters/opencode.js` |
 
 ### Profiles
 
@@ -55,7 +51,7 @@ node scripts/install.js --platform claude-code --profile full --exclude rules-ru
 Read the install state file and display what's currently installed:
 
 ```
-Installed Modules (profile: developer, platform: kiro-ide)
+Installed Modules (profile: developer, platform: claude-code)
 ──────────────────────────────────────────────────────────
   core-workflow      skills    installed 2025-01-15
   foundation         skills    installed 2025-01-15

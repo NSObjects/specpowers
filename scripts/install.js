@@ -12,8 +12,7 @@
  *
  * Usage:
  *   node scripts/install.js --platform claude-code
- *   node scripts/install.js --platform kiro-ide --profile developer
- *   node scripts/install.js --platform cursor --profile core --add rules-typescript
+ *   node scripts/install.js --platform claude-code --profile developer
  *   node scripts/install.js --platform codex --profile full --exclude rules-rust
  */
 
@@ -79,9 +78,7 @@ function parseArgs(argv) {
 // Platform adapter loader
 // ---------------------------------------------------------------------------
 
-const SUPPORTED_PLATFORMS = [
-  'claude-code', 'cursor', 'gemini-cli', 'kiro-ide', 'codex', 'opencode',
-];
+const SUPPORTED_PLATFORMS = ['claude-code', 'codex'];
 
 /**
  * Dynamically import the platform adapter for the given platform name.
@@ -238,8 +235,8 @@ function withRollback(rootDir, statePath, targetRelativePaths, operation) {
  * Build state records for the provided modules on a platform.
  *
  * When the adapter exports `expandModulePaths`, each source path is expanded
- * into its individual target files (used by kiro-ide to flatten skills into
- * steering files). Otherwise falls back to the standard 1:1 path mapping.
+ * into its individual target files. Otherwise falls back to the standard 1:1
+ * path mapping.
  *
  * @param {string[]} moduleIds
  * @param {Map<string, { id: string, paths: string[] }>} catalogMap
@@ -271,8 +268,8 @@ function buildModuleRecords(moduleIds, catalogMap, adapter, installedAt, rootDir
  * Materialize a full desired state and prune managed paths no longer selected.
  *
  * When the adapter exports `expandModulePaths` and `materializeFile`, uses
- * the adapter's custom file-level materialization (e.g. kiro-ide steering
- * flattening). Otherwise falls back to standard directory-level copy.
+ * the adapter's custom file-level materialization. Otherwise falls back to
+ * standard directory-level copy.
  *
  * @param {string} rootDir
  * @param {Array<{ paths: string[] }>} currentModules

@@ -20,7 +20,7 @@ During `exploring`, the agent MUST NOT:
 
 The only visible output is conversational: questions, summaries, trade-offs, recommendations, and alignment checks.
 
-The terminal transition is `proposing` only after the user confirms the explored direction. For Kiro, this means `readSteering → proposing.md`.
+The terminal transition is `proposing` only after the user confirms the explored direction.
 
 ## When To Use
 
@@ -39,7 +39,7 @@ Do not overuse this skill for already-specific implementation requests. If the r
 1. **Inspect available context**
     - Check existing files, docs, recent commits, project structure, and existing specs when available.
     - Identify whether this is greenfield or brownfield work.
-    - Check for existing behavior specifications, especially under known spec directories such as `specs/`, `.kiro/specs/`, or `specs/specs/` when present.
+    - Check for existing behavior specifications, especially under known spec directories such as `specs/` or `specs/specs/` when present.
 
 2. **Assess scope before details**
     - Decide whether the request is one feature, one workflow, or multiple independent subsystems.
@@ -145,9 +145,7 @@ Implementation research is allowed only to improve exploration quality. It does 
 Use the filled `./implementation-researcher-prompt.md` template when delegating research.
 
 - **Claude Code:** use `Agent` with the general-purpose agent. `Task` may exist as a backward-compatible alias in older environments.
-- **Kiro:** use `invokeSubAgent(name="general-task-execution", prompt=...)`.
 - **Codex:** use `spawn_agent(message=...)`.
-- **Cursor, Gemini CLI, OpenCode:** if no subagent dispatch is available, perform the same bounded research inline.
 
 The main agent remains responsible for synthesis, recommendation, and user alignment.
 

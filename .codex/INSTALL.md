@@ -1,66 +1,18 @@
 # Installing SpecPowers for Codex
 
-Two installation methods are available:
-
-| Method | What it does |
-|--------|-------------|
-| [Skills install](#method-1-skills-install) | Clone + symlink, no marketplace needed |
-| [Plugin install](#method-2-plugin-install) | Full plugin UI with marketplace registration |
+Codex is supported through the SpecPowers plugin only. The plugin reads managed
+skills from `.codex/skills/`, which must be generated from the authored `skills/`
+tree before installing the plugin.
 
 ## Prerequisites
 
 - Git
 - Codex CLI or Codex app, signed in with ChatGPT
-- Node.js (only for plugin install)
+- Node.js
 
 ---
 
-## Method 1: Skills Install
-
-Skills are stored in `~/.codex/skills/` and auto-discovered by Codex.
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/NSObjects/specpowers ~/.codex/specpowers
-```
-
-### 2. Symlink the skills
-
-**macOS / Linux:**
-
-```bash
-mkdir -p ~/.codex/skills
-ln -s ~/.codex/specpowers/skills ~/.codex/skills/specpowers
-```
-
-**Windows (PowerShell):**
-
-```powershell
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills"
-cmd /c mklink /J "$env:USERPROFILE\.codex\skills\specpowers" "$env:USERPROFILE\.codex\specpowers\skills"
-```
-
-### 3. Restart Codex and verify
-
-Restart Codex, start a new thread and say "I want to build X". The workflow should begin with `exploring`.
-
-### Updating
-
-```bash
-cd ~/.codex/specpowers && git pull
-```
-
-### Uninstalling
-
-```bash
-rm ~/.codex/skills/specpowers
-rm -rf ~/.codex/specpowers
-```
-
----
-
-## Method 2: Plugin Install
+## Plugin Install
 
 Registers SpecPowers in Codex's plugin directory via a marketplace.
 
@@ -71,12 +23,15 @@ mkdir -p ~/.codex/plugins
 git clone https://github.com/NSObjects/specpowers ~/.codex/plugins/specpowers
 ```
 
-### 2. Bootstrap the managed skills
+### 2. Generate the managed skills
 
 ```bash
 cd ~/.codex/plugins/specpowers
 node scripts/install.js --platform codex --profile developer
 ```
+
+This creates `.codex/skills/` from `skills/`. Do not maintain `.codex/skills/`
+by hand.
 
 ### 3. Register in a marketplace
 

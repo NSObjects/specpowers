@@ -25,7 +25,6 @@ const sourceExpectations = [
   ],
   ['skills/dispatching-parallel-agents/SKILL.md', /Agent\("Fix agent-tool-abort\.test\.ts failures"\)/],
   ['skills/using-skills/SKILL.md', /`Agent` tool \(or legacy `Task` references\)/],
-  ['skills/using-skills/references/kiro-tools.md', /\| `Agent` tool \(dispatch subagent\) \|/],
   ['skills/using-skills/references/codex-tools.md', /\| `Agent` tool \(dispatch subagent\) \|/],
 ];
 
@@ -40,7 +39,6 @@ const materializedRelativePaths = [
   ],
   ['.codex/skills/dispatching-parallel-agents/SKILL.md', /Agent\("Fix agent-tool-abort\.test\.ts failures"\)/],
   ['.codex/skills/using-skills/SKILL.md', /`Agent` tool \(or legacy `Task` references\)/],
-  ['.codex/skills/using-skills/references/kiro-tools.md', /\| `Agent` tool \(dispatch subagent\) \|/],
   ['.codex/skills/using-skills/references/codex-tools.md', /\| `Agent` tool \(dispatch subagent\) \|/],
 ];
 
@@ -54,11 +52,6 @@ test('source skills prefer current Claude Code Agent terminology', () => {
     read('skills/dispatching-parallel-agents/SKILL.md'),
     /^Task\(/m,
     'parallel dispatch example should no longer use Task(...) as the canonical Claude Code syntax',
-  );
-  assert.doesNotMatch(
-    read('skills/using-skills/references/kiro-tools.md'),
-    /^\| `Task` tool \(dispatch subagent\) \|/m,
-    'kiro mapping should not present Task as the primary Claude Code tool name',
   );
   assert.doesNotMatch(
     read('skills/using-skills/references/codex-tools.md'),
@@ -79,11 +72,6 @@ test('materialized codex skills stay aligned with Agent terminology', async () =
       readMaterialized(tmp, '.codex/skills/dispatching-parallel-agents/SKILL.md'),
       /^Task\(/m,
       'materialized parallel dispatch example should no longer use Task(...) as the canonical Claude Code syntax',
-    );
-    assert.doesNotMatch(
-      readMaterialized(tmp, '.codex/skills/using-skills/references/kiro-tools.md'),
-      /^\| `Task` tool \(dispatch subagent\) \|/m,
-      'materialized kiro mapping should not present Task as the primary Claude Code tool name',
     );
     assert.doesNotMatch(
       readMaterialized(tmp, '.codex/skills/using-skills/references/codex-tools.md'),

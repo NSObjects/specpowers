@@ -10,13 +10,15 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { EXT_TO_SKILL } from '../scripts/lib/language-detect.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MANIFESTS_DIR = join(__dirname, '..', 'manifests');
+const ROOT = resolve(__dirname, '..');
+const SUPPORTED_TARGETS = new Set(['claude-code', 'codex']);
 
 const modulesManifest = JSON.parse(
   readFileSync(join(MANIFESTS_DIR, 'install-modules.json'), 'utf-8'),
@@ -70,6 +72,17 @@ test('install-modules.json schema validation', async (t) => {
     }
   });
 
+  await t.test('each module path exists in the authored source tree', () => {
+    for (const mod of modulesManifest.modules) {
+      for (const p of mod.paths) {
+        assert.ok(
+          existsSync(join(ROOT, p)),
+          `Module "${mod.id}" references missing path "${p}"`,
+        );
+      }
+    }
+  });
+
   await t.test('each module has required field: targets (non-empty array of strings)', () => {
     for (const mod of modulesManifest.modules) {
       assert.ok(
@@ -80,6 +93,17 @@ test('install-modules.json schema validation', async (t) => {
         assert.ok(
           typeof t === 'string' && t.length > 0,
           `Module "${mod.id}" has invalid target entry: ${t}`,
+        );
+      }
+    }
+  });
+
+  await t.test('each module target is one of the supported plugin platforms', () => {
+    for (const mod of modulesManifest.modules) {
+      for (const target of mod.targets) {
+        assert.ok(
+          SUPPORTED_TARGETS.has(target),
+          `Module "${mod.id}" declares unsupported target "${target}"`,
         );
       }
     }

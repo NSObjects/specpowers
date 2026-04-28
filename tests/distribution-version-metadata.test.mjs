@@ -24,10 +24,6 @@ test('distribution metadata versions stay aligned with package.json', async (t) 
     assert.equal(readJson('.codex-plugin/plugin.json').version, packageVersion);
   });
 
-  await t.test('.cursor-plugin/plugin.json matches package.json', () => {
-    assert.equal(readJson('.cursor-plugin/plugin.json').version, packageVersion);
-  });
-
   await t.test('.claude-plugin/plugin.json matches package.json', () => {
     assert.equal(readJson('.claude-plugin/plugin.json').version, packageVersion);
   });
@@ -39,7 +35,4 @@ test('distribution metadata versions stay aligned with package.json', async (t) 
     assert.equal(plugin.version, packageVersion);
   });
 
-  await t.test('gemini-extension.json matches package.json', () => {
-    assert.equal(readJson('gemini-extension.json').version, packageVersion);
-  });
 });

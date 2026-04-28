@@ -15,22 +15,11 @@ test('runtime entrypoints use managed install directories', async (t) => {
     assert.equal(manifest.skills, './.codex/skills/');
   });
 
-  await t.test('cursor plugin manifest points at managed skills', () => {
-    const manifest = JSON.parse(
-      readFileSync(resolve(ROOT, '.cursor-plugin/plugin.json'), 'utf-8'),
-    );
-    assert.equal(manifest.skills, './.cursor-plugin/skills/');
-  });
-
-  await t.test('OpenCode plugin prefers the managed skills directory', () => {
-    const content = readFileSync(resolve(ROOT, '.opencode/plugins/specpowers.js'), 'utf-8');
-    assert.ok(content.includes('.opencode/skills'));
-  });
-
-  await t.test('session-start hook prefers managed installed skills for hook-based platforms', () => {
+  await t.test('session-start hook uses the managed Claude Code skills payload', () => {
     const content = readFileSync(resolve(ROOT, 'hooks/session-start'), 'utf-8');
     assert.ok(content.includes('.claude/skills/using-skills/SKILL.md'));
-    assert.ok(content.includes('.cursor-plugin/skills/using-skills/SKILL.md'));
+    assert.ok(!content.includes('.cursor-plugin/skills/using-skills/SKILL.md'));
+    assert.ok(!content.includes('PLUGIN_ROOT}/skills'));
   });
 
   await t.test('Codex install docs include the managed install bootstrap step', () => {
@@ -61,6 +50,8 @@ test('runtime entrypoints use managed install directories', async (t) => {
   await t.test('.codex/INSTALL.md describes materialization not manual maintenance', () => {
     const install = readFileSync(resolve(ROOT, '.codex/INSTALL.md'), 'utf-8');
     assert.match(install, /materializ|generated|managed skills/i);
+    assert.ok(!install.includes('Symlink the skills'));
+    assert.ok(!install.includes('~/.codex/skills'));
     assert.ok(!install.match(/manually maintain|hand.maintain/i),
       'Install docs should not instruct readers to maintain .codex/skills/ as a second authored source');
   });

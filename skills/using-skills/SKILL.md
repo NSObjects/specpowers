@@ -30,7 +30,7 @@ Skills are current instructions, not memory. Even when you remember a skill, loa
 Resolve conflicts in this order:
 
 1. Platform, system, safety, and tool constraints.
-2. User's explicit request and repository instructions such as `CLAUDE.md`, `GEMINI.md`, `AGENTS.md`, `.qoder/` project assets, `.kiro/steering/`, or equivalent project guidance.
+2. User's explicit request and repository instructions such as `CLAUDE.md`, `AGENTS.md`, or equivalent project guidance.
 3. Loaded SpecPowers skills.
 4. Default agent habits and preferences.
 
@@ -43,12 +43,7 @@ Use the mechanism provided by the current environment:
 | Environment | How to load a skill |
 | --- | --- |
 | Claude Code | Use the native `Skill` tool or `/skill-name`. For tool, subagent, task-list, and plugin details, read `references/claude-code-tools.md`. |
-| Cursor | Use the Cursor plugin system and the `Skill` tool, equivalent to Claude Code when available. |
-| Gemini CLI | Use `activate_skill`. Gemini loads skill metadata at session start and full skill content on demand. |
 | Codex | Use native skill discovery. For tool translation, read `references/codex-tools.md`. |
-| OpenCode | Use OpenCode's native `skill` tool to list and load skills. |
-| Kiro IDE Power mode | Use `kiroPowers(action="readSteering", powerName="specpowers", steeringFile="<skill-name>.md")`. For tool translation, read `references/kiro-tools.md`. |
-| Qoder CLI / IDE | Use Qoder Skills via automatic matching or `/skill-name`. For Skills, Subagents, Custom Agents, and tool translation, read `references/qoder-tools.md`. |
 
 If the named tool is unavailable in the current environment, use the closest native equivalent. If no equivalent exists, state the limitation briefly and continue with the best available manual workflow.
 
@@ -60,14 +55,12 @@ Load the relevant reference file only when the current environment or a loaded s
 | --- | --- |
 | `references/claude-code-tools.md` | Running in Claude Code, handling `Skill`, `Agent`, `Task`, `TodoWrite`, `Task*`, subagent, or plugin instructions. |
 | `references/codex-tools.md` | Running in Codex or translating Claude Code tool names to Codex equivalents. |
-| `references/kiro-tools.md` | Running in Kiro IDE Power mode or translating skills into steering/subagent operations. |
-| `references/qoder-tools.md` | Running in Qoder CLI/IDE or translating Claude Code skills/subagents into Qoder Skills or Subagents. |
 
 ## Skill Check Procedure
 
 1. Identify the task type: exploration, feature/change request, bug fix, implementation, quality review, verification, installation, or archival.
 2. Check whether the user explicitly named or implied a skill.
-3. Check repository state when relevant: `specs/changes/`, existing artifacts, task files, project languages, installed rule modules, and platform-specific skill/agent directories such as `.claude/`, `.qoder/`, or `.kiro/`.
+3. Check repository state when relevant: `specs/changes/`, existing artifacts, task files, project languages, installed rule modules, and platform-specific skill directories such as `.claude/` or `.codex/`.
 4. Load process skills before implementation skills.
 5. Load `rules-common` before any language-specific `rules-*` skill when coding or reviewing code.
 6. Follow the loaded skill exactly. If it instructs you to load another skill, do so before continuing.
@@ -138,35 +131,22 @@ Load `selective-install` before adding, removing, or changing SpecPowers modules
 
 Load `archiving` when implementation and verification are complete or when the user explicitly asks to archive a change.
 
-## Session Bootstrap for Language Rules
+## Language Rule Activation
 
-When this skill is activated at session start or before the first project coding/review task, run the language-rule bootstrap if all preconditions are true:
+`using-skills` is a runtime routing skill, not an installer. During a chat session it must not write files, regenerate plugin payloads, or auto-install language rules.
 
-- You are in a project workspace.
-- SpecPowers installation scripts are present, including `scripts/install.js` and `scripts/lib/session-bootstrap.js`.
-- File writes are allowed in the workspace.
-- You are not acting as a subagent.
+Runtime rule handling:
 
-Bootstrap flow:
+1. When coding or reviewing code, load `rules-common` if it exists in the managed plugin payload.
+2. If the relevant language rule skill also exists in the managed payload, load it after `rules-common`.
+3. If the relevant language rule skill is missing, continue with `rules-common` and tell the user which install command would add the missing rule.
+4. Do not call `scripts/install.js` or `scripts/lib/session-bootstrap.js` from this skill unless the user explicitly asks to install or repair modules.
 
-1. Detect project languages from repository files.
-2. Check which `rules-*` language modules are already installed.
-3. Install missing detected `rules-{language}` modules automatically.
-4. Activate `rules-common` first, then activate each detected language rule skill.
-5. Report installed modules and activated rules briefly.
+Installer boundary:
 
-If this is the first run after plugin installation and no install-state file exists:
-
-1. Auto-detect the platform.
-2. Run a full install using the `developer` profile.
-3. Detect and install language-specific rules.
-4. Show a brief welcome and installation summary.
-
-### Auto-Install Boundary
-
-- Auto-install without confirmation: detected `rules-*` language modules only.
-- Require user confirmation: non-language modules, profile switches, manual additions, destructive changes, or changes outside the active workspace.
-- If bootstrap scripts are missing or unavailable, skip bootstrap and continue; do not invent replacement installation steps.
+- `scripts/install.js` is the supported way to generate plugin payloads.
+- `scripts/lib/session-bootstrap.js` is a programmatic installer helper, not an active runtime hook.
+- `scripts/lib/language-detect.js` may identify installable language rule modules, but detection alone does not make a rule available in the current session.
 
 ## Skill Types
 

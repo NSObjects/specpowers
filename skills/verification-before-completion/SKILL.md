@@ -1,6 +1,6 @@
 ---
 name: verification-before-completion
-description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
+description: Use when the user or active workflow explicitly requires evidence before a completion, fixed, passing, commit, or PR-ready claim; do not trigger independent verification without that checkpoint
 ---
 
 # Verification Before Completion

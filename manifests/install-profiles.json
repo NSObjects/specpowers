@@ -3,30 +3,47 @@
   "profiles": {
     "core": {
       "description": "最小基线：核心工作流 + 基础技能",
-      "modules": ["core-workflow", "foundation"]
+      "modules": [
+        "core-workflow",
+        "foundation"
+      ]
     },
     "developer": {
       "description": "标准开发：核心 + 规则 + 验证 + 质量 + 代理",
       "modules": [
-        "core-workflow", "foundation", "rules-common",
-        "verification-loop", "quality-gate", "role-agents"
+        "core-workflow",
+        "foundation",
+        "rules-common",
+        "verification-loop",
+        "quality-gate",
+        "role-agents"
       ]
     },
     "security": {
       "description": "安全增强：developer + 安全审查代理",
       "modules": [
-        "core-workflow", "foundation", "rules-common",
-        "verification-loop", "quality-gate", "role-agents"
+        "core-workflow",
+        "foundation",
+        "rules-common",
+        "verification-loop",
+        "quality-gate",
+        "role-agents"
       ]
     },
     "full": {
       "description": "完整安装：所有模块 + 所有语言规则",
       "modules": [
-        "core-workflow", "foundation", "rules-common",
-        "rules-typescript", "rules-python", "rules-golang", "rules-rust",
-        "rules-java", "rules-kotlin", "rules-cpp", "rules-swift",
-        "rules-php", "rules-perl", "rules-csharp", "rules-dart",
-        "verification-loop", "quality-gate", "role-agents"
+        "core-workflow",
+        "foundation",
+        "rules-common",
+        "rules-typescript",
+        "rules-python",
+        "rules-golang",
+        "rules-rust",
+        "rules-java",
+        "verification-loop",
+        "quality-gate",
+        "role-agents"
       ]
     }
   }

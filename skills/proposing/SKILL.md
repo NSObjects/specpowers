@@ -24,7 +24,7 @@ Do NOT proceed to specifying without user confirmation of the proposal.
 3. **Write proposal.md** — intent, scope, approach, success criteria
 4. **Self-review** — check for completeness and clarity
 5. **User confirms** — wait for explicit approval
-6. **Transition** — invoke `specifying` skill (Kiro: readSteering → specifying.md)
+6. **Transition** — invoke `specifying` skill
 
 ## Change Directory
 
@@ -92,4 +92,4 @@ Save to `specs/changes/<change-name>/proposal.md`.
 
 > "Proposal saved to `specs/changes/<change-name>/proposal.md`. Please review and confirm, then I'll define the behavioral specifications."
 
-Wait for user confirmation. Then invoke `specifying` skill (Kiro: readSteering → specifying.md).
+Wait for user confirmation. Then invoke `specifying` skill.

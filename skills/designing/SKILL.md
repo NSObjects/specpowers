@@ -28,7 +28,7 @@ Do NOT proceed to planning without user confirmation.
 6. **Map file changes** — which files to create, modify, delete (exact paths)
 7. **Self-review** — verify all Requirements are covered, patterns are followed
 8. **User confirms** — wait for explicit approval
-9. **Transition** — invoke `planning` skill (Kiro: readSteering → planning.md)
+9. **Transition** — invoke `planning` skill
 
 ## Design for Isolation and Clarity
 
@@ -139,4 +139,4 @@ Save to `specs/changes/<change-name>/design.md`.
 
 > "Technical design saved. Please review and confirm, then I'll create the implementation plan."
 
-Wait for user confirmation. Then invoke `planning` skill (Kiro: readSteering → planning.md).
+Wait for user confirmation. Then invoke `planning` skill.

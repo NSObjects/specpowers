@@ -267,4 +267,4 @@ Two execution modes are available:
 Which mode should be used?
 ```
 
-After the user chooses a mode, transition to the implementation skill, such as `spec-driven-development` or the repository's configured execution skill. For Kiro-style flows: read steering first, then invoke `spec-driven-development.md`.
+After the user chooses a mode, transition to the implementation skill, such as `spec-driven-development` or the repository's configured execution skill.

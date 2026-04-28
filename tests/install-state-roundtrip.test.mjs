@@ -44,7 +44,7 @@ const moduleEntryArb = fc.record({
 /** Arbitrary full state object. */
 const stateArb = fc.record({
   version: fc.constant(1),
-  platform: fc.constantFrom('claude-code', 'cursor', 'gemini-cli', 'kiro-ide', 'codex', 'opencode', null),
+  platform: fc.constantFrom('claude-code', 'codex', null),
   installedAt: fc.oneof(fc.constant(null), fc.constant(new Date().toISOString())),
   sourceVersion: fc.oneof(fc.constant(null), fc.constant('0.2.0')),
   profile: fc.constantFrom('core', 'developer', 'security', 'full', null),

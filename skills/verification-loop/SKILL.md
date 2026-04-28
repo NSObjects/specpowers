@@ -1,6 +1,6 @@
 ---
 name: verification-loop
-description: "Use after completing a feature, refactor, bug fix, or major code change to verify readiness with a strict fail-stop pipeline: Build → Type Check → Lint → Test → Security Scan → Diff Review. Prefer project-defined commands, stop on the first failing gate, and produce a structured readiness report."
+description: "Use when the user asks for readiness verification or an active implementation workflow reaches a milestone/final verification checkpoint; do not auto-start merely because code changed."
 ---
 
 # Verification Loop

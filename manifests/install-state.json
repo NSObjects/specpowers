@@ -28,8 +28,7 @@
         ".claude/skills/dispatching-parallel-agents",
         ".claude/skills/requesting-code-review",
         ".claude/skills/receiving-code-review",
-        ".claude/skills/verification-before-completion",
-        ".claude/skills/writing-skills"
+        ".claude/skills/verification-before-completion"
       ]
     },
     {

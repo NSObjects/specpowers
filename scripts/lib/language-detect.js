@@ -17,27 +17,6 @@ const EXT_TO_SKILL = new Map([
   ['.rs', 'rules-rust'],
   // Java
   ['.java', 'rules-java'],
-  // Kotlin
-  ['.kt', 'rules-kotlin'],
-  ['.kts', 'rules-kotlin'],
-  // C++
-  ['.cpp', 'rules-cpp'],
-  ['.cc', 'rules-cpp'],
-  ['.cxx', 'rules-cpp'],
-  ['.hpp', 'rules-cpp'],
-  ['.h', 'rules-cpp'],
-  // Swift
-  ['.swift', 'rules-swift'],
-  // PHP
-  ['.php', 'rules-php'],
-  // Perl
-  ['.pl', 'rules-perl'],
-  ['.pm', 'rules-perl'],
-  ['.t', 'rules-perl'],
-  // C#
-  ['.cs', 'rules-csharp'],
-  // Dart
-  ['.dart', 'rules-dart'],
 ]);
 
 /**
