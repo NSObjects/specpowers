@@ -14,6 +14,10 @@ function readDescription(relativePath) {
   return match[1].trim().replace(/^"(.*)"$/, '$1');
 }
 
+function read(relativePath) {
+  return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
+}
+
 const workflowSkills = [
   'skills/archiving/SKILL.md',
   'skills/designing/SKILL.md',
@@ -71,4 +75,29 @@ test('capability skills have valid YAML frontmatter with description', () => {
       `${relativePath} should have a non-empty description`,
     );
   }
+});
+
+test('using-skills keeps routing in one primary decision table', () => {
+  const content = read('skills/using-skills/SKILL.md');
+
+  assert.ok(
+    content.includes('## Routing Decision Table'),
+    'using-skills should expose one routing decision table',
+  );
+  assert.ok(
+    content.includes('Support skills are not primary routes'),
+    'using-skills should separate primary workflow routing from support skills',
+  );
+  assert.ok(
+    content.includes('| User request or repository state | Primary skill | Notes |'),
+    'using-skills should make primary route selection table-driven',
+  );
+  assert.ok(
+    content.includes('| `quality-gate` | The user asks for automated quality checks or an active workflow reaches that checkpoint. |'),
+    'quality-gate should remain a support checkpoint, not a top-level route',
+  );
+  assert.ok(
+    !content.includes('### Code quality, review, or standards check'),
+    'using-skills should not keep broad overlapping routing subsections',
+  );
 });

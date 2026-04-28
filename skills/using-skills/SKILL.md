@@ -98,38 +98,34 @@ Each stage creates or validates a specific artifact:
 
 `specifying` is mandatory for feature/change work. Do not jump from proposal to design or implementation without it.
 
-## Routing Rules
+## Routing Decision Table
 
-### New feature, behavior change, or implementation request
+Choose one primary workflow skill first. Add rule or quality skills only when the selected workflow reaches that checkpoint.
 
-1. Check `specs/changes/` for an active change matching the topic.
-2. If no active change exists, load `proposing`.
-3. If the request is ambiguous or requires understanding existing behavior first, load `exploring` before `proposing`.
-4. If an active change exists but required artifacts are missing, load the next missing workflow skill in order: `specifying`, `designing`, then `planning`.
-5. If `tasks.md` exists and has unchecked tasks, establish an execution mode before loading `spec-driven-development`:
-   - `Step-by-Step`: implement one task or small group, then report and wait when required by the active skill.
-   - `Fast`: continue through the task list, reporting meaningful progress.
-6. If the execution mode was already chosen for the current change in the current conversation, reuse it.
+| User request or repository state | Primary skill | Notes |
+| --- | --- | --- |
+| Vague request, unclear scope, competing approaches, or context needed before choosing a change | `exploring` | Do not create artifacts during exploration. Transition to `proposing` only after user confirmation. |
+| Concrete new feature, behavior change, or implementation intent without an active change artifact | `proposing` | If discovery is still required, use `exploring` first. |
+| Accepted proposal but missing behavioral requirements | `specifying` | Mandatory before design or implementation. |
+| Requirements agreed but technical approach, trade-offs, or file boundaries unresolved | `designing` | Keep design separate from task planning. |
+| Requirements and design agreed but no executable task list exists | `planning` | Produce small test-first tasks and establish execution mode. |
+| Approved `tasks.md` exists and the user wants implementation to begin or resume | `spec-driven-development` | Reuse the current execution mode if already chosen; otherwise ask for `Step-by-Step` or `Fast`. |
+| Bug, failure, regression, flaky behavior, or unexpected test result | `systematic-debugging` | Understand root cause before proposing fixes. |
+| User explicitly asks for standalone review or merge-readiness review | `requesting-code-review` | Keep one surfaced review conclusion; specialist reviewers stay internal. |
+| User asks to respond to or implement review feedback | `receiving-code-review` | Verify feedback against code before accepting it. |
+| User asks to install, repair, diagnose, add, remove, or change SpecPowers modules | `selective-install` | Runtime routing must not call installers implicitly. |
+| Completed and accepted change should be closed | `archiving` | Only after implementation and review are done. |
 
-### Bug, failure, regression, or flaky behavior
+Support skills are not primary routes:
 
-Load `debugging` first. After the root cause is understood, load additional workflow, rules, or verification skills as needed.
-
-### Code quality, review, or standards check
-
-Load `quality-gate` for a quick quality pass. Load `verification-loop` for test/build/lint execution. Load `requesting-code-review` when an independent review is needed or requested.
-
-### Research, unclear next step, or multiple possible approaches
-
-Load `exploring` first. Use `dispatching-parallel-agents` only when independent branches of investigation would reduce risk or time.
-
-### Module installation or skill/rule management
-
-Load `selective-install` before adding, removing, or changing SpecPowers modules, except for automatic language-rule installation described below.
-
-### Completed change ready to close
-
-Load `archiving` when implementation and verification are complete or when the user explicitly asks to archive a change.
+| Support skill | Use only when |
+| --- | --- |
+| `rules-common` / `rules-*` | Coding or review is active and the rule skill exists in the managed payload. |
+| `test-driven-development` | An implementation task reaches its TDD step or a subagent asks for TDD coaching. |
+| `quality-gate` | The user asks for automated quality checks or an active workflow reaches that checkpoint. |
+| `verification-loop` | A milestone or final readiness checkpoint explicitly requires full verification. |
+| `verification-before-completion` | The workflow is about to make a completion, fixed, passing, commit-ready, or PR-ready claim. |
+| `dispatching-parallel-agents` | Independent workstreams exist and subagent use is explicitly appropriate for the platform. |
 
 ## Language Rule Activation
 

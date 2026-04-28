@@ -10,7 +10,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { EXT_TO_SKILL } from '../scripts/lib/language-detect.js';
@@ -80,6 +80,25 @@ test('install-modules.json schema validation', async (t) => {
           `Module "${mod.id}" references missing path "${p}"`,
         );
       }
+    }
+  });
+
+  await t.test('each top-level authored skill is managed by the install manifest', () => {
+    const managedSkillDirs = new Set(
+      modulesManifest.modules
+        .flatMap((mod) => mod.paths)
+        .filter((p) => p.startsWith('skills/') && p.split('/').length === 2),
+    );
+    const authoredSkillDirs = readdirSync(join(ROOT, 'skills'))
+      .map((name) => `skills/${name}`)
+      .filter((p) => statSync(join(ROOT, p)).isDirectory())
+      .filter((p) => existsSync(join(ROOT, p, 'SKILL.md')));
+
+    for (const skillDir of authoredSkillDirs) {
+      assert.ok(
+        managedSkillDirs.has(skillDir),
+        `Authored top-level skill "${skillDir}" must be included in install-modules.json or moved under a managed skill directory`,
+      );
     }
   });
 
