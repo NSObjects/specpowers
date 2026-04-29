@@ -8,11 +8,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
 test('runtime entrypoints use managed install directories', async (t) => {
-  await t.test('codex plugin manifest points at managed skills', () => {
+  await t.test('codex plugin manifest relies on default root skills discovery', () => {
     const manifest = JSON.parse(
       readFileSync(resolve(ROOT, '.codex-plugin/plugin.json'), 'utf-8'),
     );
-    assert.equal(manifest.skills, './.codex/skills/');
+    assert.equal(manifest.skills, undefined);
   });
 
   await t.test('Claude Code plugin manifest points at managed skills and hooks', () => {
@@ -30,19 +30,29 @@ test('runtime entrypoints use managed install directories', async (t) => {
     assert.ok(!content.includes('PLUGIN_ROOT}/skills'));
   });
 
-  await t.test('Codex install docs include the managed install bootstrap step', () => {
+  await t.test('Codex install docs use a sparse plugin checkout with one skills tree', () => {
     const content = readFileSync(resolve(ROOT, '.codex/INSTALL.md'), 'utf-8');
-    assert.ok(content.includes('node scripts/install.js --platform codex --profile developer'));
+    const installSteps = content.split('### Migrating from older instructions')[0];
+    assert.ok(installSteps.includes("plugin checkout's `skills/` directory"));
+    assert.ok(installSteps.includes('.codex-plugin/plugin.json'));
+    assert.ok(installSteps.includes("Codex's Plugins UI"));
+    assert.ok(installSteps.includes('git clone --filter=blob:none --sparse https://github.com/NSObjects/specpowers ~/plugins/specpowers'));
+    assert.ok(installSteps.includes('git sparse-checkout set .codex-plugin skills README.md LICENSE'));
+    assert.ok(installSteps.includes('Do not point Codex at a full SpecPowers source checkout'));
+    assert.ok(!installSteps.includes('node scripts/install.js --platform codex --profile developer'));
+    assert.ok(!installSteps.includes('.codex/skills/'));
+    assert.ok(!installSteps.includes('Node.js'));
   });
 
   await t.test('Codex install docs use the home-local marketplace plugin path', () => {
     const content = readFileSync(resolve(ROOT, '.codex/INSTALL.md'), 'utf-8');
 
-    assert.ok(content.includes('git clone https://github.com/NSObjects/specpowers ~/plugins/specpowers'));
+    assert.ok(content.includes('git clone --filter=blob:none --sparse https://github.com/NSObjects/specpowers ~/plugins/specpowers'));
     assert.ok(content.includes('mkdir -p ~/plugins'));
     assert.ok(content.includes('"path": "./plugins/specpowers"'));
-    assert.ok(!content.includes('~/.codex/plugins/specpowers'));
-    assert.ok(!content.includes('./.codex/plugins/specpowers'));
+    const installSteps = content.split('### Migrating from older instructions')[0];
+    assert.ok(!installSteps.includes('~/.codex/plugins/specpowers'));
+    assert.ok(!installSteps.includes('./.codex/plugins/specpowers'));
   });
 
   await t.test('Claude Code install docs include the managed install bootstrap step', () => {
@@ -51,9 +61,10 @@ test('runtime entrypoints use managed install directories', async (t) => {
     assert.ok(content.includes('not source content'));
   });
 
-  await t.test('README documents the Codex managed install bootstrap step', () => {
+  await t.test('README documents Codex default skills discovery without materialization', () => {
     const content = readFileSync(resolve(ROOT, 'README.md'), 'utf-8');
-    assert.ok(content.includes('node scripts/install.js --platform codex --profile developer'));
+    assert.ok(content.includes('Codex plugin installs use a sparse plugin checkout'));
+    assert.ok(!content.includes('node scripts/install.js --platform codex --profile developer'));
     assert.ok(content.includes('node scripts/install.js --platform claude-code --profile developer'));
   });
 
@@ -63,23 +74,24 @@ test('runtime entrypoints use managed install directories', async (t) => {
     assert.ok(gitignore.includes('manifests/install-state/*.json'));
   });
 
-  await t.test('README describes Codex skills as materialized content', () => {
+  await t.test('README describes Codex skills as default-discovered content', () => {
     const readme = readFileSync(resolve(ROOT, 'README.md'), 'utf-8');
-    assert.match(readme, /materializ|bootstrap the managed skills payload/i);
+    assert.match(readme, /sparse plugin checkout|default plugin discovery/i);
   });
 
-  await t.test('README.zh-CN describes Codex skills as generated managed content', () => {
+  await t.test('README.zh-CN describes Codex skills as default-discovered content', () => {
     const readmeZh = readFileSync(resolve(ROOT, 'README.zh-CN.md'), 'utf-8');
-    assert.match(readmeZh, /受管技能产物|物化|生成受管/);
+    assert.match(readmeZh, /sparse 插件检出|不生成 `.codex\/skills\/`/);
   });
 
-  await t.test('.codex/INSTALL.md describes materialization not manual maintenance', () => {
+  await t.test('.codex/INSTALL.md does not reintroduce legacy or generated skill paths', () => {
     const install = readFileSync(resolve(ROOT, '.codex/INSTALL.md'), 'utf-8');
-    assert.match(install, /materializ|generated|managed skills/i);
-    assert.ok(install.includes('not source content'));
+    const installSteps = install.split('### Migrating from older instructions')[0];
     assert.ok(!install.includes('Symlink the skills'));
-    assert.ok(!install.includes('~/.codex/skills'));
-    assert.ok(!install.match(/manually maintain|hand.maintain/i),
+    assert.ok(!installSteps.includes('mkdir -p ~/.codex/skills'));
+    assert.ok(!installSteps.includes('ln -s'));
+    assert.ok(!installSteps.includes('.codex/skills/'));
+    assert.ok(!installSteps.match(/manually maintain|hand.maintain/i),
       'Install docs should not instruct readers to maintain .codex/skills/ as a second authored source');
   });
 });

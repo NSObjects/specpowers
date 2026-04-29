@@ -64,27 +64,27 @@ flowchart TD
 | Platform | Status | How to install |
 |----------|--------|---------------|
 | **Claude Code** | ✅ | Follow [.claude-plugin/INSTALL.md](.claude-plugin/INSTALL.md) |
-| **Codex** | ✅ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
+| **Codex** | ✅ | Follow [.codex/INSTALL.md](.codex/INSTALL.md) |
 
-For Claude Code and Codex local-plugin installs, generate the managed skills payload once from the cloned repo before first use:
+For Claude Code local-plugin installs, generate the managed skills payload once from the cloned repo before first use:
 
 ```bash
 node scripts/install.js --platform claude-code --profile developer
-node scripts/install.js --platform codex --profile developer
 ```
 
-Generated plugin payloads and `manifests/install-state/` files are local install artifacts, not authored source.
+Codex plugin installs use a sparse plugin checkout and read its `skills/` directory directly through default plugin discovery, so they do not generate `.codex/skills/`.
+
+Generated Claude Code plugin payloads and `manifests/install-state/` files are local install artifacts, not authored source.
 
 ### Language Rules
 
-Plugin payloads are generated at install time. The `developer` profile includes `rules-common`; add language-specific rules explicitly when generating the managed payload:
+Claude Code plugin payloads are generated at install time. The `developer` profile includes `rules-common`; add language-specific rules explicitly when generating the managed payload. Codex reads the authored rules from the sparse plugin checkout's `skills/` directly.
 
 ```bash
 node scripts/install.js --platform claude-code --profile developer --add rules-typescript
-node scripts/install.js --platform codex --profile developer --add rules-python
 ```
 
-At runtime, `using-skills` loads only skills that already exist in the managed plugin payload. It does not write files or install rules during a chat session.
+At runtime, `using-skills` does not write files or install rules during a chat session.
 
 ### Verify
 
@@ -184,7 +184,6 @@ For fine-grained control (most users don't need this):
 
 ```bash
 node scripts/install.js --platform claude-code --profile developer
-node scripts/install.js --platform codex --profile developer
 node scripts/install.js --platform claude-code --add rules-typescript
 ```
 

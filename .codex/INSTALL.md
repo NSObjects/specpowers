@@ -1,43 +1,40 @@
 # Installing SpecPowers for Codex
 
-Codex is supported through the SpecPowers plugin only. The plugin reads managed
-skills from `.codex/skills/`, which must be generated from the authored `skills/`
-tree before installing the plugin.
+Codex is supported through the SpecPowers plugin only. The plugin reads skills
+from the plugin checkout's `skills/` directory through Codex's default plugin
+skill discovery.
+
+This is a Codex plugin install: register the repository as a local plugin through
+a marketplace, then install it from Codex's Plugins UI. Do not copy or symlink
+skills into `~/.codex/skills`.
+
+Do not point Codex at a full SpecPowers source checkout. The full repository
+also contains generated `steering/` files with skill frontmatter, which Codex can
+discover as duplicate skills. Use the sparse checkout below so the plugin root
+contains only `.codex-plugin/` and one `skills/` tree.
 
 ## Prerequisites
 
 - Git
 - Codex CLI or Codex app, signed in with ChatGPT
-- Node.js
 
 ---
 
 ## Plugin Install
 
 Registers SpecPowers as a home-local or workspace-local Codex plugin via a
-marketplace.
+marketplace. The plugin manifest lives at `.codex-plugin/plugin.json`.
 
 ### 1. Clone the repository
 
 ```bash
 mkdir -p ~/plugins
-git clone https://github.com/NSObjects/specpowers ~/plugins/specpowers
-```
-
-### 2. Generate the managed skills
-
-```bash
+git clone --filter=blob:none --sparse https://github.com/NSObjects/specpowers ~/plugins/specpowers
 cd ~/plugins/specpowers
-node scripts/install.js --platform codex --profile developer
+git sparse-checkout set .codex-plugin skills README.md LICENSE
 ```
 
-This creates `.codex/skills/` from `skills/`. Do not maintain `.codex/skills/`
-by hand.
-
-The install command also writes local state under `manifests/install-state/`.
-That state records your generated plugin payload and is not source content.
-
-### 3. Register in a marketplace
+### 2. Register in a marketplace
 
 Codex supports two marketplace scopes. Choose one based on your needs:
 
@@ -79,7 +76,7 @@ Add the following entry. If the marketplace file does not exist, create it with 
 
 Same structure, but change `source.path` to point to the plugin location relative to your repo root (e.g. `./plugins/specpowers`).
 
-### 4. Restart Codex and install
+### 3. Restart Codex and install
 
 Restart Codex, then:
 
@@ -88,7 +85,7 @@ Restart Codex, then:
 
 Find `SpecPowers` in your marketplace and choose `Install plugin`.
 
-### 5. Verify
+### 4. Verify
 
 Start a new thread and say "I want to build X". The workflow should begin with `exploring`.
 
@@ -97,10 +94,32 @@ Start a new thread and say "I want to build X". The workflow should begin with `
 ```bash
 cd ~/plugins/specpowers
 git pull
-node scripts/install.js --platform codex --profile developer
+git sparse-checkout set .codex-plugin skills README.md LICENSE
 ```
 
-Restart Codex to pick up the latest generated plugin payload.
+Restart Codex to pick up the latest plugin files.
+
+### Migrating from older instructions
+
+Older instructions installed SpecPowers under `~/.codex/`, generated a second
+`.codex/skills/` tree, or pointed Codex at a full source checkout that included
+`steering/`. Remove those stale copies before reinstalling the plugin, otherwise
+Codex can discover the same skills more than once.
+
+1. Disable or remove `specpowers` from Codex's Plugins UI.
+2. Remove old `specpowers` entries from `~/.agents/plugins/marketplace.json`,
+   especially entries whose `source.path` is `./.codex/plugins/specpowers`.
+3. Delete stale local copies and plugin cache:
+
+```bash
+rm -rf ~/.codex/specpowers
+rm -rf ~/.codex/plugins/specpowers
+rm -rf ~/.codex/plugins/cache/local-plugins/specpowers
+rm -rf ~/plugins/specpowers/.codex/skills
+rm -rf ~/plugins/specpowers/steering
+```
+
+4. Follow the install steps above, then restart Codex.
 
 ### Uninstalling
 

@@ -18,7 +18,6 @@
     "debugging",
     "planning"
   ],
-  "skills": "./.codex/skills/",
   "interface": {
     "displayName": "SpecPowers",
     "shortDescription": "Specs, TDD, and workflow discipline for AI coding assistants",

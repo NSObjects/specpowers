@@ -13,15 +13,15 @@ function read(relativePath) {
 
 test('workflow guidance requires choosing an execution mode before resuming unchecked tasks', () => {
   const usingSkills = read('skills/using-skills/SKILL.md');
-  const workflowSteering = read('steering/specpowers-workflow.md');
+  const execution = read('skills/spec-driven-development/SKILL.md');
 
   assert.match(
     usingSkills,
-    /If tasks\.md exists and has unchecked items[\s\S]*If the user has not explicitly chosen `Step-by-Step` or `Fast`[\s\S]*ask the user to choose/i,
+    /Approved `tasks\.md` exists and the user wants implementation to begin or resume[\s\S]*Reuse the current execution mode if already chosen; otherwise ask for `Step-by-Step` or `Fast`/i,
   );
   assert.match(
-    workflowSteering,
-    /If a change directory exists with `tasks\.md`[\s\S]*If the execution mode has not been established[\s\S]*ask the user to choose `Step-by-Step` or `Fast` before activating `spec-driven-development`/i,
+    execution,
+    /Use Fast Mode only when the user explicitly asks for it\. Otherwise use Step-by-Step Mode\./i,
   );
 });
 
@@ -31,10 +31,10 @@ test('execution guidance keeps mode selection explicit across skills and docs', 
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
 
-  assert.match(planning, /Which mode\?/);
+  assert.match(planning, /Ask the user to choose an execution mode\./);
   assert.match(
     execution,
-    /If no execution mode has been established for the current change[\s\S]*ask the user to choose `Step-by-Step` or `Fast` before resuming/i,
+    /Determine execution mode:[\s\S]*explicit user request for Fast Mode → Fast Mode[\s\S]*otherwise → Step-by-Step Mode/i,
   );
   assert.match(
     readme,

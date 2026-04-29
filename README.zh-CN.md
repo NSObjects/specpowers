@@ -64,27 +64,27 @@ flowchart TD
 | 平台 | 状态 | 安装方式 |
 |------|------|---------|
 | **Claude Code** | ✅ | 参见 [.claude-plugin/INSTALL.md](.claude-plugin/INSTALL.md) |
-| **Codex** | ✅ | Fetch and follow instructions from `https://raw.githubusercontent.com/NSObjects/specpowers/refs/heads/main/.codex/INSTALL.md` |
+| **Codex** | ✅ | 参见 [.codex/INSTALL.md](.codex/INSTALL.md) |
 
-对于 Claude Code 和 Codex 本地插件安装，首次使用前需执行一次物化步骤，从 `skills/` 生成受管技能产物：
+对于 Claude Code 本地插件安装，首次使用前需执行一次物化步骤，从 `skills/` 生成受管技能产物：
 
 ```bash
 node scripts/install.js --platform claude-code --profile developer
-node scripts/install.js --platform codex --profile developer
 ```
 
-生成的插件技能产物和 `manifests/install-state/` 状态文件属于本地安装产物，不是源码。
+Codex 插件安装使用 sparse 插件检出，并通过默认插件发现直接读取该检出里的 `skills/` 目录，不生成 `.codex/skills/`。
+
+生成的 Claude Code 插件技能产物和 `manifests/install-state/` 状态文件属于本地安装产物，不是源码。
 
 ### 语言规则
 
-插件技能产物在安装阶段生成。`developer` 配置默认包含 `rules-common`；语言特定规则需要在生成受管产物时显式加入：
+Claude Code 插件技能产物在安装阶段生成。`developer` 配置默认包含 `rules-common`；语言特定规则需要在生成受管产物时显式加入。Codex 直接从 sparse 插件检出的 `skills/` 读取源码规则。
 
 ```bash
 node scripts/install.js --platform claude-code --profile developer --add rules-typescript
-node scripts/install.js --platform codex --profile developer --add rules-python
 ```
 
-运行时 `using-skills` 只加载受管插件产物里已经存在的 skill，不会在聊天会话中写文件或安装规则。
+运行时 `using-skills` 不会在聊天会话中写文件或安装规则。
 
 ### 验证
 
@@ -184,7 +184,6 @@ flowchart TD
 
 ```bash
 node scripts/install.js --platform claude-code --profile developer
-node scripts/install.js --platform codex --profile developer
 node scripts/install.js --platform claude-code --add rules-typescript
 ```
 
