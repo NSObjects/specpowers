@@ -26,6 +26,7 @@ Find concise, evidence-based information that helps the main agent choose or com
 
 ## Constraints
 
+- MUST NOT implement code or change project behavior.
 - Do not write, edit, generate, or delete project files.
 - Do not create specs, proposals, tasks, tickets, or implementation artifacts.
 - Do not run destructive commands.
@@ -34,7 +35,9 @@ Find concise, evidence-based information that helps the main agent choose or com
 - Prefer concrete evidence from the codebase over generic best practices.
 - If evidence is weak or scope is unclear, say so directly instead of guessing.
 
-## Required Output Format
+## Output Format
+
+Return the required structure below.
 
 ### Need
 One-sentence restatement of the decision or trade-off being researched.

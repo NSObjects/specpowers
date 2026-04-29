@@ -30,8 +30,8 @@ AI:  [planning]   → tasks.md       ✓ 3 TDD tasks mapped to specs
 You: "Step-by-Step"
 
 AI:  ✅ Task 1 — RED → GREEN → Code Review: APPROVED → ⏸️ you commit
-AI:  ✅ Task 2 — done → ⏸️ you commit
-AI:  ✅ Task 3 — done
+AI:  ✅ Task 2 — RED → GREEN → Code Review: APPROVED → ⏸️ you commit
+AI:  ✅ Task 3 — RED → GREEN → Code Review: APPROVED
      🎉 All tasks complete. Say "Archive" to merge specs.
 ```
 
@@ -50,7 +50,7 @@ flowchart TD
     Planning --> Execution[spec-driven-development<br/>execution modes]
     Execution --> Choice{Execution Mode}
     Choice -->|Step-by-Step| Step[1 task → review → pause]
-    Choice -->|Fast| Fast[all tasks → unified review]
+    Choice -->|Fast| Fast[all tasks, each reviewed]
     Step -.->|commit then continue| Step
     Step --> Done
     Fast --> Done
@@ -129,13 +129,13 @@ TypeScript · Python · Go · Rust · Java
 
 ### Role Agents
 
-Pre-built agent templates: `planner` (read-only analysis), `security-reviewer` (deep-dive specialists for unified review), `tdd-guide` (TDD coaching).
+Pre-built agent templates: `planner` (read-only analysis), `spec-reviewer` (task spec compliance), `code-quality-reviewer` (task code quality), `security-reviewer` (deep-dive specialists for unified review), `tdd-guide` (TDD coaching).
 
 ### Capability Layers
 
 - **Rules Layer** — `rules-common` and `rules-*` are standards and constraints used while writing, modifying, and reviewing code. They shape decisions and review criteria; they are not separate workflow entrypoints.
 - **Workflow Layer** — user-facing entrypoints such as `requesting-code-review`, `receiving-code-review`, and `dispatching-parallel-agents`. For review, `requesting-code-review` is the single surfaced review entrypoint.
-- **Role Layer** — internal helper roles such as `security-reviewer`, `planner`, and `tdd-guide`. These are internal helper roles used behind workflow skills rather than parallel user-facing workflows.
+- **Role Layer** — internal helper roles such as `spec-reviewer`, `code-quality-reviewer`, `security-reviewer`, `planner`, and `tdd-guide`. These are internal helper roles used behind workflow skills rather than parallel user-facing workflows.
 
 ### Execution Graph
 
@@ -144,26 +144,26 @@ flowchart TD
   using["using-skills"]
   rules["rules-common + rules-* (always-on rules)"]
   workflow["exploring → proposing → specifying → designing → planning → spec-driven-development → archiving"]
-  task["task-internal hooks: TDD + two-stage review"]
+  task["task-internal gates: TDD + two-stage review"]
   milestone["milestone gate: verification-loop"]
   completion["completion gate: verification-before-completion"]
   review["manual review flow: requesting-code-review"]
-  roles["role-layer helpers: security-reviewer / planner / tdd-guide"]
+  roles["role-layer helpers: spec-reviewer / code-quality-reviewer / security-reviewer / planner / tdd-guide"]
 
   using --> rules
   using --> workflow
   rules -. constrain .-> workflow
   workflow --> task
-  task -. every 3-4 tasks / before larger handoff .-> milestone
+  task -. feature-group completion / before larger handoff .-> milestone
   milestone -. evidence for readiness .-> completion
   review --> roles
   review -. final claim still gated by .-> completion
 ```
 
-Read it as one main workflow with attached hooks:
+Read it as one main workflow with attached gates and support roles:
 - `using-skills` decides which workflow skill to activate first.
 - `rules-common` and `rules-*` stay active as standards around the workflow, not as extra phases.
-- `spec-driven-development` contains task-internal hooks such as TDD and two-stage review.
+- `spec-driven-development` contains task-internal gates such as TDD and two-stage review. The review trigger is task completion after GREEN and before `tasks.md` is marked complete; it is not a global hook on every file edit.
 - `verification-loop` is a milestone gate, not a peer stage in the main workflow.
 - `verification-before-completion` is the final claim gate before saying work is complete or ready.
 - `requesting-code-review` is a separate manual review flow that can call role-layer helpers without creating extra top-level workflows.

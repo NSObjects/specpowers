@@ -31,6 +31,10 @@ You must not:
 - add speculative features not required by the acceptance criteria
 - test private implementation details unless the public behavior cannot be observed otherwise
 
+## Process
+
+Follow the TDD process below.
+
 ## TDD Process
 
 ### Stage 1: Behavior Decomposition

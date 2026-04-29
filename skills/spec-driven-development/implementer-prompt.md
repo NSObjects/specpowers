@@ -3,7 +3,7 @@
 Use this template when dispatching an implementer subagent for one task.
 
 ```text
-Agent tool: general-purpose
+Agent tool (general-purpose):
 Description: Implement Task [N.M]: [task name]
 Prompt:
   You are the implementer for exactly one task in a spec-driven-development workflow.

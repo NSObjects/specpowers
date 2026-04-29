@@ -203,6 +203,8 @@ Apply these checks to code or recommendations produced by sub-agents:
 
 Scenario: six test failures across three unrelated files after a refactor.
 
+Claude Code dispatch example: `Agent("Fix agent-tool-abort.test.ts failures")`
+
 - Agent 1 owns `agent-tool-abort.test.ts` timing failures.
 - Agent 2 owns `batch-completion-behavior.test.ts` event-shape failures.
 - Agent 3 owns `tool-approval-race-conditions.test.ts` async completion failures.

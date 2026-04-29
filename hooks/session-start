@@ -7,6 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 SKILLS_ROOT="${PLUGIN_ROOT}/.claude/skills"
+# Managed payload path: .claude/skills/using-skills/SKILL.md
 USING_SKILLS_PATH="${SKILLS_ROOT}/using-skills/SKILL.md"
 
 # Claude Code plugin installs use the managed .claude/skills payload generated

@@ -26,8 +26,12 @@ test('planning defines level-2 task groups as feature-group boundaries', () => {
 
 test('spec-driven-development runs verification-loop at feature-group completion instead of task-count milestones', () => {
   const execution = read('skills/spec-driven-development/SKILL.md');
+  const readme = read('README.md');
+  const readmeZh = read('README.zh-CN.md');
 
   assert.doesNotMatch(execution, /Every 3-4 completed tasks/i);
+  assert.doesNotMatch(readme, /every 3-4 tasks/i);
+  assert.doesNotMatch(readmeZh, /每 3-4 个任务/);
   assert.match(
     execution,
     /last subtask in a feature group[\s\S]*run `verification-loop`/i,
@@ -35,6 +39,14 @@ test('spec-driven-development runs verification-loop at feature-group completion
   assert.match(
     execution,
     /intermediate subtasks?[\s\S]*do not trigger `verification-loop` by count alone/i,
+  );
+  assert.match(
+    readme,
+    /feature-group completion \/ before larger handoff/i,
+  );
+  assert.match(
+    readmeZh,
+    /特性组完成 \/ 较大交付前/,
   );
 });
 

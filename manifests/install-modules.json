@@ -25,14 +25,15 @@
     {
       "id": "foundation",
       "kind": "skills",
-      "description": "Foundation skills (TDD, debugging, code review, verification)",
+      "description": "Foundation and utility skills (TDD, debugging, code review, verification, install helpers)",
       "paths": [
         "skills/test-driven-development",
         "skills/systematic-debugging",
         "skills/dispatching-parallel-agents",
         "skills/requesting-code-review",
         "skills/receiving-code-review",
-        "skills/verification-before-completion"
+        "skills/verification-before-completion",
+        "skills/selective-install"
       ],
       "targets": [
         "claude-code",
@@ -172,9 +173,11 @@
     {
       "id": "role-agents",
       "kind": "agents",
-      "description": "Role agent templates (planner, security-reviewer, tdd-guide)",
+      "description": "Role agent templates (planner, spec-reviewer, code-quality-reviewer, security-reviewer, tdd-guide)",
       "paths": [
         "skills/dispatching-parallel-agents/planner-agent-prompt.md",
+        "skills/spec-driven-development/spec-reviewer-prompt.md",
+        "skills/spec-driven-development/code-quality-reviewer-prompt.md",
         "skills/dispatching-parallel-agents/security-reviewer-prompt.md",
         "skills/dispatching-parallel-agents/tdd-guide-prompt.md"
       ],

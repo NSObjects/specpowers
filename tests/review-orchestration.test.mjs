@@ -60,6 +60,61 @@ test('dispatching-parallel-agents keeps specialist reviewers behind unified revi
   );
 });
 
+test('spec-driven-development requires dispatched review gates before task completion', () => {
+  const content = read('skills/spec-driven-development/SKILL.md');
+
+  assert.ok(
+    content.includes('Review dispatch is mandatory after implementation reaches GREEN and before `tasks.md` is updated'),
+    'spec-driven-development should pin review dispatch between GREEN and task completion',
+  );
+  assert.ok(
+    content.includes('Do not replace reviewer dispatch with inline self-check'),
+    'spec-driven-development should not allow inline self-check to silently replace reviewer dispatch',
+  );
+  assert.match(
+    content,
+    /dispatch `\.\/spec-reviewer-prompt\.md` and wait for `PASS`/i,
+    'Stage 1 should require a dispatched spec reviewer PASS when subagents are available',
+  );
+  assert.match(
+    content,
+    /dispatch `\.\/code-quality-reviewer-prompt\.md` and wait for `APPROVED`/i,
+    'Stage 2 should require a dispatched code quality reviewer APPROVED when subagents are available',
+  );
+  assert.ok(
+    content.includes('Review evidence:'),
+    'task reports should include review evidence instead of only a claim',
+  );
+});
+
+test('Codex mapping names the task-internal code quality reviewer prompt', () => {
+  const content = read('skills/using-skills/references/codex-tools.md');
+
+  assert.ok(
+    content.includes('skills/spec-driven-development/code-quality-reviewer-prompt.md'),
+    'Codex named-agent translation should point task-internal review to the spec-driven-development code quality reviewer prompt',
+  );
+  assert.ok(
+    content.includes('skills/requesting-code-review/code-reviewer-prompt.md'),
+    'Codex named-agent translation should keep standalone review mapped to requesting-code-review',
+  );
+});
+
+test('role agent manifest includes task review templates', () => {
+  const manifest = JSON.parse(read('manifests/install-modules.json'));
+  const roleAgents = manifest.modules.find((module) => module.id === 'role-agents');
+
+  assert.ok(roleAgents, 'role-agents module should exist');
+  assert.ok(
+    roleAgents.paths.includes('skills/spec-driven-development/spec-reviewer-prompt.md'),
+    'role-agents should expose the Stage 1 spec reviewer template',
+  );
+  assert.ok(
+    roleAgents.paths.includes('skills/spec-driven-development/code-quality-reviewer-prompt.md'),
+    'role-agents should expose the Stage 2 code quality reviewer template',
+  );
+});
+
 test('README describes one review entrypoint with optional deep-dive specialists', () => {
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');

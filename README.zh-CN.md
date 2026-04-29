@@ -30,8 +30,8 @@ AI:  [planning]   → tasks.md       ✓ 3 个 TDD 任务映射到规范
 你: "逐任务"
 
 AI:  ✅ 任务 1 — RED → GREEN → 代码审查: APPROVED → ⏸️ 你来 commit
-AI:  ✅ 任务 2 — 完成 → ⏸️ 你来 commit
-AI:  ✅ 任务 3 — 完成
+AI:  ✅ 任务 2 — RED → GREEN → 代码审查: APPROVED → ⏸️ 你来 commit
+AI:  ✅ 任务 3 — RED → GREEN → 代码审查: APPROVED
      🎉 全部完成。说 "Archive" 合并规范。
 ```
 
@@ -50,7 +50,7 @@ flowchart TD
     Planning --> Execution[spec-driven-development<br/>执行模式]
     Execution --> Choice{执行模式}
     Choice -->|逐任务| Step[1 个任务 → 审查 → 暂停]
-    Choice -->|快速| Fast[全部执行 → 统一审查]
+    Choice -->|快速| Fast[全部任务，每项审查]
     Step -.->|commit 后继续| Step
     Step --> Done
     Fast --> Done
@@ -129,13 +129,13 @@ TypeScript · Python · Go · Rust · Java
 
 ### 角色代理
 
-预置代理模板：`planner`（只读分析）、`security-reviewer`（由统一审查按需调用的专项深审角色）、`tdd-guide`（TDD 教练）。
+预置代理模板：`planner`（只读分析）、`spec-reviewer`（任务规范符合性审查）、`code-quality-reviewer`（任务代码质量审查）、`security-reviewer`（由统一审查按需调用的专项深审角色）、`tdd-guide`（TDD 教练）。
 
 ### 能力分层
 
 - **规则层** — `rules-common` 和 `rules-*` 是写代码、改代码、review 代码时要遵守的标准与约束。它们塑造决策和审查标准，但不是新的流程入口。
 - **流程层** — 面向用户的入口能力，例如 `requesting-code-review`、`receiving-code-review`、`dispatching-parallel-agents`。在审查场景里，`requesting-code-review` 是唯一对外的审查入口。
-- **角色层** — `security-reviewer`、`planner`、`tdd-guide` 这类内部协作角色。它们通过流程层被按需调用，而不是与流程层并列的用户入口。
+- **角色层** — `spec-reviewer`、`code-quality-reviewer`、`security-reviewer`、`planner`、`tdd-guide` 这类内部协作角色。它们通过流程层被按需调用，而不是与流程层并列的用户入口。
 
 ### 执行图
 
@@ -144,26 +144,26 @@ flowchart TD
   using["using-skills"]
   rules["rules-common + rules-*（常驻规则）"]
   workflow["exploring → proposing → specifying → designing → planning → spec-driven-development → archiving"]
-  task["任务内钩子：TDD + 两阶段审查"]
+  task["任务内闸门：TDD + 两阶段审查"]
   milestone["里程碑闸门：verification-loop"]
   completion["完成声明闸门：verification-before-completion"]
   review["独立审查流：requesting-code-review"]
-  roles["角色层 helper：security-reviewer / planner / tdd-guide"]
+  roles["角色层 helper：spec-reviewer / code-quality-reviewer / security-reviewer / planner / tdd-guide"]
 
   using --> rules
   using --> workflow
   rules -. 约束 .-> workflow
   workflow --> task
-  task -. 每 3-4 个任务 / 较大交付前 .-> milestone
+  task -. 特性组完成 / 较大交付前 .-> milestone
   milestone -. 为完成声明提供证据 .-> completion
   review --> roles
   review -. 最终对外结论仍受其约束 .-> completion
 ```
 
-可以把它理解成“一条主流程 + 几类挂点”：
+可以把它理解成“一条主流程 + 几类闸门和支撑角色”：
 - `using-skills` 负责先决定当前该激活哪个流程技能。
 - `rules-common` 和 `rules-*` 作为常驻标准围绕流程生效，而不是额外流程阶段。
-- `spec-driven-development` 内部再挂任务级钩子，例如 TDD 和两阶段审查。
+- `spec-driven-development` 内部有任务级闸门，例如 TDD 和两阶段审查。审查触发点是任务 GREEN 之后、`tasks.md` 标记完成之前；它不是每次文件编辑后的全局 hook。
 - `verification-loop` 是里程碑闸门，不是主流程里的平级阶段。
 - `verification-before-completion` 是最终完成声明前的闸门。
 - `requesting-code-review` 是独立的手动审查流，可以按需调用角色层 helper，但不会再展开成新的顶层流程。

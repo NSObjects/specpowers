@@ -2,10 +2,13 @@
 
 SpecPowers skills usually name Claude Code tools. In Codex, translate them as follows.
 
+Codex supports subagent dispatch natively. Use `spawn_agent` to dispatch and `wait_agent` to collect results.
+
 | Skill reference | Codex equivalent |
 | --- | --- |
 | `Skill` | Native skill discovery/load. Follow the loaded skill content. |
-| `Agent` or legacy `Task` | `spawn_agent`. Use `wait_agent` for results and `close_agent` when finished. |
+| `Agent` tool (dispatch subagent) | `spawn_agent`. Use `wait_agent` for results and `close_agent` when finished. |
+| legacy `Task` | Treat as `Agent` and use `spawn_agent`. |
 | Multiple `Agent` calls | Multiple `spawn_agent` calls, then `wait_agent` for each. |
 | `TodoWrite` | `update_plan`. |
 | `Read`, `Write`, `Edit` | Native file tools. |
@@ -17,7 +20,7 @@ If a Codex environment does not expose subagent tools, do not invent a prerequis
 
 Claude Code skills may reference named agents such as `specpowers:code-reviewer`. Codex does not have a named SpecPowers agent registry. Dispatch named agents manually:
 
-1. Find the referenced prompt file, for example `skills/requesting-code-review/code-reviewer-prompt.md`.
+1. Find the referenced prompt file. For task-internal code quality review, use `skills/spec-driven-development/code-quality-reviewer-prompt.md`. For standalone review, use `skills/requesting-code-review/code-reviewer-prompt.md`.
 2. Read the prompt content.
 3. Fill all template placeholders such as `{BASE_SHA}` and `{WHAT_WAS_IMPLEMENTED}`.
 4. Spawn a `worker` agent with the filled prompt as the message.
@@ -25,7 +28,8 @@ Claude Code skills may reference named agents such as `specpowers:code-reviewer`
 
 | Skill instruction | Codex execution |
 | --- | --- |
-| `Agent tool (specpowers:code-reviewer)` | `spawn_agent(agent_type="worker", message=<filled code-reviewer prompt>)` |
+| `Agent tool (specpowers:code-reviewer)` in `spec-driven-development` | `spawn_agent(agent_type="worker", message=<filled skills/spec-driven-development/code-quality-reviewer-prompt.md>)` |
+| `Agent tool (specpowers:code-reviewer)` in `requesting-code-review` | `spawn_agent(agent_type="worker", message=<filled skills/requesting-code-review/code-reviewer-prompt.md>)` |
 | `Agent tool (general-purpose)` with inline prompt | `spawn_agent(message=<same inline prompt>)` |
 
 ## Message Framing for Subagents

@@ -5,7 +5,7 @@ description: Use when the user asks for a standalone code review, before merge, 
 
 # Requesting Code Review
 
-Use this skill to run a standalone code review through the single user-facing review entrypoint. The main agent owns orchestration, sends a bounded review package to the reviewer, integrates any specialist findings, and returns one consolidated decision to the user.
+Use this skill to run a standalone code review through the single surfaced entrypoint. The main agent owns orchestration, sends a bounded review package to the reviewer, integrates any specialist reviewer findings, and returns one consolidated decision to the user.
 
 The reviewer receives only the packaged review context, not the full session history. This keeps review focused on the implementation, specification, and changed code rather than on the main agent's reasoning process.
 
@@ -36,9 +36,11 @@ Specialist reviewers deepen a scoped risk area. They do not become separate user
 
 Use the platform's closest equivalent review mechanism:
 
+Claude Code: use `Agent` tool with `specpowers:code-reviewer`; legacy `Task` references are compatible aliases.
+
 | Platform | Dispatch method |
 |---|---|
-| Claude Code | Use `Agent` with `specpowers:code-reviewer`. Treat legacy `Task` references as compatible aliases. |
+| Claude Code | Use `Agent` tool with `specpowers:code-reviewer`. Treat legacy `Task` references as compatible aliases. |
 | Codex | Use `spawn_agent(agent_type="worker", message=...)` with the filled `./code-reviewer-prompt.md`. |
 
 ## Review Package Requirements
@@ -74,7 +76,7 @@ If the change includes uncommitted work, either commit it before review or expli
 4. **Collect test context.** Include relevant test commands already run and their results. If no tests were run, state that plainly.
 5. **Fill `./code-reviewer-prompt.md`.** Replace all placeholders with concrete values.
 6. **Dispatch or review inline.** Use the platform dispatch table above.
-7. **Synthesize findings.** Return one consolidated result to the user.
+7. **Synthesize findings.** Return one consolidated result to the user with a single final conclusion.
 
 ## Specialist Escalation
 

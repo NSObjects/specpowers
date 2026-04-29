@@ -142,9 +142,9 @@ Implementation research is allowed only to improve exploration quality. It does 
 
 ### Platform dispatch
 
-Use the filled `./implementation-researcher-prompt.md` template when delegating research.
+Use the filled `./implementation-researcher-prompt.md` template when delegating research. This is optional subagent delegation for bounded research only.
 
-- **Claude Code:** use `Agent` with the general-purpose agent. `Task` may exist as a backward-compatible alias in older environments.
+- Claude Code: use the `Agent` tool with the general-purpose agent. `Task` may exist as a backward-compatible alias in older environments.
 - **Codex:** use `spawn_agent(message=...)`.
 
 The main agent remains responsible for synthesis, recommendation, and user alignment.

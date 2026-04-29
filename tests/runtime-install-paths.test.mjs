@@ -58,7 +58,9 @@ test('runtime entrypoints use managed install directories', async (t) => {
   await t.test('Claude Code install docs include the managed install bootstrap step', () => {
     const content = readFileSync(resolve(ROOT, '.claude-plugin/INSTALL.md'), 'utf-8');
     assert.ok(content.includes('node scripts/install.js --platform claude-code --profile developer'));
-    assert.ok(content.includes('not source content'));
+    assert.match(content, /local install\s+artifacts?/i);
+    assert.match(content, /not authored source/i);
+    assert.ok(!content.includes('not source content'));
   });
 
   await t.test('README documents Codex default skills discovery without materialization', () => {

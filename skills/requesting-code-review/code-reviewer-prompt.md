@@ -39,6 +39,10 @@ Then:
 - Inspect edge cases around inputs, state transitions, errors, concurrency, persistence, and compatibility.
 - Run the smallest relevant test set when practical; otherwise inspect test code and note that tests were not executed.
 
+## Review Process
+
+Perform the two stages below and report one decision.
+
 ## Stage 1: Spec Compliance
 
 For each Spec Scenario, verify both implementation behavior and test coverage.

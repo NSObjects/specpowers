@@ -1,6 +1,6 @@
 ---
 name: specifying
-description: "Use after a change intent or proposal has been accepted, before design or coding, when expected system behavior must be defined as precise, reviewable, testable requirements with GIVEN/WHEN/THEN scenarios. Produces specs under specs/changes/<change-name>/specs/."
+description: "Use when an accepted change intent needs precise, reviewable, testable behavioral requirements before design or coding."
 ---
 
 # Specifying Behavior

@@ -67,6 +67,8 @@ Run commands from the repository root unless the project layout clearly requires
 
 Use non-interactive commands. Avoid watch mode, prompts, or commands that mutate source files unless the user explicitly asked for fixes.
 
+A single feature-group change still requires a final `verification-loop` pass before completion is claimed.
+
 ---
 
 ## Toolchain Detection

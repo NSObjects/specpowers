@@ -21,7 +21,7 @@ const sourceExpectations = [
   ['skills/spec-driven-development/spec-reviewer-prompt.md', /^Agent tool \(general-purpose\):/m],
   [
     'skills/spec-driven-development/code-quality-reviewer-prompt.md',
-    /^Agent tool \(specpowers:code-reviewer subagent\):/m,
+    /^Agent tool \(specpowers:code-reviewer\):/m,
   ],
   ['skills/dispatching-parallel-agents/SKILL.md', /Agent\("Fix agent-tool-abort\.test\.ts failures"\)/],
   ['skills/using-skills/SKILL.md', /`Agent` tool \(or legacy `Task` references\)/],
@@ -35,7 +35,7 @@ const materializedRelativePaths = [
   ['.codex/skills/spec-driven-development/spec-reviewer-prompt.md', /^Agent tool \(general-purpose\):/m],
   [
     '.codex/skills/spec-driven-development/code-quality-reviewer-prompt.md',
-    /^Agent tool \(specpowers:code-reviewer subagent\):/m,
+    /^Agent tool \(specpowers:code-reviewer\):/m,
   ],
   ['.codex/skills/dispatching-parallel-agents/SKILL.md', /Agent\("Fix agent-tool-abort\.test\.ts failures"\)/],
   ['.codex/skills/using-skills/SKILL.md', /`Agent` tool \(or legacy `Task` references\)/],
@@ -58,6 +58,11 @@ test('source skills prefer current Claude Code Agent terminology', () => {
     /^\| `Task` tool \(dispatch subagent\) \|/m,
     'codex mapping should not present Task as the primary Claude Code tool name',
   );
+  assert.doesNotMatch(
+    read('skills/spec-driven-development/code-quality-reviewer-prompt.md'),
+    /specpowers:code-reviewer subagent/,
+    'code reviewer agent type should stay exactly specpowers:code-reviewer',
+  );
 });
 
 test('materialized codex skills stay aligned with Agent terminology', async () => {
@@ -77,6 +82,11 @@ test('materialized codex skills stay aligned with Agent terminology', async () =
       readMaterialized(tmp, '.codex/skills/using-skills/references/codex-tools.md'),
       /^\| `Task` tool \(dispatch subagent\) \|/m,
       'materialized codex mapping should not present Task as the primary Claude Code tool name',
+    );
+    assert.doesNotMatch(
+      readMaterialized(tmp, '.codex/skills/spec-driven-development/code-quality-reviewer-prompt.md'),
+      /specpowers:code-reviewer subagent/,
+      'materialized code reviewer agent type should stay exactly specpowers:code-reviewer',
     );
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });

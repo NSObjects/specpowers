@@ -1,42 +1,49 @@
-# 为 Claude Code 安装 SpecPowers
+# Installing SpecPowers for Claude Code
 
-Claude Code 只支持通过 SpecPowers plugin 使用。本插件从 `.claude/skills/`
-读取受管技能产物；安装插件前，必须先从源码 `skills/` 生成该目录。
+Claude Code is supported through the SpecPowers plugin only. The plugin reads
+managed skill payloads from `.claude/skills/`; before installing the plugin,
+generate that directory from the authored `skills/` source tree.
 
-## 前置条件
+## Prerequisites
 
 - Git
-- 支持 plugin 的 Claude Code
+- Claude Code with plugin support
 - Node.js
 
-## 插件安装
+## Plugin Install
 
-### 1. 克隆仓库
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/NSObjects/specpowers ~/.claude/plugins/specpowers
 ```
 
-### 2. 生成受管技能产物
+### 2. Generate the managed skill payload
 
 ```bash
 cd ~/.claude/plugins/specpowers
 node scripts/install.js --platform claude-code --profile developer
 ```
 
-这会从 `skills/` 生成 `.claude/skills/`。不要手工维护 `.claude/skills/`。
+This generates `.claude/skills/` from `skills/`. Do not maintain
+`.claude/skills/` by hand.
 
-安装命令还会在 `manifests/install-state/` 下写入本地状态。该状态只记录当前生成的插件产物，不是源码。
+The install command also writes local state under `manifests/install-state/`.
+That state records the generated plugin payload only; it is a local install
+artifact, not authored source.
 
-### 3. 安装插件
+### 3. Install the plugin
 
-使用 Claude Code 的 plugin marketplace 流程安装这个本地插件。插件元数据会指向已生成的 `.claude/skills/` 产物和 `hooks/hooks.json`。
+Use Claude Code's plugin marketplace flow to install this local plugin. The
+plugin metadata points to the generated `.claude/skills/` payload and
+`hooks/hooks.json`.
 
-### 4. 验证
+### 4. Verify
 
-开启新会话并说“我想做 X”。工作流应该从 `exploring` 开始。
+Start a new session and say "I want to build X". The workflow should begin with
+`exploring`.
 
-## 更新
+## Updating
 
 ```bash
 cd ~/.claude/plugins/specpowers
@@ -44,12 +51,12 @@ git pull
 node scripts/install.js --platform claude-code --profile developer
 ```
 
-重新生成受管产物后，重启 Claude Code。
+Restart Claude Code after regenerating the managed payload.
 
-## 卸载
+## Uninstalling
 
-1. 在 Claude Code 的 Plugins UI 中禁用或移除 `specpowers`。
-2. 如有需要，删除本地克隆：
+1. Disable or remove `specpowers` in Claude Code's Plugins UI.
+2. Optionally delete the local clone:
 
 ```bash
 rm -rf ~/.claude/plugins/specpowers

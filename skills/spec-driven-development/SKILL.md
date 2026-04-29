@@ -1,7 +1,7 @@
 ---
 name: spec-driven-development
 summary: Execute an approved specification plan task-by-task with TDD, spec traceability, staged review, and user-controlled commits.
-description: "Use when a change already has an approved task plan, usually specs/changes/<change-name>/tasks.md, and the user wants implementation to begin or resume. This skill is for execution, not planning, proposal editing, or spec rewriting."
+description: "Use when an approved task plan exists and the user wants implementation to begin or resume."
 ---
 
 # Spec-Driven Development
@@ -29,6 +29,7 @@ The only permitted edit to `tasks.md` during this skill is changing a completed 
 - **Change:** The active spec change being implemented, usually under `specs/changes/<change-name>/`.
 - **Task:** One unchecked item in `tasks.md`. A task is the smallest unit of uninterrupted execution.
 - **Feature group:** A group of tasks that share the same top-level number, for example `1.1`, `1.2`, and `1.3` belong to feature group `1`. If tasks are organized by headings instead of numbers, treat each heading section as a feature group.
+- **Subtask:** A task inside a feature group for verification-boundary purposes.
 - **Linked Spec Scenarios:** The GIVEN/WHEN/THEN scenarios explicitly referenced by the task. If a task does not list scenario references, infer the closest scenarios from the Spec and state the inference in the task report.
 - **Controller:** The main agent running this skill.
 - **Worker:** A subagent or the controller acting directly to implement a task.
@@ -59,7 +60,7 @@ Use Fast Mode only when the user explicitly asks for it. Otherwise use Step-by-S
    - otherwise → Step-by-Step Mode
 5. Determine execution mechanism:
    - if the platform supports subagents, dispatch workers/reviewers using the prompt templates in this skill directory
-   - otherwise execute and review inline using the self-checks below
+   - otherwise execute and review inline using the self-checks below, and report that fallback explicitly
 6. Find the first unchecked task. If no unchecked tasks remain, run the final completion checks and report that implementation is complete.
 
 ## Subagent Dispatch
@@ -69,6 +70,13 @@ Use subagents when the platform supports them. Dispatch a fresh worker per task 
 - Implementer worker: `./implementer-prompt.md`
 - Stage 1 reviewer: `./spec-reviewer-prompt.md`
 - Stage 2 reviewer: `./code-quality-reviewer-prompt.md`
+
+Review dispatch is mandatory after implementation reaches GREEN and before `tasks.md` is updated.
+
+- On subagent-capable platforms, dispatch both reviewer stages as separate review steps and wait for their results.
+- Do not replace reviewer dispatch with inline self-check merely because the task seems simple or the controller already inspected the code.
+- If reviewer dispatch is unavailable or fails for platform/tooling reasons, the controller may use the inline self-checks below, but must report the fallback reason and the exact self-check result.
+- Each reviewer package must include the task, linked scenarios, changed files or diff summary, relevant test results, and the implementer report.
 
 If subagents are unavailable, the controller performs the same work inline. Do not skip either review stage merely because subagents are unavailable.
 
@@ -123,8 +131,8 @@ For each task:
 
    Purpose: verify the implementation matches the requested Spec exactly — complete, no missing requirements, no extra behavior.
 
-   - With subagents: dispatch `./spec-reviewer-prompt.md`.
-   - Without subagents: run the Spec Compliance Self-Check below.
+   - With subagents: dispatch `./spec-reviewer-prompt.md` and wait for `PASS`.
+   - Without subagents: run the Spec Compliance Self-Check below and record the fallback reason.
 
    If Stage 1 finds issues, fix them, rerun relevant tests, and repeat Stage 1. Do not start Stage 2 until Stage 1 passes.
 
@@ -132,14 +140,14 @@ For each task:
 
    Purpose: verify the implementation is maintainable, idiomatic, tested, and safe.
 
-   - With subagents: dispatch `./code-quality-reviewer-prompt.md`.
-   - Without subagents: run the Code Quality Self-Check below.
+   - With subagents: dispatch `./code-quality-reviewer-prompt.md` and wait for `APPROVED`.
+   - Without subagents: run the Code Quality Self-Check below and record the fallback reason.
 
    If Stage 2 finds blocking issues, fix them, rerun relevant tests, and repeat Stage 2. If a Stage 2 fix changes behavior or public interfaces, rerun Stage 1 as well.
 
 6. **Milestone verification**
 
-   If this task is the final task in its feature group, run `specpowers:verification-loop` for that feature group. Do not start the next feature group until the verification result exists and passes.
+   If this task is the last subtask in a feature group, run `verification-loop` for that feature group. Intermediate subtasks do not trigger `verification-loop` by count alone. Do not start the next feature group until the verification result exists and passes.
 
 7. **Mark task complete**
 
@@ -180,8 +188,9 @@ When the user says to continue, resume from the first unchecked task. Do not re-
 - ✅ Scenario "[name]" — GIVEN/WHEN/THEN covered by `[test name or file]`
 
 **Reviews**
-- Stage 1 — Spec Compliance: ✅ Passed
-- Stage 2 — Code Quality: ✅ Passed
+- Stage 1 — Spec Compliance: ✅ Passed (`spec-reviewer`, scope: [task/diff/files] | inline fallback: [reason])
+- Stage 2 — Code Quality: ✅ Passed (`code-quality-reviewer`, scope: [task/diff/files] | inline fallback: [reason])
+- Review evidence: [reviewer result summary, rerun count, or self-check evidence]
 - Fixed review issues: [none | summary]
 
 **Verification**
@@ -197,7 +206,9 @@ When the user says to continue, resume from the first unchecked task. Do not re-
 
 Execute every unchecked task using the full Task Execution Protocol.
 
-Before entering a new feature group, confirm the previous feature group has passed `verification-loop`. After all tasks are complete, run a final global `verification-loop`.
+Before starting the next feature group, confirm the current feature group has a passing `verification-loop` result. If the result is missing or failed, do not proceed to the next feature group.
+
+After all feature groups are complete, run a final `verification-loop` before the final completion report.
 
 ### Fast Mode Final Report Format
 
@@ -216,6 +227,7 @@ Before entering a new feature group, confirm the previous feature group has pass
 **Reviews**
 - Stage 1 Spec Compliance: ✅ all tasks passed
 - Stage 2 Code Quality: ✅ all tasks passed
+- Review evidence: [per-task reviewer summaries or inline fallback reasons]
 
 **Verification**
 - Feature groups: ✅ all passed
@@ -305,6 +317,7 @@ If implementation reveals a Spec/Design conflict:
 - Never skip TDD for behavior-changing work.
 - Never modify Spec, Design, or Proposal during implementation.
 - Never skip Stage 1 before Stage 2.
+- Never replace reviewer dispatch with inline self-check on a subagent-capable platform unless dispatch is unavailable or failed, and the fallback is reported.
 - Never report a task complete while Stage 1, Stage 2, required tests, or due milestone verification are failing.
 - Never treat a worker report as proof. Verify code and tests directly.
 - Never ignore user feedback. If the user says the result is wrong, stop the normal flow and address it.

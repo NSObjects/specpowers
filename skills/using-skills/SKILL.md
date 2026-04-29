@@ -51,6 +51,8 @@ If the named tool is unavailable in the current environment, use the closest nat
 
 Load the relevant reference file only when the current environment or a loaded skill needs platform-specific translation:
 
+For `Agent` tool (or legacy `Task` references), use the platform reference below before dispatching subagents.
+
 | Reference file | Use when |
 | --- | --- |
 | `references/claude-code-tools.md` | Running in Claude Code, handling `Skill`, `Agent`, `Task`, `TodoWrite`, `Task*`, subagent, or plugin instructions. |

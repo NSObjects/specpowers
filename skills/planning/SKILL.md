@@ -1,6 +1,6 @@
 ---
 name: planning
-description: "Use after specs and design are approved to convert them into a traceable, bite-sized, test-first implementation plan."
+description: "Use when approved requirements and design need a traceable, bite-sized, test-first implementation plan."
 ---
 
 # Planning Skill
@@ -16,7 +16,7 @@ Use this skill when requirements/spec scenarios and the design direction are alr
 ## Hard Gates
 
 - Do **not** write implementation code in this skill.
-- Do **not** proceed to implementation without explicit user aapproval of the plan.
+- Do **not** proceed to implementation without explicit user approval of the plan.
 - Read the relevant specs, design, and existing code before writing tasks. If a required source cannot be found, ask one focused question instead of inventing details.
 - Every task must include a `Covers specs:` field.
 - Business-logic, validation, error-handling, integration, and UI tasks must map to at least one concrete Spec Scenario.
@@ -128,7 +128,7 @@ Tasks must be ordered so that each completed task leaves the project in a workin
 
 ## Task Format
 
-Use `## N. [Module or Feature Boundary]` for a feature group. Use `### Task N.M: [Specific behavior]` for each task.
+Use `## N. [Module or Feature Boundary]` for a feature group. `## 1. [Module Name]` is the canonical feature group heading shape. Use `### Task N.M: [Specific behavior]` for each task; `Task N.M` entries are subtasks within that feature group.
 
 ````markdown
 # Tasks

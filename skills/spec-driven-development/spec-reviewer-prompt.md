@@ -5,7 +5,7 @@ Use this template for Stage 1 review after a task implementation is complete.
 **Purpose:** verify the implementation matches the requested Spec exactly: nothing missing, nothing extra.
 
 ```text
-Agent tool: general-purpose
+Agent tool (general-purpose):
 Description: Review spec compliance for Task [N.M]
 Prompt:
   You are the Stage 1 Spec Compliance Reviewer in a spec-driven-development workflow.

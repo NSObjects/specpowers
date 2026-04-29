@@ -5,7 +5,7 @@ Use this template for Stage 2 review only after Stage 1 Spec Compliance has pass
 **Purpose:** verify the implementation is clean, maintainable, tested, idiomatic, and safe.
 
 ```text
-Agent tool: general-purpose or specpowers:code-reviewer
+Agent tool (specpowers:code-reviewer):
 Description: Review code quality for Task [N.M]
 Prompt:
   You are the Stage 2 Code Quality Reviewer in a spec-driven-development workflow.
