@@ -35,6 +35,16 @@ test('runtime entrypoints use managed install directories', async (t) => {
     assert.ok(content.includes('node scripts/install.js --platform codex --profile developer'));
   });
 
+  await t.test('Codex install docs use the home-local marketplace plugin path', () => {
+    const content = readFileSync(resolve(ROOT, '.codex/INSTALL.md'), 'utf-8');
+
+    assert.ok(content.includes('git clone https://github.com/NSObjects/specpowers ~/plugins/specpowers'));
+    assert.ok(content.includes('mkdir -p ~/plugins'));
+    assert.ok(content.includes('"path": "./plugins/specpowers"'));
+    assert.ok(!content.includes('~/.codex/plugins/specpowers'));
+    assert.ok(!content.includes('./.codex/plugins/specpowers'));
+  });
+
   await t.test('Claude Code install docs include the managed install bootstrap step', () => {
     const content = readFileSync(resolve(ROOT, '.claude-plugin/INSTALL.md'), 'utf-8');
     assert.ok(content.includes('node scripts/install.js --platform claude-code --profile developer'));

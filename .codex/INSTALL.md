@@ -14,19 +14,20 @@ tree before installing the plugin.
 
 ## Plugin Install
 
-Registers SpecPowers in Codex's plugin directory via a marketplace.
+Registers SpecPowers as a home-local or workspace-local Codex plugin via a
+marketplace.
 
 ### 1. Clone the repository
 
 ```bash
-mkdir -p ~/.codex/plugins
-git clone https://github.com/NSObjects/specpowers ~/.codex/plugins/specpowers
+mkdir -p ~/plugins
+git clone https://github.com/NSObjects/specpowers ~/plugins/specpowers
 ```
 
 ### 2. Generate the managed skills
 
 ```bash
-cd ~/.codex/plugins/specpowers
+cd ~/plugins/specpowers
 node scripts/install.js --platform codex --profile developer
 ```
 
@@ -42,7 +43,7 @@ Codex supports two marketplace scopes. Choose one based on your needs:
 
 | Scope | Marketplace file | `source.path` | Use case |
 |-------|-----------------|---------------|----------|
-| Personal | `~/.agents/plugins/marketplace.json` | `./.codex/plugins/specpowers` | Available across all your repos |
+| Personal | `~/.agents/plugins/marketplace.json` | `./plugins/specpowers` | Available across all your repos |
 | Workspace | `$REPO_ROOT/.agents/plugins/marketplace.json` | `./plugins/specpowers` | Shared with team via version control |
 
 > Codex resolves `source.path` relative to the marketplace root (home directory for personal, repo root for workspace). Paths must start with `./`.
@@ -62,7 +63,7 @@ Add the following entry. If the marketplace file does not exist, create it with 
       "name": "specpowers",
       "source": {
         "source": "local",
-        "path": "./.codex/plugins/specpowers"
+        "path": "./plugins/specpowers"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -94,10 +95,12 @@ Start a new thread and say "I want to build X". The workflow should begin with `
 ### Updating
 
 ```bash
-cd ~/.codex/plugins/specpowers && git pull
+cd ~/plugins/specpowers
+git pull
+node scripts/install.js --platform codex --profile developer
 ```
 
-Restart Codex to pick up the latest files.
+Restart Codex to pick up the latest generated plugin payload.
 
 ### Uninstalling
 
@@ -106,5 +109,5 @@ Restart Codex to pick up the latest files.
 3. Optionally delete the clone:
 
 ```bash
-rm -rf ~/.codex/plugins/specpowers
+rm -rf ~/plugins/specpowers
 ```
