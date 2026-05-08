@@ -40,4 +40,8 @@ test('distribution metadata versions stay aligned with package.json', async (t) 
     assert.equal(plugin.version, packageVersion);
   });
 
+  await t.test('marketplace name matches the public upgrade command', () => {
+    assert.equal(readJson('.claude-plugin/marketplace.json').name, 'specpowers');
+  });
+
 });

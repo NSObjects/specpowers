@@ -178,6 +178,28 @@ test('receiving-code-review routes review comment acquisition by platform', () =
   );
 });
 
+test('receiving-code-review discovers review comments from repository context before asking', () => {
+  const content = read('skills/receiving-code-review/SKILL.md');
+  const acquisition = content.split('## Review Comment Acquisition')[1]?.split('## Default Workflow')[0] ?? '';
+
+  assert.ok(
+    acquisition.includes('current repository context'),
+    'receiving-code-review should explicitly use current repository context when no comments are pasted',
+  );
+  assert.ok(
+    acquisition.includes('active branch') && acquisition.includes('repository remote'),
+    'receiving-code-review should use the active branch and repository remote as discovery signals',
+  );
+  assert.ok(
+    acquisition.includes('discover an associated pull request or merge request'),
+    'receiving-code-review should try to discover the associated review before asking the user',
+  );
+  assert.ok(
+    acquisition.includes('Only ask the user after'),
+    'receiving-code-review should ask for missing input only after discovery cannot identify comments',
+  );
+});
+
 test('receiving-code-review acquisition guidance avoids rigid step scripts', () => {
   const content = read('skills/receiving-code-review/SKILL.md');
   const acquisition = content.split('## Review Comment Acquisition')[1]?.split('## Default Workflow')[0] ?? '';

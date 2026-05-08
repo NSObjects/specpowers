@@ -75,13 +75,13 @@ Claude Code 本地插件安装在首次使用前生成一次受管产物：
 node scripts/install.js --platform claude-code --profile developer
 ```
 
-Codex 插件安装使用 sparse 插件检出，并通过默认插件发现直接读取该检出里的 `skills/` 目录，因此不生成 `.codex/skills/`。
+Codex 插件安装使用 `codex plugin marketplace`，并通过默认插件发现直接读取插件检出里的 `skills/` 目录，因此不生成 `.codex/skills/`。
 
 生成的 Claude Code 插件技能产物和 `manifests/install-state/` 状态文件属于本地安装产物，不是源码。
 
 ### 语言规则
 
-Claude Code 插件技能产物在安装阶段生成。`developer` 配置默认包含 `rules-common`；语言特定规则需要在生成受管产物时显式加入。Codex 直接从 sparse 插件检出的 `skills/` 读取源码规则。
+Claude Code 插件技能产物在安装阶段生成。`developer` 配置默认包含 `rules-common`；语言特定规则需要在生成受管产物时显式加入。Codex 直接从 marketplace 插件检出的 `skills/` 读取源码规则。
 
 ```bash
 node scripts/install.js --platform claude-code --profile developer --add rules-typescript

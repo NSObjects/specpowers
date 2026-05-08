@@ -19,6 +19,7 @@ Before evaluating review feedback, make sure the actual comments are available.
 
 - If the user pasted review comments, use those comments directly.
 - If the user provided a review link, merge request ID, pull request ID, or equivalent review identifier, use the configured review source to fetch the comments before evaluating them.
+- If the user did not paste comments or an identifier, first use the current repository context and configured review source to try to find the active review before asking the user to supply comments.
 - If the configured review source is unavailable, lacks permission, or cannot fetch comments for that review system, ask the user for the missing comments, link, review identifier, platform, or permissions needed to continue.
 - Do not invent, infer, or simulate review comments. Missing review input is a blocker, not an invitation to guess.
 
@@ -27,9 +28,11 @@ Before evaluating review feedback, make sure the actual comments are available.
 When review comments are not already pasted into the conversation, treat acquisition as source lookup rather than a fixed script. Prefer this order:
 
 - Start from the most concrete signal available: pasted comments, review link, merge request ID, pull request ID, repository remote, or user-provided platform context.
+- When only current repository context is available, use the active branch, upstream branch if present, repository remote, and existing platform context to discover an associated pull request or merge request before asking for pasted comments.
 - When the review source has a native repository or code-host integration, use it to collect pull request or merge request review comments, conversation comments, and inline threads.
 - Otherwise, use the configured MCP or platform integration for that host to collect the same review comment set.
 - Collect the review-level comments and inline or threaded discussions that are accessible through the chosen integration. Follow pagination when the platform exposes it.
+- Only ask the user after repository-context discovery cannot identify a review, the available review source cannot fetch comments, or a required source, tool, permission, or identifier is missing.
 - If the source, tool, permission, or identifier is missing, ask only for the missing piece and wait. Do not continue with guessed feedback.
 
 ## Default Workflow
