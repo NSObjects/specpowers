@@ -33,6 +33,7 @@
         "skills/requesting-code-review",
         "skills/receiving-code-review",
         "skills/verification-before-completion",
+        "skills/confidence-loop",
         "skills/selective-install"
       ],
       "targets": [

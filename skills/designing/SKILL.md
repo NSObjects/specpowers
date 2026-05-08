@@ -15,6 +15,7 @@ Define **how** to implement the specified behavior. Technical decisions, archite
 Do NOT write actual code (code snippets for illustration are fine).
 Do NOT skip specs — read ALL specs before designing.
 Every Requirement in the specs MUST have a corresponding technical approach in the design.
+Do NOT continue designing when the specs are not adequate; return to `specifying` or an earlier stage when behavior is still unclear.
 Do NOT proceed to planning without user confirmation.
 </HARD-GATE>
 
@@ -29,6 +30,27 @@ Do NOT proceed to planning without user confirmation.
 7. **Self-review** — verify all Requirements are covered, patterns are followed
 8. **User confirms** — wait for explicit approval
 9. **Transition** — invoke `planning` skill
+
+## Spec Adequacy Gate
+
+Before making technical decisions, inspect the approved specifications for adequacy.
+
+Adequate specifications must provide enough behavior detail for design to trace every Requirement to a technical approach:
+
+- each in-scope behavior has a concrete Requirement;
+- each active Requirement has happy-path and edge or error coverage;
+- key terms, actors, boundaries, and observable outcomes are defined;
+- no behavior-affecting open question remains.
+
+Stop designing and return to `specifying` or an earlier stage if the specs contain any of these blockers:
+
+- unresolved behavioral questions;
+- undefined terms;
+- missing edge or error scenarios;
+- unclear boundaries;
+- abstract expected outcomes.
+
+When this gate fails, report the specific Requirement or Scenario that is blocked and the missing behavioral detail. Do not fill the gap with a technical assumption.
 
 ## Design for Isolation and Clarity
 

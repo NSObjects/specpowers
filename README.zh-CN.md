@@ -35,7 +35,7 @@ AI:  ✅ 任务 3 — RED → GREEN → 代码审查: APPROVED
      🎉 全部完成。说 "Archive" 合并规范。
 ```
 
-AI 永远不会执行 git 命令。每个任务完成后由你 review 和 commit。
+AI 不会执行会修改 git 状态的操作，例如 commit、reset、checkout、rebase、merge、push、stash 或 git add；只读检查如 `git status`、`git diff` 可以在有用时使用。每个任务完成后由你 review 和 commit。
 如果你是从已有 `tasks.md` 恢复执行，执行开始或恢复前，先选择 `Step-by-Step` 或 `Fast`。
 
 对于复杂需求，`exploring` 可以按需研究现有实现，或委派受限研究子任务，但这仍然属于 `exploring` 内部能力，不会变成额外流程阶段。
@@ -111,6 +111,7 @@ node scripts/install.js --platform claude-code --profile developer --add rules-t
 | `test-driven-development` | RED → GREEN → REFACTOR，没有例外 |
 | `verification-loop` | 6 阶段管道：构建 → 类型 → Lint → 测试 → 安全 → Diff |
 | `quality-gate` | 编辑后快速 lint/类型检查 |
+| `confidence-loop` | 完成或批准声明前的证据边界疑点循环 |
 | `systematic-debugging` | 四阶段根因分析 |
 
 ### 语言规则
@@ -174,7 +175,7 @@ flowchart TD
 - **TDD 是强制的** — 每个任务从失败的测试开始
 - **证据优于声明** — 证明能用再往下走
 - **研究内嵌而非独立阶段** — 在关键决策阶段研究已有方案，而不是额外分叉一条流程
-- **你掌控 git** — AI 永远不 commit，你 review 一切
+- **你掌控 git** — AI 不 commit、不修改 git 状态；只读检查允许，你 review 一切
 - **角色隔离** — AI 在每个阶段扮演受限角色（采访者、架构师、开发者……）
 - **存量优先** — 为已有代码库而生，新项目同样好用
 

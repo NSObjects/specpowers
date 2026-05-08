@@ -63,11 +63,28 @@ Do not overuse this skill for already-specific implementation requests. If the r
 
 6. **Confirm alignment**
     - Restate the agreed problem, scope, non-goals, constraints, and recommended direction.
+    - Present the Alignment Checkpoint below before asking to proceed.
     - Ask whether to proceed to `proposing`.
 
 7. **Transition**
     - Only after the user confirms, invoke `proposing`.
     - Do not invoke implementation skills from `exploring`.
+
+## Alignment Checkpoint
+
+Before leaving `exploring`, present a user-reviewable alignment checkpoint that includes:
+
+- **problem statement:** the concrete problem or outcome being pursued;
+- **target users:** who uses or benefits from the change;
+- **primary workflow:** what happens before, during, and after the change;
+- **inputs and outputs:** the important information, actions, artifacts, or visible results involved;
+- **in-scope behavior:** what the first change will cover;
+- **out-of-scope behavior:** what will explicitly not be covered;
+- **constraints:** technical, product, security, compatibility, schedule, or operational limits;
+- **failure modes:** expected invalid states, errors, blocked paths, or unavailable dependencies;
+- **open questions:** remaining decisions, separated into blocking and non-blocking questions.
+
+Behavior-affecting open questions block transition. If any open question can change user-visible behavior, scope boundaries, permissions, failure outcomes, or success criteria, ask one focused clarification question or state the blocker. Do not create `proposal.md` until the blocker is resolved or the user explicitly narrows the scope to exclude it.
 
 ## Scope Assessment
 
@@ -155,8 +172,10 @@ Exploration is complete only when all of these are true:
 
 - The problem statement is clear.
 - The user and primary workflow are clear enough to propose against.
+- Inputs, outputs, in-scope behavior, out-of-scope behavior, constraints, and failure modes have been stated.
 - Scope and non-goals are explicit.
 - Major constraints and risks are known or deliberately deferred.
+- Behavior-affecting open questions have been resolved, or the user has explicitly excluded them from the first change.
 - A recommended approach has been presented with alternatives.
 - The user has agreed to proceed to `proposing`.
 

@@ -127,7 +127,13 @@ For each task:
 
    For tasks that are genuinely not behavior-changing, create the closest meaningful verification first, such as a compile check, configuration validation, migration test, or fixture-based assertion. Do not pretend TDD occurred; state the verification strategy clearly.
 
-4. **Stage 1: Spec Compliance Review**
+4. **Evidence-bound confidence loop**
+
+   Run or verify `specpowers:confidence-loop` over the task scope after GREEN/refactor and before Stage 1 review. The loop must list concrete doubts raised by the diff, linked scenarios, tests, touched code paths, user feedback, review feedback, and stated risks.
+
+   If an in-scope doubt is confirmed and fixable, fix it, rerun relevant verification, and repeat the loop. If the loop finds an unresolved confidence gap that prevents reliable judgment, stop and get the missing evidence or context before continuing.
+
+5. **Stage 1: Spec Compliance Review**
 
    Purpose: verify the implementation matches the requested Spec exactly — complete, no missing requirements, no extra behavior.
 
@@ -136,7 +142,7 @@ For each task:
 
    If Stage 1 finds issues, fix them, rerun relevant tests, and repeat Stage 1. Do not start Stage 2 until Stage 1 passes.
 
-5. **Stage 2: Code Quality Review**
+6. **Stage 2: Code Quality Review**
 
    Purpose: verify the implementation is maintainable, idiomatic, tested, and safe.
 
@@ -145,15 +151,17 @@ For each task:
 
    If Stage 2 finds blocking issues, fix them, rerun relevant tests, and repeat Stage 2. If a Stage 2 fix changes behavior or public interfaces, rerun Stage 1 as well.
 
-6. **Milestone verification**
+7. **Milestone verification**
 
    If this task is the last subtask in a feature group, run `verification-loop` for that feature group. Intermediate subtasks do not trigger `verification-loop` by count alone. Do not start the next feature group until the verification result exists and passes.
 
-7. **Mark task complete**
+8. **Mark task complete**
 
    After TDD, Stage 1, Stage 2, and any required feature-group verification pass, update `tasks.md` for this task from `- [ ]` to `- [x]`.
 
-8. **Report**
+   Do not mark `tasks.md` complete while any unresolved confidence gap remains.
+
+9. **Report**
 
    Use the Step-by-Step or Fast Mode report format below.
 
@@ -192,6 +200,7 @@ When the user says to continue, resume from the first unchecked task. Do not re-
 - Stage 2 — Code Quality: ✅ Passed (`code-quality-reviewer`, scope: [task/diff/files] | inline fallback: [reason])
 - Review evidence: [reviewer result summary, rerun count, or self-check evidence]
 - Fixed review issues: [none | summary]
+- Confidence Loop: [checked doubts | fixed issues | unresolved gaps: None]
 
 **Verification**
 - Feature-group verification: [not due | ✅ passed | details]
@@ -228,6 +237,7 @@ After all feature groups are complete, run a final `verification-loop` before th
 - Stage 1 Spec Compliance: ✅ all tasks passed
 - Stage 2 Code Quality: ✅ all tasks passed
 - Review evidence: [per-task reviewer summaries or inline fallback reasons]
+- Confidence Loop: ✅ all task scopes had no unresolved confidence gaps
 
 **Verification**
 - Feature groups: ✅ all passed
@@ -320,6 +330,7 @@ If implementation reveals a Spec/Design conflict:
 - Never skip Stage 1 before Stage 2.
 - Never replace reviewer dispatch with inline self-check on a subagent-capable platform unless dispatch is unavailable or failed, and the fallback is reported.
 - Never report a task complete while Stage 1, Stage 2, required tests, or due milestone verification are failing.
+- Never report or mark a task complete while an unresolved confidence gap remains.
 - Never treat a worker report as proof. Verify code and tests directly.
 - Never ignore user feedback. If the user says the result is wrong, stop the normal flow and address it.
 
@@ -347,6 +358,7 @@ If implementation reveals a Spec/Design conflict:
 - `specpowers:rules-{language}` — language-specific rules, for example `rules-golang`, `rules-typescript`, or `rules-python`.
 - `specpowers:verification-loop` — milestone and final verification pipeline.
 - `specpowers:requesting-code-review` — optional standalone review workflow outside this per-task flow.
+- `specpowers:confidence-loop` — evidence-bound loop for concrete doubts and unresolved confidence gaps before task completion.
 - `specpowers:archiving` — used only after all tasks are complete and the user asks to archive.
 
 After all tasks complete, tell the user:

@@ -33,6 +33,7 @@ Prompt:
   Before editing code, load or apply:
   - specpowers:rules-common
   - specpowers:test-driven-development
+  - specpowers:confidence-loop
   - specpowers:rules-{language} for the project's primary language
 
   If the platform cannot literally load these skills, apply their rules as review criteria.
@@ -62,7 +63,8 @@ Prompt:
   5. Run the targeted test and verify GREEN.
   6. Refactor only after GREEN, if needed.
   7. Rerun relevant tests/build checks.
-  8. Self-review before reporting.
+  8. Run the Evidence-Bound Confidence Loop for the task scope.
+  9. Self-review before reporting.
 
   For non-behavior-changing tasks, create the closest meaningful verification first, such as a compile check, config validation, migration test, fixture assertion, or static check. State clearly when classic RED/GREEN TDD was not applicable.
 
@@ -88,6 +90,12 @@ Prompt:
   - No mutating git commands were run.
 
   Fix any issues you find during self-review before reporting, unless fixing them would exceed the task boundary.
+
+  ## Confidence Loop Protocol
+
+  Before returning DONE, run specpowers:confidence-loop over the task scope. If an in-scope doubt is confirmed and fixable, fix it, rerun relevant tests, and repeat the loop. If missing context or missing evidence prevents reliable confidence, return NEEDS_CONTEXT or BLOCKED. If a real concern exists outside the task boundary, return DONE_WITH_CONCERNS and name the concern.
+
+  If any unresolved confidence gap remains, you must not return DONE.
 
   ## Report Format
 
@@ -119,6 +127,12 @@ Prompt:
 
   **Self-Review Findings**
   - [none, or concise findings]
+
+  **Confidence Loop**
+  - Scope: [task/diff/files reviewed]
+  - Concrete doubts checked: [summary]
+  - Fixed issues: [none or summary]
+  - Unresolved Confidence Gaps: [None, or exact missing evidence]
 
   **Concerns / Blockers / Needed Context**
   - [none, or precise issue and what help is needed]

@@ -25,6 +25,7 @@ Prompt:
 
   Before reviewing, load or apply:
   - specpowers:rules-common
+  - specpowers:confidence-loop
   - specpowers:rules-{language} for the project's primary language
 
   If an existing specpowers:requesting-code-review reviewer is available, you may use its review discipline, but this prompt is self-contained and sufficient.
@@ -72,6 +73,7 @@ Prompt:
   **Evidence-backed confidence**
   - Before returning APPROVED, ask whether you have 100% confidence, based on reviewed evidence, that no Critical or Important issue remains in this task scope.
   - Treat 100% confidence as evidence-bound, not omniscience: every concrete doubt raised by the diff, tests, task context, touched code paths, and stated risks has been investigated or reported.
+  - Apply specpowers:confidence-loop when available; use the same Unresolved Confidence Gaps definition.
   - Convert confirmed or likely problems into Issues.
   - Put missing evidence that prevents a reliable approval under Unresolved Confidence Gaps, with the exact evidence needed.
 

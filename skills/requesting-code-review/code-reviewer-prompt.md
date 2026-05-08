@@ -85,6 +85,8 @@ Before returning `APPROVED`, ask: **Do I have 100% confidence, based on reviewed
 
 Treat "100% confidence" as an evidence-bound gate, not omniscience. It means every concrete doubt raised by the diff, specification, tests, touched code paths, and stated risks has been investigated or reported.
 
+Apply `specpowers:confidence-loop` when available; this stage uses the same evidence-bound definition and **Unresolved Confidence Gaps** output.
+
 If the answer is no, repeat this loop:
 
 1. Identify every plausible defect, vulnerability, regression, or evidence gap that could matter within the reviewed scope.

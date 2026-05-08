@@ -35,7 +35,7 @@ AI:  ✅ Task 3 — RED → GREEN → Code Review: APPROVED
      🎉 All tasks complete. Say "Archive" to merge specs.
 ```
 
-The agent never runs git. You review and commit after each task.
+The agent does not mutate git state: no commits, resets, branch changes, pushes, or stash operations. Read-only inspection such as `git status` and `git diff` is allowed when useful. You review and commit after each task.
 If you resume a change from an existing `tasks.md`, choose `Step-by-Step` or `Fast` before execution begins or resumes.
 
 For complex requests, `exploring` may research existing implementations or delegate bounded research, but that stays inside `exploring` rather than becoming a separate workflow phase.
@@ -111,6 +111,7 @@ Start a new session and say "I want to build X". The agent should begin with `ex
 | `test-driven-development` | RED → GREEN → REFACTOR, no exceptions |
 | `verification-loop` | 6-stage pipeline: Build → Types → Lint → Tests → Security → Diff |
 | `quality-gate` | Fast lint/type checks after edits |
+| `confidence-loop` | Evidence-bound doubt loop before completion or approval claims |
 | `systematic-debugging` | 4-phase root cause analysis |
 
 ### Language Rules
@@ -174,7 +175,7 @@ Read it as one main workflow with attached gates and support roles:
 - **TDD is mandatory** — every task starts with a failing test
 - **Evidence over claims** — prove it works before moving on
 - **Research is embedded, not a phase** — investigate existing solutions inside decision-making stages instead of adding workflow branches
-- **You control git** — the agent never commits; you review everything
+- **You control git** — the agent never commits or mutates git state; read-only inspection is allowed, and you review everything
 - **Role isolation** — the AI plays a constrained role at each stage (interviewer, architect, developer…)
 - **Brownfield-first** — built for existing codebases, works great for greenfield too
 

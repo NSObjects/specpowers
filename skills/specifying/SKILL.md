@@ -29,7 +29,25 @@ Use the accepted proposal and repository context to determine:
 - In-scope behavior, out-of-scope behavior, success criteria, actors, triggers, business rules, permissions, validations, notifications, and failure modes.
 - Existing specs under `specs/specs/`, if any.
 
-If a behavior is underspecified but not blocking, make a conservative assumption and list it in the final summary for user confirmation. Ask a clarification question only when a testable spec cannot be written without it.
+If a detail is underspecified but does not change observable behavior, make a conservative non-behavioral assumption and list it in the final summary for user confirmation. Ask a clarification question when a testable spec cannot be written without changing user-visible behavior.
+
+## Concrete Behavior Gate
+
+Before saving or asking the user to confirm specifications, verify that every active Requirement and Scenario identifies:
+
+- **actor:** who triggers or observes the behavior;
+- **precondition:** the relevant starting state and data;
+- **trigger action:** the single action, event, or request being evaluated;
+- **expected outcome:** the observable result, state change, message, artifact, or blocked path;
+- **edge or error condition:** the invalid, boundary, unavailable, denied, or alternate path that must be covered.
+
+Abstract behavior descriptions are not acceptable specifications. Phrases such as "works correctly", "handles various cases", "appropriate error handling", "seamless", "robust", "intuitive", or "etc." are signals to rewrite them as concrete scenarios. If the missing concrete behavior would change user-visible behavior, scope, permissions, failure outcomes, or success criteria, treat it as a blocking issue and ask one focused clarification question before continuing.
+
+## Behavior Assumption Boundary
+
+A non-behavioral assumption is allowed only when the missing detail does not change observable behavior, scope, permissions, failure outcomes, or success criteria. Disclose each non-behavioral assumption in the final summary so the user can correct it before design.
+
+A user-visible behavior decision must be confirmed by the user before the specification is saved or approved. If a missing decision can change observable behavior, scope, permissions, failure outcomes, or success criteria, stop and ask a focused clarification question instead of silently choosing a default.
 
 ## Workflow
 
@@ -59,11 +77,14 @@ If a behavior is underspecified but not blocking, make a conservative assumption
    - `WHEN` states a single trigger, action, or event.
    - `THEN` states the primary observable result.
    - `AND` states additional observable outcomes, state changes, visibility rules, notifications, or constraints.
+   - Apply the Concrete Behavior Gate before accepting the scenario.
 
 6. **Self-review and fix inline**
    - Remove ambiguity, implementation leakage, duplication, and untestable claims.
    - Confirm every in-scope proposal item maps to at least one Requirement.
    - Confirm every active Requirement has both happy-path and edge/error coverage.
+   - Confirm no abstract behavior descriptions remain unresolved.
+   - Confirm every user-visible behavior decision is explicit or confirmed by the user.
 
 7. **Save and request confirmation**
    - Save files to `specs/changes/<change-name>/specs/<domain>/spec.md`.

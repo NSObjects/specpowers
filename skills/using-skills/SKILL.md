@@ -75,7 +75,7 @@ When multiple skills apply, load them in this order:
 1. **Process skills** — `exploring`, `proposing`, `specifying`, `designing`, `planning`, `debugging`.
 2. **Rules skills** — `rules-common`, then applicable `rules-{language}` modules.
 3. **Implementation skills** — `spec-driven-development`.
-4. **Quality skills** — `verification-loop`, `quality-gate`, `requesting-code-review`.
+4. **Quality skills** — `verification-loop`, `quality-gate`, `confidence-loop`, `requesting-code-review`.
 5. **Utility skills** — `dispatching-parallel-agents`, `selective-install`, and other support skills.
 
 ## SpecPowers Artifact Workflow
@@ -124,6 +124,7 @@ Support skills are not primary routes:
 | --- | --- |
 | `rules-common` / `rules-*` | Coding or review is active and the rule skill exists in the managed payload. |
 | `test-driven-development` | An implementation task reaches its TDD step or a subagent asks for TDD coaching. |
+| `confidence-loop` | An implementation, review, or completion gate needs evidence-bound confidence before claiming done, approved, fixed, passing, or ready. |
 | `quality-gate` | The user asks for automated quality checks or an active workflow reaches that checkpoint. |
 | `verification-loop` | A milestone or final readiness checkpoint explicitly requires full verification. |
 | `verification-before-completion` | The workflow is about to make a completion, fixed, passing, commit-ready, or PR-ready claim. |
@@ -148,7 +149,7 @@ Installer boundary:
 
 ## Skill Types
 
-- **Rigid:** `debugging`, `specifying`, `verification-loop`, `quality-gate`, and TDD-oriented skills. Follow the steps exactly.
+- **Rigid:** `debugging`, `specifying`, `verification-loop`, `quality-gate`, `confidence-loop`, and TDD-oriented skills. Follow the steps exactly.
 - **Flexible:** `exploring`, `designing`, `rules-common`, and `rules-{language}`. Apply principles to the project context.
 - **Utility:** `selective-install`, `dispatching-parallel-agents`, and support skills. Use them to enable the main workflow.
 
