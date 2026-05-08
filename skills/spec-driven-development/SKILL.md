@@ -117,6 +117,8 @@ For each task:
 
    Read the task text, linked scenarios, relevant Design sections, and relevant existing code/tests. Keep the task boundary explicit: implement only what this task requests.
 
+   Maintain traceable changes: every changed file and key edit must trace to the current request, accepted specification, task, failing test, review feedback, or current-change orphan cleanup. Remove drive-by refactors, comment rewrites, naming churn, formatting noise, and unrelated file changes unless the user explicitly expands the scope.
+
 3. **Run TDD implementation**
 
    - Write or extend a test that fails for the linked scenario.
@@ -301,6 +303,7 @@ Check at minimum:
 - **Architecture fit:** follows existing project patterns and the file structure from the plan.
 - **Test quality:** tests assert behavior, cover meaningful edge cases, and are not over-mocked.
 - **Scope control:** no unrelated refactors, no speculative features, no broad cleanup outside the task.
+- **Surgical changes:** every changed file and key edit is traceable to the current request, accepted specification, task, failing test, review feedback, or current-change orphan cleanup; no drive-by refactors, comment rewrites, or formatting noise.
 - **Operational safety:** no secret leakage, unsafe defaults, surprising side effects, or avoidable performance regressions.
 - **Evidence-backed confidence:** before passing Stage 2, confirm that every concrete doubt raised by the diff, tests, task context, touched code paths, and stated risks has been investigated or reported.
 

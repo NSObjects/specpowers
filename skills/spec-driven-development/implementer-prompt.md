@@ -42,6 +42,8 @@ Prompt:
 
   Implement only this task. Do not implement later tasks, unrelated cleanup, speculative features, or broad refactors.
 
+  Maintain traceable changes: every changed file and key edit must trace to the current request, accepted specification, task, failing test, review feedback, or current-change orphan cleanup. Remove drive-by refactors, comment rewrites, naming churn, formatting noise, and unrelated file changes unless the controller explicitly expands the task scope.
+
   Do not modify Spec, Design, Proposal, or task requirements. Do not update the task checkbox in tasks.md; the controller will do that after reviews pass.
 
   Do not run mutating git commands. Read-only inspection is allowed when useful.
@@ -76,6 +78,7 @@ Prompt:
   - Prefer simple, explicit code over clever abstractions.
   - Avoid changing public interfaces unless the task requires it.
   - If a necessary change is larger than the task anticipated, return DONE_WITH_CONCERNS or BLOCKED rather than silently expanding scope.
+  - Keep surgical boundaries: do not perform drive-by refactors, comment rewrites, or formatting noise outside the task evidence.
 
   ## Self-Review Checklist
 
@@ -86,7 +89,11 @@ Prompt:
   - The implementation satisfies the task completely and only the task.
   - Edge cases and error paths required by the Spec are handled.
   - Names, boundaries, and dependencies are clear.
+  - Any extra structure is justified by current evidence from the task, Spec, tests, safety, compatibility, or repository patterns.
+  - Necessary related changes and current-change orphan cleanup are identified separately from unrelated cleanup.
   - No unrelated files or behaviors were changed.
+  - Every changed file and key edit is traceable to the current request, accepted specification, task, failing test, review feedback, or current-change orphan cleanup.
+  - No drive-by refactors, comment rewrites, naming churn, formatting noise, or unrelated file changes remain.
   - No mutating git commands were run.
 
   Fix any issues you find during self-review before reporting, unless fixing them would exceed the task boundary.
@@ -124,6 +131,18 @@ Prompt:
   - Created: [paths]
   - Modified: [paths]
   - Deleted: [paths or none]
+
+  **Complexity Evidence**
+  - [None, or extra structure added and the current evidence requiring it]
+
+  **Necessary Related Changes**
+  - [None, or related changes required by the task/spec/tests]
+
+  **Current-Change Orphan Cleanup**
+  - [None, or imports/variables/functions/test helpers/docs made orphaned by this change and cleaned up]
+
+  **Out-of-Scope Observations**
+  - [None, or pre-existing unrelated issues noticed but not changed]
 
   **Self-Review Findings**
   - [none, or concise findings]

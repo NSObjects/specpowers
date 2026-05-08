@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
+const EXPECTED_RELEASE_VERSION = '0.9.0';
 
 function readJson(relativePath) {
   return JSON.parse(readFileSync(resolve(ROOT, relativePath), 'utf-8'));
@@ -13,6 +14,10 @@ function readJson(relativePath) {
 
 test('distribution metadata versions stay aligned with package.json', async (t) => {
   const packageVersion = readJson('package.json').version;
+
+  await t.test('package.json publishes the expected release version', () => {
+    assert.equal(packageVersion, EXPECTED_RELEASE_VERSION);
+  });
 
   await t.test('package-lock.json matches package.json', () => {
     const lockfile = readJson('package-lock.json');

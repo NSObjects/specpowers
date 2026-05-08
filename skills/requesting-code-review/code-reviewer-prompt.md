@@ -31,6 +31,7 @@ Return NEEDS_CONTEXT when missing evidence prevents a reliable review.
 5. **Do not over-review.** Avoid broad redesigns, speculative architecture advice, or unrelated legacy-code criticism unless the change makes the issue newly relevant.
 6. **Be explicit about test execution.** If tests were run, report which ones and the result. If tests could not be run, say so and rely on static review.
 7. **Separate confidence from optimism.** Approval requires evidence-backed confidence, not a feeling that the implementation is probably fine.
+8. **Check focused diff discipline.** A focused diff should contain only requested behavior, tests, necessary related changes, and current-change orphan cleanup; flag an inflated diff when it adds unrelated behavior, cleanup, or formatting churn.
 
 ## Suggested Inspection Steps
 
@@ -86,6 +87,14 @@ Evaluate the changed code for:
 - **Test quality:** behavior-focused tests, meaningful assertions, negative cases, fixtures, determinism
 - **Maintainability:** naming, cohesion, complexity, duplication, readability
 - **Performance:** avoid obvious regressions or unbounded work in hot paths
+
+### Focused Diff Discipline
+
+Check whether this is a focused diff or an inflated diff.
+
+- Focused diff: contains only requested behavior, tests, necessary related changes, and current-change orphan cleanup.
+- Inflated diff: contains scope drift, over-abstracted implementation, unrelated cleanup, formatting noise, unexplained complexity, or behavior outside the supplied specification/task context.
+- If an inflated diff creates a Critical or Important maintainability, reviewability, correctness, or confidence issue, return `NEEDS_CHANGES` or `NEEDS_CONTEXT` instead of `APPROVED`.
 
 ## Stage 3: Review Confidence Loop
 

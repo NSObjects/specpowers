@@ -21,6 +21,27 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 
 If you haven't completed Phase 1, you cannot propose fixes.
 
+## Diagnostic Discussion Gate
+
+A bug report is not edit authorization.
+
+When the user reports a bug, error report, test failure, regression, unexpected behavior, or asks a failure-related why-question, default to diagnostic discussion mode. The user has asked for investigation and explanation unless they explicitly authorized a direct fix.
+
+In diagnostic discussion mode:
+
+- Read the relevant code carefully before drawing conclusions.
+- Trace entry points, call flow, data flow, configuration, tests, and recent changes before naming the root cause.
+- Use read-only actions such as reading files, searching code, running tests, reading logs, and inspecting read-only git state.
+- Do not edit files.
+- Do not generate patches.
+- Do not refactor.
+- Do not attempt fixes or "just try" changes.
+- Before Phase 4 Implementation, report confirmed facts, suspected root cause, unresolved doubts, and the smallest repair direction.
+- Ask for user confirmation before implementation unless the user already explicitly authorized a direct fix.
+- Fix authorization is not permission to skip specification discipline. Before Phase 4 Implementation, bind the repair to an existing accepted spec, existing observable contract, or failing test. If the expected behavior is not specified or the repair changes user-visible behavior, create or confirm a minimal bug spec before editing. No new spec artifact is required only when the repair restores an existing observable contract and the failing test or reproduction proves that contract.
+
+If evidence is insufficient, say what is missing and continue read-only investigation or ask for the needed context. Do not guess by modifying code.
+
 ## When to Use
 
 Use for ANY technical issue:

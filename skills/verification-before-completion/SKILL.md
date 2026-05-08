@@ -39,11 +39,11 @@ Skip any step = lying, not verifying
 
 ## Evidence-Bound Confidence Loop
 
-Before claiming complete, fixed, passing, PR-ready, approved, or safe to proceed, run or apply `specpowers:confidence-loop` for the exact claim scope.
+Before claiming complete, fixed, passing, ready for review, PR-ready, approved, or safe to proceed, run or apply `specpowers:confidence-loop` for the exact claim scope.
 
 The loop must identify concrete doubts raised by the change, diff, tests, specification, touched code paths, user feedback, review feedback, and known risks. Each doubt must be investigated, fixed, reported, or converted into **Unresolved Confidence Gaps** with the exact missing evidence.
 
-If **Unresolved Confidence Gaps** is not `None`, the agent must not claim complete, fixed, passing, PR-ready, or approved. State the actual status and the missing evidence instead.
+If **Unresolved Confidence Gaps** is not `None`, the agent must not claim complete, fixed, passing, PR-ready, or approved. The same block applies to ready for review and safe to proceed. State the actual status and the missing evidence instead.
 
 ## Automated Evidence: Quality Gate
 

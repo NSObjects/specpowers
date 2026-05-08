@@ -43,6 +43,18 @@ Use this structure when reporting the loop:
 - Result: [PASS | BLOCKED]
 ```
 
+## Post-Implementation Confidence Loop
+
+When an Agent completes code implementation it owns, it must run or apply this loop before reporting the result to the user. The trigger scope includes `ordinary code edits`, `code modifications`, and `bug fix implementations`, and it runs `before reporting complete, fixed, passing, ready for review, or safe to proceed`.
+
+The reviewed scope after implementation must cover the task, diff, file set, relevant Spec scenarios, tests, and known risks for this implementation. For bug fix implementations, the scope must also include `original failure`, `modified code paths`, `verification evidence`, and `known risks` so the Agent does not claim fixed based only on code changes.
+
+`post-implementation reports` reuse the Output Shape above and must at least describe checked doubts, fixed issues, **Unresolved Confidence Gaps**, and the `PASS | BLOCKED` result. If an unresolved confidence gap remains, the Agent must report the actual status and missing evidence instead of claiming complete, fixed, passing, ready for review, or safe to proceed.
+
+This post-implementation trigger `extends ordinary implementation paths`; it `does not replace spec-driven implementation, review, handoff, or completion gates`. Existing gates keep their own scope, evidence package, review, and blocking rules, including the requirement not to proceed while Critical or Important findings or Unresolved Confidence Gaps remain.
+
+This is an `Agent-owned behavior gate`, not a `file watcher`, `Git hook`, `daemon`, or `runtime enforcement` mechanism. It runs when the Agent is evaluating its own completed implementation scope before reporting or proceeding; `external file changes do not automatically run it`.
+
 ## Review Package Adequacy Gate
 
 Apply this gate before dispatching any subagent review. A reviewer must receive enough context to evaluate the requested scope without inventing conversation history or user intent.

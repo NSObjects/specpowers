@@ -54,6 +54,35 @@ test('confidence-loop skill requires repeated doubt inspection before approval',
   );
 });
 
+test('post-implementation confidence loop covers ordinary edits and bug fixes', () => {
+  const content = read('skills/confidence-loop/SKILL.md');
+
+  for (const expected of [
+    '## Post-Implementation Confidence Loop',
+    'ordinary code edits',
+    'code modifications',
+    'bug fix implementations',
+    'before reporting complete, fixed, passing, ready for review, or safe to proceed',
+    'original failure',
+    'modified code paths',
+    'verification evidence',
+    'known risks',
+  ]) {
+    assert.ok(content.includes(expected), `missing post-implementation trigger text: ${expected}`);
+  }
+});
+
+test('post-implementation confidence loop source guidance stays in English', () => {
+  const content = read('skills/confidence-loop/SKILL.md');
+  const start = content.indexOf('## Post-Implementation Confidence Loop');
+  assert.notEqual(start, -1, 'missing post-implementation confidence loop section');
+
+  const nextSection = content.indexOf('\n## ', start + 1);
+  const section = nextSection === -1 ? content.slice(start) : content.slice(start, nextSection);
+
+  assert.doesNotMatch(section, /[\u4E00-\u9FFF]/u);
+});
+
 test('implementer prompt blocks DONE when confidence gaps remain', () => {
   const content = read('skills/spec-driven-development/implementer-prompt.md');
 
@@ -113,6 +142,86 @@ test('verification-before-completion blocks completion claims on confidence gaps
   );
 });
 
+test('post-implementation reports include evidence and block completion claims on gaps', () => {
+  const confidenceLoop = read('skills/confidence-loop/SKILL.md');
+  const completionGate = read('skills/verification-before-completion/SKILL.md');
+
+  for (const expected of [
+    'post-implementation reports',
+    'checked doubts',
+    'fixed issues',
+    'Unresolved Confidence Gaps',
+    '`PASS | BLOCKED` result',
+  ]) {
+    assert.ok(confidenceLoop.includes(expected), `missing implementation report evidence text: ${expected}`);
+  }
+
+  for (const expected of [
+    'ready for review',
+    'safe to proceed',
+    'State the actual status and the missing evidence instead',
+  ]) {
+    assert.ok(completionGate.includes(expected), `missing expanded completion gate text: ${expected}`);
+  }
+});
+
+test('post-implementation trigger preserves existing workflow gates', () => {
+  const confidenceLoop = read('skills/confidence-loop/SKILL.md');
+  const usingSkills = read('skills/using-skills/SKILL.md');
+  const specDrivenDevelopment = read('skills/spec-driven-development/SKILL.md');
+
+  for (const expected of [
+    'extends ordinary implementation paths',
+    'does not replace spec-driven implementation, review, handoff, or completion gates',
+    'Do not proceed while Critical or Important findings or Unresolved Confidence Gaps remain',
+  ]) {
+    assert.ok(confidenceLoop.includes(expected), `missing existing gate preservation text: ${expected}`);
+  }
+
+  assert.ok(
+    usingSkills.includes('Support skills are not primary routes'),
+    'using-skills should still keep confidence-loop out of primary workflow routing',
+  );
+  assert.ok(
+    specDrivenDevelopment.includes('Run or verify `specpowers:confidence-loop` over the task scope after GREEN/refactor and before Stage 1 review'),
+    'spec-driven-development task gate should remain intact',
+  );
+});
+
+test('post-implementation confidence loop is documented as agent-owned rather than background automation', () => {
+  const confidenceLoop = read('skills/confidence-loop/SKILL.md');
+  const readme = read('README.md');
+  const readmeZh = read('README.zh-CN.md');
+
+  for (const expected of [
+    'Agent-owned behavior gate',
+    'external file changes do not automatically run it',
+    'file watcher',
+    'Git hook',
+    'daemon',
+    'runtime enforcement',
+  ]) {
+    assert.ok(confidenceLoop.includes(expected), `missing no-background boundary in confidence-loop: ${expected}`);
+  }
+
+  assert.ok(
+    readme.includes('Agent-owned post-implementation gate'),
+    'README should describe the post-implementation gate as agent-owned',
+  );
+  assert.ok(
+    readme.includes('not a file watcher, Git hook, daemon, or runtime enforcement'),
+    'README should reject background automation claims',
+  );
+  assert.ok(
+    readmeZh.includes('Agent 自己完成代码实现后的门禁'),
+    'Chinese README should describe the post-implementation gate as agent-owned',
+  );
+  assert.ok(
+    readmeZh.includes('不是文件监听、Git hook、daemon 或 runtime enforcement'),
+    'Chinese README should reject background automation claims',
+  );
+});
+
 test('using-skills treats confidence-loop as a support skill', () => {
   const content = read('skills/using-skills/SKILL.md');
 
@@ -127,6 +236,26 @@ test('using-skills treats confidence-loop as a support skill', () => {
   assert.ok(
     content.includes('Support skills are not primary routes'),
     'confidence-loop should not become a primary workflow route',
+  );
+});
+
+test('using-skills routes completed code implementation to confidence-loop without covering non-code work', () => {
+  const content = read('skills/using-skills/SKILL.md');
+
+  for (const expected of [
+    'completed code implementation',
+    'ordinary code implementation',
+    'run or apply `confidence-loop`',
+    'same evidence-bound confidence definition',
+    'read-only investigation, proposal, spec, design, or planning',
+    'does not trigger the post-implementation Confidence Loop',
+  ]) {
+    assert.ok(content.includes(expected), `missing post-implementation routing text: ${expected}`);
+  }
+
+  assert.ok(
+    content.includes('Support skills are not primary routes'),
+    'confidence-loop should remain support-only after ordinary implementation routing',
   );
 });
 

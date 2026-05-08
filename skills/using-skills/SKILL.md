@@ -100,6 +100,18 @@ Each stage creates or validates a specific artifact:
 
 `specifying` is mandatory for feature/change work. Do not jump from proposal to design or implementation without it.
 
+## Bug Diagnostic Routing
+
+Bug-like input is not edit authorization. A bug report, error report, test failure, regression, unexpected behavior, or failure-related why-question defaults to `systematic-debugging` in diagnostic discussion mode.
+
+Design, trade-off, architecture, workflow, or explanation-only why-questions do not imply a failure. Route those by their actual task type, and do not treat it as a bug diagnostic unless the question is tied to a bug, error, failure, regression, unexpected behavior, or broken test.
+
+For ordinary bug diagnostics, use a lightweight path: route to `systematic-debugging`, perform read-only investigation, discuss the evidence and root-cause direction with the user, and wait for explicit fix authorization before editing files.
+
+Ordinary read-only diagnostic work does not require `proposing`, `specifying`, `designing`, or `planning`. Escalate to the artifact workflow when investigation reveals a behavior change or expanded scope that needs a new user-visible contract.
+
+Fix authorization is not an artifact-workflow bypass. Before editing for a bug fix, bind the fix to an existing accepted spec, existing observable contract, or failing test. If the expected behavior is not already specified, or the fix changes user-visible behavior, create or confirm a minimal bug specification before implementation. If no new spec artifact is required because the repair only restores an existing observable contract, state that contract and the failing test or reproduction that proves it before entering implementation.
+
 ## Routing Decision Table
 
 Choose one primary workflow skill first. Add rule or quality skills only when the selected workflow reaches that checkpoint.
@@ -112,7 +124,7 @@ Choose one primary workflow skill first. Add rule or quality skills only when th
 | Requirements agreed but technical approach, trade-offs, or file boundaries unresolved | `designing` | Keep design separate from task planning. |
 | Requirements and design agreed but no executable task list exists | `planning` | Produce small test-first tasks and establish execution mode. |
 | Approved `tasks.md` exists and the user wants implementation to begin or resume | `spec-driven-development` | Reuse the current execution mode if already chosen; otherwise ask for `Step-by-Step` or `Fast`. |
-| Bug, failure, regression, flaky behavior, or unexpected test result | `systematic-debugging` | Understand root cause before proposing fixes. |
+| Bug report, error report, failure, regression, flaky behavior, unexpected test result, or failure-related why-question | `systematic-debugging` | Enter diagnostic discussion mode; understand root cause, then keep any authorized fix bound to an existing spec, observable contract, failing test, or minimal bug specification before editing. |
 | User explicitly asks for standalone review or merge-readiness review | `requesting-code-review` | Keep one surfaced review conclusion; specialist reviewers stay internal. |
 | User asks to respond to or implement review feedback | `receiving-code-review` | Verify feedback against code before accepting it. |
 | User asks to install, repair, diagnose, add, remove, or change SpecPowers modules | `selective-install` | Runtime routing must not call installers implicitly. |
@@ -129,6 +141,13 @@ Support skills are not primary routes:
 | `verification-loop` | A milestone or final readiness checkpoint explicitly requires full verification. |
 | `verification-before-completion` | The workflow is about to make a completion, fixed, passing, commit-ready, or PR-ready claim. |
 | `dispatching-parallel-agents` | Independent workstreams exist and subagent use is explicitly appropriate for the platform. |
+
+Post-implementation routing:
+
+- During coding or review, load `rules-common` and the relevant language rules first.
+- After a `completed code implementation`, including `ordinary code implementation`, run or apply `confidence-loop` before reporting complete, fixed, passing, ready for review, or safe to proceed.
+- Ordinary implementation uses the `same evidence-bound confidence definition` from `confidence-loop`; do not create a new route or weaker local checklist.
+- A `read-only investigation, proposal, spec, design, or planning` result `does not trigger the post-implementation Confidence Loop`; do not claim code implementation is complete for non-code work.
 
 ## Language Rule Activation
 
@@ -173,5 +192,6 @@ Before producing the final answer or taking the next major action, verify:
 - Relevant skills were loaded before action.
 - Required artifacts were not skipped.
 - `rules-common` and language rules were considered for coding/review tasks.
+- Completed code implementation ran or applied `confidence-loop` before any complete, fixed, passing, ready for review, or safe-to-proceed claim.
 - Execution mode was established when implementing from `tasks.md`.
 - Any skipped bootstrap or unavailable tool was disclosed only when it affects the task.

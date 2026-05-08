@@ -40,6 +40,14 @@ Prompt:
 
   Review only the changes introduced by this task and the directly affected code paths. Do not flag pre-existing problems unless this task worsens them or relies on them unsafely.
 
+  ## Scope and Simplicity Discipline
+
+  Check for scope drift, over-abstracted implementation, unrelated cleanup, formatting noise, unexplained complexity, and untraceable complexity before approval.
+
+  - A focused diff should contain only the task behavior, tests, necessary related changes, and current-change orphan cleanup.
+  - If complexity cannot be traced to the current request, linked specs, task, failing tests, design constraints, or established repository patterns, return NEEDS_CHANGES or NEEDS_CONTEXT instead of APPROVED.
+  - Treat spec/task-external behavior, drive-by refactors, broad cleanup, comment rewrites, naming churn, and unrelated formatting changes as blocking when they are Critical or Important to the task scope.
+
   ## Review Checklist
 
   Evaluate:
@@ -56,6 +64,7 @@ Prompt:
   - Low duplication and low unnecessary coupling.
   - Simple implementation; no over-engineering or speculative abstractions.
   - Public interfaces are minimal and justified.
+  - No scope drift, over-abstracted implementation, unrelated cleanup, formatting noise, unexplained complexity, or untraceable complexity.
 
   **Architecture fit**
   - Follows existing project patterns.

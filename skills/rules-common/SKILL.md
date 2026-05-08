@@ -200,13 +200,40 @@ Never commit secrets, credentials, or PII to version control. Use pre-commit hoo
 
 ---
 
+## 7. Change Discipline
+
+### 7.1 Minimum Necessary Complexity
+
+Prefer the least complex solution that satisfies the confirmed user request, specifications, task, tests, and repository constraints.
+
+- Treat current evidence as the boundary for added structure: confirmed requirements, failing tests, safety constraints, compatibility needs, or established repository patterns.
+- Add abstraction, configuration, extension points, caching, strategy layers, or wrappers only when that current evidence requires them.
+- If extra structure is necessary, make the reason traceable in the implementation notes, review notes, or nearby documentation.
+
+### 7.2 No Speculative Complexity
+
+Do not add complexity for hypothetical future requirements.
+
+- Reject speculative configuration, plugin points, strategy interfaces, multi-backend support, generalized parameters, caches, adapters, or wrappers when they only serve unconfirmed future needs.
+- If a future extension seems useful but is outside the current scope, report it only as out-of-scope observations instead of implementing it.
+
+### 7.3 Current-Change Orphan Cleanup Only
+
+Limit cleanup to current-change orphan cleanup unless the user or accepted specification explicitly asks for broader cleanup.
+
+- Remove or update imports, variables, functions, test helpers, or documentation fragments that the current change directly makes unused or invalid.
+- Preserve pre-existing dead code, bad names, formatting inconsistencies, or neighboring design problems when they do not affect the current request, task, failing test, or review feedback.
+- Report pre-existing unrelated issues as out-of-scope observations instead of fixing them inside the current change.
+
+---
+
 ## Red Flags
 
 These thoughts mean you're about to violate a rule — stop and reconsider:
 
 | Thought | Reality |
 |---------|---------|
-| "I'll clean this up later" | Later never comes. Fix it now or file a tracked issue. |
+| "I'll clean this up later" | If the cleanup belongs to the current scope, fix it now; otherwise report it as an out-of-scope observation. |
 | "It's just a small hack" | Small hacks compound. Follow the rule or document the exception. |
 | "Nobody will see this code" | You will see it in 3 months and not remember why. |
 | "The tests are slowing me down" | Tests are saving future-you hours of debugging. |
