@@ -77,6 +77,14 @@ If multiple interpretations are possible, prefer the one most directly supported
     - Ask the user to choose an execution mode.
     - Do not invoke implementation until the user approves.
 
+Use the Workflow Handoff Confidence Loop from `../confidence-loop/SKILL.md` with `../confidence-loop/workflow-handoff-reviewer-prompt.md` before the `planning → spec-driven-development` handoff when subagents are available, after the user approves the plan and chooses an execution mode.
+
+Review package must include `tasks.md`, the `Spec Coverage Summary`, relevant specs, relevant design constraints, exact test commands, execution mode decision, assumptions, repository constraints, and any `Open Planning Blockers`.
+
+Do not proceed to `spec-driven-development` while Critical or Important findings, `NEEDS_USER_DECISION`, or Unresolved Confidence Gaps remain.
+
+If the handoff loop changes `tasks.md`, assumptions, scope, test commands, or execution-relevant content, present the updated plan and obtain user approval and execution mode confirmation again before proceeding to `spec-driven-development`.
+
 ## Scenario Inventory Format
 
 Before the task list, include a concise inventory so coverage can be audited:

@@ -28,7 +28,7 @@ Do not use this skill as a replacement for normal implementation, testing, or th
 1. Run the general `specpowers:code-reviewer` review over the full requested scope.
 2. Escalate to a specialist reviewer only when there is a concrete risk hypothesis.
 3. Deduplicate and reconcile all findings in the main agent.
-4. Return one final user-facing conclusion: `APPROVED` or `NEEDS_CHANGES`.
+4. Return one final user-facing conclusion: `APPROVED`, `NEEDS_CHANGES`, or `NEEDS_CONTEXT`.
 
 Specialist reviewers deepen a scoped risk area. They do not become separate user-facing workflows.
 
@@ -45,7 +45,7 @@ Claude Code: use `Agent` tool with `specpowers:code-reviewer`; legacy `Task` ref
 
 ## Review Package Requirements
 
-Before dispatching, build a compact review package. The reviewer should receive enough context to evaluate the change without reading the full conversation.
+Before dispatching, build a compact review package and apply the `specpowers:confidence-loop` Review Package Adequacy Gate. The reviewer should receive enough context to evaluate the change without reading the full conversation.
 
 Required fields:
 
@@ -54,6 +54,8 @@ Required fields:
 - `{BASE_SHA}` — starting commit, merge base, or explicit review base
 - `{HEAD_SHA}` — ending commit or explicit review head
 - `{DESCRIPTION}` — purpose, constraints, known risks, relevant test results, and anything intentionally out of scope
+
+If the package cannot include the diff, scope, relevant specs/design/tasks, test evidence, known risks, or prior findings/gaps needed for a fair review, do not ask the reviewer to guess. Provide the missing evidence first, or expect `NEEDS_CONTEXT` / **Unresolved Confidence Gaps** rather than approval.
 
 Useful preflight commands:
 
@@ -115,7 +117,7 @@ Final user-facing result should include:
 
 ```markdown
 ## Review Result
-**Decision:** APPROVED / NEEDS_CHANGES
+**Decision:** APPROVED / NEEDS_CHANGES / NEEDS_CONTEXT
 **Why:** [short synthesis]
 
 ## Blocking Issues
@@ -134,18 +136,22 @@ Final user-facing result should include:
 
 ## Re-Review Loop
 
+Use the `specpowers:confidence-loop` Review Confidence Loop for every re-review.
+
 After fixes:
 
 1. Use the previous review head as the new base when only reviewing the fixes.
 2. Include the prior blocking findings and unresolved confidence gaps in `{DESCRIPTION}`.
-3. Ask the reviewer to verify that the fixes address those findings, close the confidence gaps, and do not introduce regressions.
-4. Repeat until no Critical or Important issues or approval-blocking unresolved confidence gaps remain.
+3. Include a Resolution Package that classifies each prior item as `fixed`, `rejected`, `out_of_scope`, or `needs_user_decision`, with evidence.
+4. Ask the reviewer to verify that the fixes address those findings, close the confidence gaps, and do not introduce regressions.
+5. Repeat until no Critical or Important issues or approval-blocking unresolved confidence gaps remain.
 
 ## Decision Policy
 
 - Any Critical issue => `NEEDS_CHANGES`.
 - Any Important issue => `NEEDS_CHANGES`.
-- Any approval-blocking unresolved confidence gap => `NEEDS_CHANGES`.
+- Missing context or approval-blocking evidence gap => `NEEDS_CONTEXT`.
+- Any approval-blocking unresolved confidence gap with a required in-scope fix => `NEEDS_CHANGES`.
 - Minor issues only => usually `APPROVED` with notes.
 - Missing or incomplete Spec Scenarios do not automatically block the review, but missing tests for provided required scenarios are Critical.
 - If the reviewer is wrong, push back with code, tests, or specification evidence.

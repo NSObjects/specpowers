@@ -1,23 +1,23 @@
 ---
 name: confidence-loop
-description: Use when an implementation, review, or completion gate needs evidence-bound confidence before claiming done, approved, fixed, passing, or ready.
+description: Use when an artifact handoff, implementation, review, or completion gate needs evidence-bound confidence before proceeding or claiming done, approved, fixed, passing, or ready.
 ---
 
 # Evidence-Bound Confidence Loop
 
-Use this support skill when an agent is about to claim `DONE`, `APPROVED`, complete, fixed, passing, PR-ready, or otherwise safe to proceed.
+Use this support skill when an agent is about to move between artifact stages, dispatch a subagent review, claim `DONE`, `APPROVED`, complete, fixed, passing, PR-ready, or otherwise safe to proceed.
 
 ## Core Definition
 
 `100% confidence` is an evidence-bound gate, not omniscience. It means every concrete doubt raised by the reviewed scope has been investigated, fixed, or reported with the missing evidence needed to decide.
 
-The reviewed scope may be a task, diff, file set, Spec scenario set, review package, bug fix, or completion claim. The loop must stay inside that scope unless the investigation exposes a real cross-boundary risk.
+The reviewed scope may be a task, diff, file set, Spec scenario set, review package, bug fix, completion claim, artifact or handoff package. The loop must stay inside that scope unless the investigation exposes a real cross-boundary risk.
 
 ## Loop Steps
 
 Repeat these steps until the stopping condition is met:
 
-1. **Define the reviewed scope** — name the task, diff, files, scenarios, claim, or review package being evaluated.
+1. **Define the reviewed scope** — name the task, diff, files, scenarios, claim, artifact, review package, or handoff package being evaluated.
 2. **List concrete doubts** — enumerate plausible defects, regressions, missing tests, edge cases, failure paths, user-feedback concerns, review-feedback concerns, and evidence gaps raised by the scope.
 3. **Investigate each doubt** — inspect code, tests, specs, logs, command output, surrounding behavior, and relevant prior decisions.
 4. **Fix, report, or convert** — fix confirmed in-scope problems, report out-of-scope problems, or convert missing evidence into **Unresolved Confidence Gaps** with the exact evidence needed.
@@ -36,12 +36,55 @@ Use this structure when reporting the loop:
 
 ```markdown
 **Confidence Loop**
-- Scope: [task, diff, claim, or review package]
+- Scope: [task, diff, claim, review package, artifact or handoff package]
 - Concrete doubts checked: [summary]
 - Fixed issues: [none | summary]
 - Unresolved Confidence Gaps: [None | exact missing evidence]
 - Result: [PASS | BLOCKED]
 ```
+
+## Review Package Adequacy Gate
+
+Apply this gate before dispatching any subagent review. A reviewer must receive enough context to evaluate the requested scope without inventing conversation history or user intent.
+
+The main agent's review package must include:
+
+- scope;
+- current artifact or diff;
+- confirmed user decisions;
+- in-scope and out-of-scope boundaries;
+- open questions;
+- relevant specs, design, tasks, and tests;
+- test evidence, commands, and results when available;
+- known risks;
+- prior findings or gaps.
+
+Do not infer missing context. If missing evidence prevents a fair review, the reviewer must return `NEEDS_CONTEXT`, `NEEDS_USER_DECISION`, or list the missing evidence under **Unresolved Confidence Gaps**. Missing evidence is a blocking state, not permission to guess, `PASS`, or `APPROVED`.
+
+## Workflow Handoff Confidence Loop
+
+Use this loop for artifact handoff gates, including but not limited to `exploring → proposing`, `proposing → specifying`, `specifying → designing`, `designing → planning`, and `planning → spec-driven-development`.
+
+1. Build a handoff review package with the current artifact or conversation summary, prior confirmed context, intended next stage, known constraints, explicit exclusions, open questions, and success criteria relevant to the handoff.
+2. Run the Review Package Adequacy Gate before review dispatch.
+3. When subagents are available, request a read-only review using `workflow-handoff-reviewer-prompt.md`. If subagents are unavailable, perform the same check inline and report that fallback.
+4. The reviewer returns `PASS`, `NEEDS_CHANGES`, or `NEEDS_USER_DECISION`.
+5. For each finding, the main agent sends a **Resolution Package** that marks the finding as `fixed`, `rejected`, `out_of_scope`, or `needs_user_decision`, with evidence.
+6. Re-review the updated artifact and Resolution Package; repeat until `PASS` or `NEEDS_USER_DECISION`.
+
+Do not proceed while Critical or Important findings or Unresolved Confidence Gaps remain. `NEEDS_USER_DECISION` stops the handoff until the user answers one focused question.
+
+## Review Confidence Loop
+
+Use this loop for standalone code review, Stage 2 code-quality review, and review feedback re-review.
+
+1. Define the review scope: branch, task, commit range, working tree diff, or review package.
+2. Run the Review Package Adequacy Gate before review dispatch.
+3. The reviewer returns `APPROVED`, `NEEDS_CHANGES`, or `NEEDS_CONTEXT`.
+4. For each finding, the main agent sends a **Resolution Package** that marks the finding as `fixed`, `rejected`, `out_of_scope`, or `needs_user_decision`, with evidence.
+5. Re-review the updated diff, review package, and Resolution Package; repeat until `APPROVED` or `NEEDS_CONTEXT` requires user or external evidence.
+
+Reviewers may return `APPROVED` only when no Critical or Important issue remains and **Unresolved Confidence Gaps** is `None`. Use `NEEDS_CONTEXT` when missing evidence prevents a reliable review, and use `NEEDS_CHANGES` when an in-scope fix is required.
 
 ## Misuse Prevention
 
@@ -53,7 +96,8 @@ Use this structure when reporting the loop:
 
 ## Integration Points
 
+- Workflow artifact handoffs use the Workflow Handoff Confidence Loop and `workflow-handoff-reviewer-prompt.md` before moving between artifact stages.
 - Implementers run this before returning `DONE`.
 - Controllers run or verify it before task completion and before updating `tasks.md`.
-- Reviewers use it before returning `APPROVED`.
+- Reviewers use the Review Package Adequacy Gate and Review Confidence Loop before returning `APPROVED`.
 - `verification-before-completion` uses it before any completion, fixed, passing, approved, commit-ready, or PR-ready claim.

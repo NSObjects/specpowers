@@ -124,7 +124,7 @@ Support skills are not primary routes:
 | --- | --- |
 | `rules-common` / `rules-*` | Coding or review is active and the rule skill exists in the managed payload. |
 | `test-driven-development` | An implementation task reaches its TDD step or a subagent asks for TDD coaching. |
-| `confidence-loop` | An implementation, review, or completion gate needs evidence-bound confidence before claiming done, approved, fixed, passing, or ready. |
+| `confidence-loop` | An artifact handoff, implementation, review, or completion gate needs evidence-bound confidence before proceeding or claiming done, approved, fixed, passing, or ready. |
 | `quality-gate` | The user asks for automated quality checks or an active workflow reaches that checkpoint. |
 | `verification-loop` | A milestone or final readiness checkpoint explicitly requires full verification. |
 | `verification-before-completion` | The workflow is about to make a completion, fixed, passing, commit-ready, or PR-ready claim. |

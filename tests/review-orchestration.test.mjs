@@ -51,8 +51,8 @@ test('code reviewer prompt requires a factual confidence loop before approval', 
   const content = read('skills/requesting-code-review/code-reviewer-prompt.md');
 
   assert.ok(
-    content.includes('Factual Confidence Loop'),
-    'code reviewer prompt should require an explicit confidence loop',
+    content.includes('Review Confidence Loop'),
+    'code reviewer prompt should require the shared review confidence loop',
   );
   assert.ok(
     content.includes('100% confidence'),
@@ -62,11 +62,35 @@ test('code reviewer prompt requires a factual confidence loop before approval', 
     content.includes('Unresolved Confidence Gaps'),
     'code reviewer prompt should expose evidence gaps separately from findings',
   );
+  assert.ok(
+    content.includes('Review Package Adequacy Gate'),
+    'code reviewer prompt should check package adequacy before approval',
+  );
+  assert.ok(
+    content.includes('**Decision:** APPROVED / NEEDS_CHANGES / NEEDS_CONTEXT'),
+    'code reviewer prompt output should allow NEEDS_CONTEXT',
+  );
+  assert.ok(
+    content.includes('Return NEEDS_CONTEXT when missing evidence prevents a reliable review'),
+    'code reviewer prompt should map missing evidence to NEEDS_CONTEXT',
+  );
 });
 
 test('requesting-code-review re-review loop keeps confidence gaps blocking', () => {
   const content = read('skills/requesting-code-review/SKILL.md');
 
+  assert.ok(
+    content.includes('Review Confidence Loop'),
+    'requesting-code-review should use the shared review confidence loop',
+  );
+  assert.ok(
+    content.includes('APPROVED / NEEDS_CHANGES / NEEDS_CONTEXT'),
+    'requesting-code-review final result should support NEEDS_CONTEXT',
+  );
+  assert.ok(
+    content.includes('Missing context or approval-blocking evidence gap => `NEEDS_CONTEXT`'),
+    'requesting-code-review decision policy should preserve missing-context state',
+  );
   assert.ok(
     content.includes('unresolved confidence gaps'),
     'requesting-code-review should keep unresolved confidence gaps in the re-review loop',
@@ -125,6 +149,14 @@ test('task code quality reviewer shares the evidence-backed confidence gate', ()
   const content = read('skills/spec-driven-development/code-quality-reviewer-prompt.md');
 
   assert.ok(
+    content.includes('Review Confidence Loop'),
+    'task code quality reviewer should use the shared review confidence loop',
+  );
+  assert.ok(
+    content.includes('Review Package Adequacy Gate'),
+    'task code quality reviewer should verify review package adequacy',
+  );
+  assert.ok(
     content.includes('100% confidence'),
     'task code quality reviewer should use the same evidence-backed confidence gate before approval',
   );
@@ -136,6 +168,23 @@ test('task code quality reviewer shares the evidence-backed confidence gate', ()
     content.includes('Return NEEDS_CONTEXT when missing evidence prevents a reliable review'),
     'task code quality reviewer should map approval-blocking evidence gaps to NEEDS_CONTEXT',
   );
+});
+
+test('receiving-code-review defines review resolution loop for re-review', () => {
+  const content = read('skills/receiving-code-review/SKILL.md');
+
+  for (const expected of [
+    'Review Resolution Loop',
+    'Review Confidence Loop',
+    'Resolution Package',
+    'valid',
+    'wrong/harmful',
+    'out_of_scope',
+    'needs_user_decision',
+    're-review',
+  ]) {
+    assert.ok(content.includes(expected), `receiving-code-review should include: ${expected}`);
+  }
 });
 
 test('Codex mapping names the task-internal code quality reviewer prompt', () => {

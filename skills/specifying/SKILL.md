@@ -49,6 +49,14 @@ A non-behavioral assumption is allowed only when the missing detail does not cha
 
 A user-visible behavior decision must be confirmed by the user before the specification is saved or approved. If a missing decision can change observable behavior, scope, permissions, failure outcomes, or success criteria, stop and ask a focused clarification question instead of silently choosing a default.
 
+## Workflow Handoff Confidence Loop
+
+Use the Workflow Handoff Confidence Loop from `../confidence-loop/SKILL.md` with `../confidence-loop/workflow-handoff-reviewer-prompt.md` before the `specifying → designing` handoff when subagents are available.
+
+Review package must include the accepted proposal, saved specifications, Requirement and Scenario counts, assumptions, excluded behavior, and any open questions.
+
+Do not proceed to `designing` while Critical or Important findings, `NEEDS_USER_DECISION`, or Unresolved Confidence Gaps remain.
+
 ## Workflow
 
 1. **Read the accepted proposal**

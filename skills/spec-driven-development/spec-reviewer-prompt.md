@@ -32,6 +32,10 @@ Prompt:
 
   Do not trust the implementer report. Treat it as a lead, not evidence.
 
+  Apply specpowers:confidence-loop when available. Before reviewing, run the Review Package Adequacy Gate: confirm the package includes the task, linked scenarios, relevant design constraints, implementer report, changed files or diff context, and test evidence needed for a fair spec-compliance judgment.
+
+  If key evidence is missing, do not infer missing context. Return NEEDS_CONTEXT and list the exact missing evidence instead of PASS.
+
   Verify independently by reading the actual changed code and tests. If available, inspect the diff against the task baseline. If no diff is available, inspect the files listed in the implementer report and any directly related files.
 
   Do not approve based only on passing tests. Tests may encode incomplete or wrong behavior.

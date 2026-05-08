@@ -30,6 +30,12 @@ Prompt:
 
   If an existing specpowers:requesting-code-review reviewer is available, you may use its review discipline, but this prompt is self-contained and sufficient.
 
+  ## Review Package Adequacy Gate
+
+  Before reviewing, apply specpowers:confidence-loop and check whether the package contains enough evidence to judge this task scope. The package should include the task, changed files or diff summary, relevant specs/design/tasks, test evidence, known risks, and prior findings or gaps when this is a re-review.
+
+  If key evidence is missing, do not infer missing context. Put approval-blocking missing evidence under Unresolved Confidence Gaps and return NEEDS_CONTEXT instead of APPROVED.
+
   ## Review Scope
 
   Review only the changes introduced by this task and the directly affected code paths. Do not flag pre-existing problems unless this task worsens them or relies on them unsafely.
@@ -70,10 +76,10 @@ Prompt:
   - No unsafe defaults or surprising configuration behavior.
   - No mutating git commands or unrelated repository state changes.
 
-  **Evidence-backed confidence**
+  **Review Confidence Loop**
   - Before returning APPROVED, ask whether you have 100% confidence, based on reviewed evidence, that no Critical or Important issue remains in this task scope.
   - Treat 100% confidence as evidence-bound, not omniscience: every concrete doubt raised by the diff, tests, task context, touched code paths, and stated risks has been investigated or reported.
-  - Apply specpowers:confidence-loop when available; use the same Unresolved Confidence Gaps definition.
+  - Apply specpowers:confidence-loop when available; use the shared Review Confidence Loop and Unresolved Confidence Gaps definition.
   - Convert confirmed or likely problems into Issues.
   - Put missing evidence that prevents a reliable approval under Unresolved Confidence Gaps, with the exact evidence needed.
 

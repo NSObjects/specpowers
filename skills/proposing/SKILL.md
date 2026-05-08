@@ -45,6 +45,14 @@ Every proposal is a reviewable boundary contract. It must make the intended beha
 
 Behavior-affecting open questions are blockers. If an open question can change user-visible behavior, scope boundaries, permissions, failure outcomes, or success criteria, ask the user to resolve it before moving to `specifying`. Do not create behavioral specifications from unresolved assumptions.
 
+## Workflow Handoff Confidence Loop
+
+Use the Workflow Handoff Confidence Loop from `../confidence-loop/SKILL.md` with `../confidence-loop/workflow-handoff-reviewer-prompt.md` before the `proposing → specifying` handoff when subagents are available.
+
+Review package must include `proposal.md`, confirmed exploration context, in-scope behavior, out-of-scope behavior, User Workflow, Boundary Decisions, Definitions, Open Questions, and Observable Success Criteria.
+
+Do not proceed to `specifying` while Critical or Important findings, `NEEDS_USER_DECISION`, or Unresolved Confidence Gaps remain.
+
 ## Proposal Format
 
 ```markdown

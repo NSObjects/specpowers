@@ -77,6 +77,7 @@ Review dispatch is mandatory after implementation reaches GREEN and before `task
 - Do not replace reviewer dispatch with inline self-check merely because the task seems simple or the controller already inspected the code.
 - If reviewer dispatch is unavailable or fails for platform/tooling reasons, the controller may use the inline self-checks below, but must report the fallback reason and the exact self-check result.
 - Each reviewer package must include the task, linked scenarios, changed files or diff summary, relevant test results, and the implementer report.
+- Before dispatching a reviewer, apply the `specpowers:confidence-loop` Review Package Adequacy Gate. If the task, linked scenarios, design constraints, diff context, test evidence, known risks, or prior findings/gaps are missing, provide them before review or treat the reviewer result as `NEEDS_CONTEXT`.
 
 If subagents are unavailable, the controller performs the same work inline. Do not skip either review stage merely because subagents are unavailable.
 

@@ -52,6 +52,14 @@ Stop designing and return to `specifying` or an earlier stage if the specs conta
 
 When this gate fails, report the specific Requirement or Scenario that is blocked and the missing behavioral detail. Do not fill the gap with a technical assumption.
 
+## Workflow Handoff Confidence Loop
+
+Use the Workflow Handoff Confidence Loop from `../confidence-loop/SKILL.md` with `../confidence-loop/workflow-handoff-reviewer-prompt.md` before the `designing → planning` handoff when subagents are available.
+
+Review package must include the approved specs, design draft, Requirement mapping, Architecture Decisions, Data Flow, File Changes, test strategy, and explicit trade-offs.
+
+Do not proceed to `planning` while Critical or Important findings, `NEEDS_USER_DECISION`, or Unresolved Confidence Gaps remain.
+
 ## Design for Isolation and Clarity
 
 Break the system into smaller units that each:

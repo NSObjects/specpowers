@@ -68,6 +68,19 @@ FOR each review item:
       run relevant verification
 ```
 
+## Review Resolution Loop
+
+Use this loop when handling feedback that will be sent back for re-review under the `specpowers:confidence-loop` Review Confidence Loop.
+
+For each review item, produce a Resolution Package entry:
+
+- `valid` / `fixed` — verified against the codebase, fixed with the smallest correct change, and covered by relevant verification.
+- `wrong/harmful` / `rejected` — contradicted by code, tests, specs, platform constraints, or prior user decisions; include evidence.
+- `out_of_scope` — real concern, but outside the requested review scope or explicitly excluded by the accepted boundary.
+- `needs_user_decision` — product, boundary, permission, failure-mode, or success-criteria decision that only the user can make.
+
+After fixes, request re-review with the updated diff, prior findings, unresolved confidence gaps, verification evidence, and the Resolution Package. Do not claim approval while Critical or Important issues or approval-blocking gaps remain.
+
 ## Source-Specific Handling
 
 ### Feedback from the User

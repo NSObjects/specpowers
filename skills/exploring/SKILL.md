@@ -86,6 +86,14 @@ Before leaving `exploring`, present a user-reviewable alignment checkpoint that 
 
 Behavior-affecting open questions block transition. If any open question can change user-visible behavior, scope boundaries, permissions, failure outcomes, or success criteria, ask one focused clarification question or state the blocker. Do not create `proposal.md` until the blocker is resolved or the user explicitly narrows the scope to exclude it.
 
+## Workflow Handoff Confidence Loop
+
+Use the Workflow Handoff Confidence Loop from `../confidence-loop/SKILL.md` with `../confidence-loop/workflow-handoff-reviewer-prompt.md` before the `exploring → proposing` handoff when subagents are available.
+
+Review package must include the alignment checkpoint, confirmed user answers, open questions, scope boundaries, constraints, and intended proposal direction.
+
+Do not proceed to `proposing` while Critical or Important findings, `NEEDS_USER_DECISION`, or Unresolved Confidence Gaps remain.
+
 ## Scope Assessment
 
 Before detailed clarification, classify the request:
