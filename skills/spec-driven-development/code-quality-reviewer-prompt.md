@@ -69,6 +69,12 @@ Prompt:
   - No unsafe defaults or surprising configuration behavior.
   - No mutating git commands or unrelated repository state changes.
 
+  **Evidence-backed confidence**
+  - Before returning APPROVED, ask whether you have 100% confidence, based on reviewed evidence, that no Critical or Important issue remains in this task scope.
+  - Treat 100% confidence as evidence-bound, not omniscience: every concrete doubt raised by the diff, tests, task context, touched code paths, and stated risks has been investigated or reported.
+  - Convert confirmed or likely problems into Issues.
+  - Put missing evidence that prevents a reliable approval under Unresolved Confidence Gaps, with the exact evidence needed.
+
   ## Severity Definitions
 
   - Critical: likely incorrect behavior, data loss, security issue, broken build/test, or major maintainability hazard. Must fix before task completion.
@@ -90,6 +96,9 @@ Prompt:
   - Why it matters: [impact]
   - Recommended fix: [specific, bounded recommendation]
 
+  **Unresolved Confidence Gaps**
+  - [approval-blocking evidence gaps that prevent APPROVED, or "None"]
+
   **Tests / Checks Reviewed**
   - [commands/results from implementer or reviewer]
 
@@ -99,5 +108,5 @@ Prompt:
   Approval rule:
   - Return APPROVED only when there are no Critical or Important issues.
   - Return NEEDS_CHANGES when any Critical or Important issue exists.
-  - Return NEEDS_CONTEXT only when missing evidence prevents a reliable review.
+  - Return NEEDS_CONTEXT when missing evidence prevents a reliable review, including any approval-blocking unresolved confidence gap.
 ```

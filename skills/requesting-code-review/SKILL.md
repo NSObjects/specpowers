@@ -119,7 +119,7 @@ Final user-facing result should include:
 **Why:** [short synthesis]
 
 ## Blocking Issues
-- [Critical or Important issues, or "None"]
+- [Critical or Important issues, approval-blocking confidence gaps, or "None"]
 
 ## Non-Blocking Notes
 - [Minor issues or follow-ups, or "None"]
@@ -137,14 +137,15 @@ Final user-facing result should include:
 After fixes:
 
 1. Use the previous review head as the new base when only reviewing the fixes.
-2. Include the prior blocking findings in `{DESCRIPTION}`.
-3. Ask the reviewer to verify that the fixes address those findings and do not introduce regressions.
-4. Repeat until no Critical or Important issues remain.
+2. Include the prior blocking findings and unresolved confidence gaps in `{DESCRIPTION}`.
+3. Ask the reviewer to verify that the fixes address those findings, close the confidence gaps, and do not introduce regressions.
+4. Repeat until no Critical or Important issues or approval-blocking unresolved confidence gaps remain.
 
 ## Decision Policy
 
 - Any Critical issue => `NEEDS_CHANGES`.
 - Any Important issue => `NEEDS_CHANGES`.
+- Any approval-blocking unresolved confidence gap => `NEEDS_CHANGES`.
 - Minor issues only => usually `APPROVED` with notes.
 - Missing or incomplete Spec Scenarios do not automatically block the review, but missing tests for provided required scenarios are Critical.
 - If the reviewer is wrong, push back with code, tests, or specification evidence.

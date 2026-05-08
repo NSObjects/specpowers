@@ -291,8 +291,9 @@ Check at minimum:
 - **Test quality:** tests assert behavior, cover meaningful edge cases, and are not over-mocked.
 - **Scope control:** no unrelated refactors, no speculative features, no broad cleanup outside the task.
 - **Operational safety:** no secret leakage, unsafe defaults, surprising side effects, or avoidable performance regressions.
+- **Evidence-backed confidence:** before passing Stage 2, confirm that every concrete doubt raised by the diff, tests, task context, touched code paths, and stated risks has been investigated or reported.
 
-Stage 2 fails on any Critical or Important issue. Minor issues may be reported but should not block completion unless they accumulate into a maintainability risk.
+Stage 2 fails on any Critical or Important issue or approval-blocking confidence gap. Minor issues may be reported but should not block completion unless they accumulate into a maintainability risk. If missing evidence prevents a reliable self-check, treat it as a blocker and get the missing context or verification before marking the task complete.
 
 ## Existing Failures and Blockers
 

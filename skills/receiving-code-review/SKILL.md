@@ -5,13 +5,32 @@ description: Use before replying to or implementing code review feedback. Clarif
 
 # Code Review Reception
 
-Use this skill when code review feedback arrives and you need to decide whether to respond, clarify, push back, or implement.
+Use this skill when code review feedback needs to be handled and you need to decide whether to respond, clarify, push back, or implement.
 
 ## Core Rule
 
 Code review feedback is a technical claim to evaluate, not an order to obey.
 
 Understand it first. Verify it against the current codebase. Then respond or implement.
+
+## Feedback Input Boundary
+
+Before evaluating review feedback, make sure the actual comments are available.
+
+- If the user pasted review comments, use those comments directly.
+- If the user provided a review link, merge request ID, pull request ID, or equivalent review identifier, use the configured review source to fetch the comments before evaluating them.
+- If the configured review source is unavailable, lacks permission, or cannot fetch comments for that review system, ask the user for the missing comments, link, review identifier, platform, or permissions needed to continue.
+- Do not invent, infer, or simulate review comments. Missing review input is a blocker, not an invitation to guess.
+
+## Review Comment Acquisition
+
+When review comments are not already pasted into the conversation, treat acquisition as source lookup rather than a fixed script. Prefer this order:
+
+- Start from the most concrete signal available: pasted comments, review link, merge request ID, pull request ID, repository remote, or user-provided platform context.
+- When the review source has a native repository or code-host integration, use it to collect pull request or merge request review comments, conversation comments, and inline threads.
+- Otherwise, use the configured MCP or platform integration for that host to collect the same review comment set.
+- Collect the review-level comments and inline or threaded discussions that are accessible through the chosen integration. Follow pagination when the platform exposes it.
+- If the source, tool, permission, or identifier is missing, ask only for the missing piece and wait. Do not continue with guessed feedback.
 
 ## Default Workflow
 
@@ -144,7 +163,7 @@ Push back when the suggestion:
 
 Good pushback cites files, tests, current behavior, platform constraints, or user decisions. It should state the consequence and offer a safer alternative when available.
 
-If you notice yourself avoiding necessary pushback, use this signal phrase: **“Strange things are afoot at the Circle K.”** Then state the technical concern plainly.
+If you notice yourself avoiding necessary pushback, stop and state the technical concern plainly with evidence. Do not use catchphrases or unrelated asides.
 
 ## Correcting Course
 
@@ -156,15 +175,9 @@ Verified against `auth_test.go`; the feedback is correct. My initial read missed
 
 Avoid long apologies or defensive explanations.
 
-## GitHub Inline Review Replies
+## Inline Review Replies
 
-When replying to inline GitHub PR review comments, reply in the existing thread, not as a top-level PR comment.
-
-```bash
-gh api \
-  repos/{owner}/{repo}/pulls/{pr}/comments/{comment_id}/replies \
-  -f body='Fixed in <file or commit>. Verified with <test/build/lint>.'
-```
+When replying to inline review comments, use the review system's existing thread or conversation when available. Avoid top-level summary comments unless the user asks for one or the platform has no threaded reply mechanism.
 
 ## Final Checklist
 

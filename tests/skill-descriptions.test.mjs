@@ -101,3 +101,94 @@ test('using-skills keeps routing in one primary decision table', () => {
     'using-skills should not keep broad overlapping routing subsections',
   );
 });
+
+test('receiving-code-review pushback guidance avoids user-facing catchphrases', () => {
+  const content = read('skills/receiving-code-review/SKILL.md');
+
+  assert.doesNotMatch(
+    content,
+    /\bsignal phrase\b/i,
+    'receiving-code-review should not require a fixed signal phrase in user-facing replies',
+  );
+  assert.doesNotMatch(
+    content,
+    /Strange things are afoot at the Circle K/i,
+    'receiving-code-review should avoid unrelated pop-culture catchphrases',
+  );
+});
+
+test('receiving-code-review reply guidance stays platform-neutral', () => {
+  const content = read('skills/receiving-code-review/SKILL.md');
+
+  assert.doesNotMatch(
+    content,
+    /GitHub|Yunxiao|云效/i,
+    'receiving-code-review should avoid naming specific code hosting platforms',
+  );
+  assert.doesNotMatch(
+    content,
+    /\bgh api\b/i,
+    'receiving-code-review should not prescribe GitHub CLI commands',
+  );
+});
+
+test('receiving-code-review defines how to obtain missing feedback', () => {
+  const content = read('skills/receiving-code-review/SKILL.md');
+
+  assert.ok(
+    content.includes('## Feedback Input Boundary'),
+    'receiving-code-review should define the boundary for obtaining review feedback',
+  );
+  assert.ok(
+    content.includes('configured review source'),
+    'receiving-code-review should use the configured review source instead of assuming one provider',
+  );
+  assert.ok(
+    content.includes('ask the user for the missing comments, link, review identifier, platform, or permissions'),
+    'receiving-code-review should ask for missing review input instead of inventing comments',
+  );
+  assert.ok(
+    content.includes('Do not invent, infer, or simulate review comments'),
+    'receiving-code-review should forbid fabricated review feedback',
+  );
+});
+
+test('receiving-code-review routes review comment acquisition by platform', () => {
+  const content = read('skills/receiving-code-review/SKILL.md');
+
+  assert.ok(
+    content.includes('## Review Comment Acquisition'),
+    'receiving-code-review should define how to acquire comments before processing them',
+  );
+  assert.ok(
+    content.includes('native repository or code-host integration'),
+    'receiving-code-review should allow platform-native repository integrations',
+  );
+  assert.ok(
+    content.includes('MCP or platform integration'),
+    'receiving-code-review should route platform integrations without naming a specific provider',
+  );
+  assert.ok(
+    content.includes('MCP'),
+    'receiving-code-review should explicitly support MCP-backed platforms',
+  );
+  assert.ok(
+    content.includes('merge request') && content.includes('pull request'),
+    'receiving-code-review should cover both MR and PR terminology',
+  );
+});
+
+test('receiving-code-review acquisition guidance avoids rigid step scripts', () => {
+  const content = read('skills/receiving-code-review/SKILL.md');
+  const acquisition = content.split('## Review Comment Acquisition')[1]?.split('## Default Workflow')[0] ?? '';
+
+  assert.doesNotMatch(
+    acquisition,
+    /^\d+\.\s/m,
+    'comment acquisition should be priority guidance rather than a rigid numbered script',
+  );
+  assert.ok(
+    acquisition.includes('Prefer this order'),
+    'comment acquisition should describe a flexible preference order',
+  );
+});

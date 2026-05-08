@@ -47,6 +47,36 @@ test('code reviewer prompt can recommend specialist deep dives without becoming 
   );
 });
 
+test('code reviewer prompt requires a factual confidence loop before approval', () => {
+  const content = read('skills/requesting-code-review/code-reviewer-prompt.md');
+
+  assert.ok(
+    content.includes('Factual Confidence Loop'),
+    'code reviewer prompt should require an explicit confidence loop',
+  );
+  assert.ok(
+    content.includes('100% confidence'),
+    'code reviewer prompt should preserve the user-facing confidence gate language',
+  );
+  assert.ok(
+    content.includes('Unresolved Confidence Gaps'),
+    'code reviewer prompt should expose evidence gaps separately from findings',
+  );
+});
+
+test('requesting-code-review re-review loop keeps confidence gaps blocking', () => {
+  const content = read('skills/requesting-code-review/SKILL.md');
+
+  assert.ok(
+    content.includes('unresolved confidence gaps'),
+    'requesting-code-review should keep unresolved confidence gaps in the re-review loop',
+  );
+  assert.ok(
+    content.includes('approval-blocking confidence gaps'),
+    'requesting-code-review final result should surface confidence gaps as blocking issues',
+  );
+});
+
 test('dispatching-parallel-agents keeps specialist reviewers behind unified review orchestration', () => {
   const content = read('skills/dispatching-parallel-agents/SKILL.md');
 
@@ -84,6 +114,27 @@ test('spec-driven-development requires dispatched review gates before task compl
   assert.ok(
     content.includes('Review evidence:'),
     'task reports should include review evidence instead of only a claim',
+  );
+  assert.ok(
+    content.includes('approval-blocking confidence gap'),
+    'inline Code Quality Self-Check should not pass with unresolved confidence gaps',
+  );
+});
+
+test('task code quality reviewer shares the evidence-backed confidence gate', () => {
+  const content = read('skills/spec-driven-development/code-quality-reviewer-prompt.md');
+
+  assert.ok(
+    content.includes('100% confidence'),
+    'task code quality reviewer should use the same evidence-backed confidence gate before approval',
+  );
+  assert.ok(
+    content.includes('Unresolved Confidence Gaps'),
+    'task code quality reviewer should report evidence gaps explicitly',
+  );
+  assert.ok(
+    content.includes('Return NEEDS_CONTEXT when missing evidence prevents a reliable review'),
+    'task code quality reviewer should map approval-blocking evidence gaps to NEEDS_CONTEXT',
   );
 });
 

@@ -22,6 +22,7 @@ If a required input is missing or ambiguous, continue with the review using the 
 4. **Prioritize behavioral risk.** Correctness, spec compliance, data loss, security, reliability, and test gaps matter more than style preferences.
 5. **Do not over-review.** Avoid broad redesigns, speculative architecture advice, or unrelated legacy-code criticism unless the change makes the issue newly relevant.
 6. **Be explicit about test execution.** If tests were run, report which ones and the result. If tests could not be run, say so and rely on static review.
+7. **Separate confidence from optimism.** Approval requires evidence-backed confidence, not a feeling that the implementation is probably fine.
 
 ## Suggested Inspection Steps
 
@@ -41,7 +42,7 @@ Then:
 
 ## Review Process
 
-Perform the two stages below and report one decision.
+Perform the stages below and report one decision.
 
 ## Stage 1: Spec Compliance
 
@@ -78,6 +79,22 @@ Evaluate the changed code for:
 - **Maintainability:** naming, cohesion, complexity, duplication, readability
 - **Performance:** avoid obvious regressions or unbounded work in hot paths
 
+## Stage 3: Factual Confidence Loop
+
+Before returning `APPROVED`, ask: **Do I have 100% confidence, based on reviewed evidence, that no Critical or Important issue remains in the reviewed scope?**
+
+Treat "100% confidence" as an evidence-bound gate, not omniscience. It means every concrete doubt raised by the diff, specification, tests, touched code paths, and stated risks has been investigated or reported.
+
+If the answer is no, repeat this loop:
+
+1. Identify every plausible defect, vulnerability, regression, or evidence gap that could matter within the reviewed scope.
+2. Inspect the available diff, surrounding code, tests, and specification context to resolve each doubt.
+3. Convert confirmed or still-likely problems into actionable findings with severity and suggested fixes.
+4. Put missing evidence that prevents a reliable approval under **Unresolved Confidence Gaps** with the exact evidence needed.
+5. Ask the confidence question again after each pass.
+
+Do not return `APPROVED` while any Critical issue, Important issue, or approval-blocking unresolved confidence gap remains. Do not inflate low-evidence guesses into findings; keep speculative concerns in **Reviewer Notes** unless the reviewed evidence supports them.
+
 ## Issue Format
 
 Every issue must be actionable:
@@ -97,6 +114,8 @@ Use `unknown line` only when line numbers are unavailable.
 - **Minor:** Non-blocking improvement, readability suggestion, small cleanup, or follow-up item.
 
 `NEEDS_CHANGES` is required if there is any Critical or Important issue. Minor issues alone may still be `APPROVED`.
+
+Approval-blocking unresolved confidence gaps also require `NEEDS_CHANGES` because the review cannot factually support approval.
 
 ## Deep Dive Recommendations
 
@@ -128,6 +147,9 @@ Return exactly this structure:
 **Issues:**
 - [severity/category/evidence/impact/suggested fix]
 - If no issues: `None found`
+
+## Unresolved Confidence Gaps
+- [approval-blocking evidence gaps that must be resolved before approval, or "None"]
 
 ## Deep Dive Recommendations
 - `none` — no specialist deep dive warranted
