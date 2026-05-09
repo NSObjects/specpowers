@@ -1,6 +1,6 @@
 ---
 name: verification-before-completion
-description: Use when the user or active workflow explicitly requires evidence before a completion, fixed, passing, commit, or PR-ready claim; do not trigger independent verification without that checkpoint
+description: Use before any final answer or status claim after code implementation, ordinary code edits, code modifications, or bug fix implementations; also use before a completion, fixed, passing, commit, or PR-ready claim.
 ---
 
 # Verification Before Completion
@@ -8,6 +8,8 @@ description: Use when the user or active workflow explicitly requires evidence b
 ## Overview
 
 Claiming work is complete without verification is dishonesty, not efficiency.
+
+Use before any final answer or status claim after code implementation. This includes ordinary code edits, code modifications, and bug fix implementations.
 
 **Core principle:** Evidence before claims, always.
 

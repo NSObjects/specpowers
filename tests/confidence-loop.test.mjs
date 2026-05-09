@@ -259,6 +259,36 @@ test('using-skills routes completed code implementation to confidence-loop witho
   );
 });
 
+test('post-implementation confidence loop is discoverable before final responses', () => {
+  const confidenceLoop = read('skills/confidence-loop/SKILL.md');
+  const usingSkills = read('skills/using-skills/SKILL.md');
+  const completionGate = read('skills/verification-before-completion/SKILL.md');
+
+  for (const expected of [
+    'Use immediately after ordinary code edits, code modifications, or bug fix implementations',
+    'before the final response',
+    'claiming done, complete, fixed, passing, ready for review, or safe to proceed',
+  ]) {
+    assert.ok(confidenceLoop.includes(expected), `confidence-loop discovery text should include: ${expected}`);
+  }
+
+  for (const expected of [
+    'Before the final response after code edits',
+    'load or apply `confidence-loop`',
+    'load or apply `verification-before-completion`',
+  ]) {
+    assert.ok(usingSkills.includes(expected), `using-skills final-response gate should include: ${expected}`);
+  }
+
+  for (const expected of [
+    'Use before any final answer or status claim after code implementation',
+    'ordinary code edits',
+    'bug fix implementations',
+  ]) {
+    assert.ok(completionGate.includes(expected), `completion gate discovery text should include: ${expected}`);
+  }
+});
+
 test('install manifest includes confidence-loop in foundation', () => {
   const manifest = JSON.parse(read('manifests/install-modules.json'));
   const foundation = manifest.modules.find((module) => module.id === 'foundation');

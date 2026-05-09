@@ -146,6 +146,7 @@ Post-implementation routing:
 
 - During coding or review, load `rules-common` and the relevant language rules first.
 - After a `completed code implementation`, including `ordinary code implementation`, run or apply `confidence-loop` before reporting complete, fixed, passing, ready for review, or safe to proceed.
+- Before the final response after code edits, load or apply `confidence-loop` for the implemented scope, then load or apply `verification-before-completion` for any complete, fixed, passing, ready-for-review, or safe-to-proceed claim.
 - Ordinary implementation uses the `same evidence-bound confidence definition` from `confidence-loop`; do not create a new route or weaker local checklist.
 - A `read-only investigation, proposal, spec, design, or planning` result `does not trigger the post-implementation Confidence Loop`; do not claim code implementation is complete for non-code work.
 

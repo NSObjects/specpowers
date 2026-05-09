@@ -1,6 +1,6 @@
 ---
 name: confidence-loop
-description: Use when an artifact handoff, implementation, review, or completion gate needs evidence-bound confidence before proceeding or claiming done, approved, fixed, passing, or ready.
+description: Use immediately after ordinary code edits, code modifications, or bug fix implementations before the final response, and before artifact handoffs, reviews, or claiming done, complete, fixed, passing, ready for review, or safe to proceed.
 ---
 
 # Evidence-Bound Confidence Loop
@@ -44,6 +44,8 @@ Use this structure when reporting the loop:
 ```
 
 ## Post-Implementation Confidence Loop
+
+For skill discovery, this skill is the post-implementation gate: Use immediately after ordinary code edits, code modifications, or bug fix implementations before the final response, especially before claiming done, complete, fixed, passing, ready for review, or safe to proceed.
 
 When an Agent completes code implementation it owns, it must run or apply this loop before reporting the result to the user. The trigger scope includes `ordinary code edits`, `code modifications`, and `bug fix implementations`, and it runs `before reporting complete, fixed, passing, ready for review, or safe to proceed`.
 
