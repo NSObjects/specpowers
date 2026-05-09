@@ -71,6 +71,13 @@ Use subagents when the platform supports them. Dispatch a fresh worker per task 
 - Stage 1 reviewer: `./spec-reviewer-prompt.md`
 - Stage 2 reviewer: `./code-quality-reviewer-prompt.md`
 
+Resolve concrete language rules before dispatch:
+
+- Use `scripts/lib/language-detect.js` against the task files, known implementation files, and reviewer changed files to identify concrete language rule skills.
+- Fill each worker or reviewer prompt's `Resolved Language Rules` section with concrete `specpowers:rules-*` skill names, such as `specpowers:rules-typescript`, `specpowers:rules-python`, `specpowers:rules-golang`, `specpowers:rules-rust`, or `specpowers:rules-java`.
+- If no installed language rule matches the task or review scope, write `none` in that section and continue with `rules-common`.
+- Do not dispatch a worker or reviewer prompt while `specpowers:rules-{language}` remains unresolved. The placeholder is a template marker, not a loadable skill.
+
 Review dispatch is mandatory after implementation reaches GREEN and before `tasks.md` is updated.
 
 - On subagent-capable platforms, dispatch both reviewer stages as separate review steps and wait for their results.

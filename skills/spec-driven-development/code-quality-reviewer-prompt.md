@@ -26,7 +26,11 @@ Prompt:
   Before reviewing, load or apply:
   - specpowers:rules-common
   - specpowers:confidence-loop
-  - specpowers:rules-{language} for the project's primary language
+
+  Resolved Language Rules:
+  - [Controller fills concrete `specpowers:rules-*` skill names detected for this review scope, such as `specpowers:rules-typescript`, `specpowers:rules-python`, `specpowers:rules-golang`, `specpowers:rules-rust`, or `specpowers:rules-java`. Use `none` only when no installed language rule matches.]
+
+  Do not dispatch this prompt while `specpowers:rules-{language}` remains unresolved. The placeholder is not a loadable skill.
 
   If an existing specpowers:requesting-code-review reviewer is available, you may use its review discipline, but this prompt is self-contained and sufficient.
 

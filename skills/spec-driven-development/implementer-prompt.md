@@ -34,7 +34,11 @@ Prompt:
   - specpowers:rules-common
   - specpowers:test-driven-development
   - specpowers:confidence-loop
-  - specpowers:rules-{language} for the project's primary language
+
+  Resolved Language Rules:
+  - [Controller fills concrete `specpowers:rules-*` skill names detected for this task, such as `specpowers:rules-typescript`, `specpowers:rules-python`, `specpowers:rules-golang`, `specpowers:rules-rust`, or `specpowers:rules-java`. Use `none` only when no installed language rule matches.]
+
+  Do not dispatch this prompt while `specpowers:rules-{language}` remains unresolved. The placeholder is not a loadable skill.
 
   If the platform cannot literally load these skills, apply their rules as review criteria.
 
