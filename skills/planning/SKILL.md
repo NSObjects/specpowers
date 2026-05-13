@@ -16,6 +16,8 @@ Use this skill when requirements/spec scenarios and the design direction are alr
 ## Hard Gates
 
 - Do **not** write implementation code in this skill.
+- Do **not** include code blocks, diffs, pseudocode, function bodies, imports, concrete control flow, or inline implementation snippets in task descriptions.
+- Tasks may name files, tests, responsibilities, observable behavior, acceptance criteria, and verification commands only. Leave exact code to `spec-driven-development`.
 - Do **not** proceed to implementation without explicit user approval of the plan.
 - Read the relevant specs, design, and existing code before writing tasks. If a required source cannot be found, ask one focused question instead of inventing details.
 - Every task must include a `Covers specs:` field.
@@ -65,7 +67,7 @@ If multiple interpretations are possible, prefer the one most directly supported
 
 6. **Write TDD steps**
     - RED: write a failing test with a specific name and expected failure reason.
-    - GREEN: implement the smallest production change that satisfies the test.
+    - GREEN: describe the smallest production responsibility that satisfies the test, without writing code.
     - VERIFY: run the concrete test command and expected result.
 
 7. **Self-review and repair**
@@ -175,9 +177,9 @@ Use `## N. [Module or Feature Boundary]` for a feature group. `## 1. [Module Nam
   Run: `<exact command>`
   Expected: FAIL for `<specific reason>`, not because of compile/setup errors.
 
-- [ ] **Step 3: Implement minimal code**
+- [ ] **Step 3: Describe minimal production responsibility**
   File: `path/to/source_file.ext`
-  Responsibility: `<what behavior this code must provide>`
+  Responsibility: `<observable responsibility the implementation must provide; do not include code, pseudocode, or control-flow steps>`
 
 - [ ] **Step 4: Verify GREEN**
   Run: `<exact command>`
@@ -203,7 +205,7 @@ Use this only for setup that enables later behavior tasks.
 
 - [ ] **Step 1: Create infrastructure artifact**
   File: `path/to/file.ext`
-  Responsibility: `<specific enabling responsibility>`
+  Responsibility: `<specific enabling responsibility; do not include code, pseudocode, or control-flow steps>`
 
 - [ ] **Step 2: Verify infrastructure**
   Run: `<exact command>`
@@ -219,6 +221,7 @@ These are plan failures and must be rewritten before presenting the plan:
 - `Add validation` without exact invalid inputs and expected outputs.
 - `Write tests` without test file, test name, GIVEN/WHEN/THEN, and expected RED reason.
 - `Implement the logic` without source file and responsibility.
+- Any fenced code block, diff, pseudocode, function body, import list, or concrete control-flow sequence in a task.
 - `Same as previous task`, `similar to Task N`, or references that force the reader to infer missing details.
 - A file path that is approximate instead of exact.
 - A command that is approximate instead of exact.
@@ -234,6 +237,7 @@ After drafting the complete plan, perform this review and include the result at 
 - [ ] **No unmapped behavior:** Every non-infrastructure task has a concrete Spec Scenario mapping.
 - [ ] **Infrastructure justified:** Every infrastructure task names the behavior task or scenario it enables.
 - [ ] **No placeholders:** The plan contains no `TBD`, `TODO`, vague validation/error handling, or inferred steps.
+- [ ] **No implementation content:** The plan contains no code blocks, diffs, pseudocode, function bodies, imports, or concrete control-flow steps.
 - [ ] **Test-first:** Every behavior, integration, error-path, and regression task starts with a failing test.
 - [ ] **Concrete commands:** Every task has an exact test, compile, lint, or smoke-test command.
 - [ ] **Concrete files:** Every task lists exact file paths and responsibilities.
