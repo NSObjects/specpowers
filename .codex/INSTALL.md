@@ -1,17 +1,18 @@
 # Installing SpecPowers for Codex
 
-Codex is supported through the SpecPowers plugin only. The plugin reads skills
-from the plugin checkout's `skills/` directory through Codex's default plugin
-skill discovery.
+Codex is supported through the SpecPowers plugin only. The plugin manifest at
+`.codex-plugin/plugin.json` points Codex at the plugin checkout's `skills/`
+directory.
 
 This is a Codex plugin install: register the repository as a marketplace with
-the Codex CLI, then install it from Codex's Plugins UI. Do not copy or symlink
+the Codex CLI, then install it from Codex's Plugins UI. The repository
+marketplace lives at `.agents/plugins/marketplace.json`. Do not copy or symlink
 skills into `~/.codex/skills`.
 
-Do not point Codex at a full SpecPowers source checkout. The full repository
-can contain generated or legacy plugin payloads that Codex may discover as
-duplicate skills. Use the marketplace command below so Codex manages the plugin
-checkout from `.codex-plugin/plugin.json` and one `skills/` tree.
+Older marketplace metadata used a root `source` entry, which recent Codex
+versions skip as an empty local plugin path. Use the marketplace command below
+so Codex reads the current `.agents/plugins/marketplace.json` catalog and the
+plugin's `.codex-plugin/plugin.json` manifest.
 
 ## Prerequisites
 
@@ -23,7 +24,8 @@ checkout from `.codex-plugin/plugin.json` and one `skills/` tree.
 
 ## Plugin Install
 
-Registers SpecPowers as a Codex marketplace. The plugin manifest lives at
+Registers SpecPowers as a Codex marketplace. The marketplace catalog lives at
+`.agents/plugins/marketplace.json`, and the plugin manifest lives at
 `.codex-plugin/plugin.json`.
 
 ### 1. Add the marketplace

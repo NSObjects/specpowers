@@ -1,11 +1,7 @@
 {
   "name": "specpowers",
-  "metadata": {
-    "description": "A curated SpecPowers marketplace providing spec-driven development workflows and skills for AI coding assistants."
-  },
-  "owner": {
-    "name": "NSObjects",
-    "email": ""
+  "interface": {
+    "displayName": "SpecPowers"
   },
   "plugins": [
     {
@@ -20,11 +16,7 @@
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
       },
-      "category": "Coding",
-      "author": {
-        "name": "NSObjects",
-        "email": ""
-      }
+      "category": "Coding"
     }
   ]
 }

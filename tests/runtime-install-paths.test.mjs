@@ -8,11 +8,29 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
 test('runtime entrypoints use managed install directories', async (t) => {
-  await t.test('codex plugin manifest relies on default root skills discovery', () => {
+  await t.test('codex plugin manifest declares the authored skills directory', () => {
     const manifest = JSON.parse(
       readFileSync(resolve(ROOT, '.codex-plugin/plugin.json'), 'utf-8'),
     );
-    assert.equal(manifest.skills, undefined);
+    assert.equal(manifest.skills, './skills/');
+  });
+
+  await t.test('Codex repo marketplace uses the current marketplace schema', () => {
+    const marketplace = JSON.parse(
+      readFileSync(resolve(ROOT, '.agents/plugins/marketplace.json'), 'utf-8'),
+    );
+    const plugin = marketplace.plugins.find((entry) => entry.name === 'specpowers');
+
+    assert.equal(marketplace.name, 'specpowers');
+    assert.equal(marketplace.interface.displayName, 'SpecPowers');
+    assert.ok(plugin, 'Expected specpowers entry in .agents/plugins/marketplace.json');
+    assert.deepEqual(plugin.source, {
+      source: 'url',
+      url: 'https://github.com/NSObjects/specpowers.git',
+    });
+    assert.equal(plugin.policy.installation, 'AVAILABLE');
+    assert.equal(plugin.policy.authentication, 'ON_INSTALL');
+    assert.equal(plugin.category, 'Coding');
   });
 
   await t.test('Claude Code plugin manifest points at managed skills and hooks', () => {
@@ -33,12 +51,13 @@ test('runtime entrypoints use managed install directories', async (t) => {
   await t.test('Codex install docs use marketplace commands for install and update', () => {
     const content = readFileSync(resolve(ROOT, '.codex/INSTALL.md'), 'utf-8');
     const installSteps = content.split('### Migrating from older instructions')[0];
-    assert.ok(installSteps.includes("plugin checkout's `skills/` directory"));
+    assert.match(installSteps, /plugin checkout's `skills\/`\s+directory/);
     assert.ok(installSteps.includes('.codex-plugin/plugin.json'));
+    assert.ok(installSteps.includes('.agents/plugins/marketplace.json'));
     assert.ok(installSteps.includes("Codex's Plugins UI"));
     assert.ok(installSteps.includes('codex plugin marketplace add https://github.com/NSObjects/specpowers.git'));
     assert.ok(installSteps.includes('codex plugin marketplace upgrade specpowers'));
-    assert.ok(installSteps.includes('Do not point Codex at a full SpecPowers source checkout'));
+    assert.ok(!installSteps.includes('source": "./"'));
     assert.ok(!installSteps.includes('git clone --filter=blob:none --sparse'));
     assert.ok(!installSteps.includes('git sparse-checkout set .codex-plugin skills README.md LICENSE'));
     assert.ok(!installSteps.includes('node scripts/install.js --platform codex --profile developer'));
@@ -46,7 +65,7 @@ test('runtime entrypoints use managed install directories', async (t) => {
     assert.ok(!installSteps.includes('Node.js'));
   });
 
-  await t.test('Codex install docs do not require hand-written local marketplaces', () => {
+  await t.test('Codex install docs do not require personal marketplace workarounds', () => {
     const content = readFileSync(resolve(ROOT, '.codex/INSTALL.md'), 'utf-8');
 
     const installSteps = content.split('### Migrating from older instructions')[0];
@@ -79,12 +98,13 @@ test('runtime entrypoints use managed install directories', async (t) => {
 
   await t.test('README describes Codex skills as default-discovered content', () => {
     const readme = readFileSync(resolve(ROOT, 'README.md'), 'utf-8');
-    assert.match(readme, /codex plugin marketplace|default plugin discovery/i);
+    assert.match(readme, /codex plugin marketplace|\.codex-plugin\/plugin\.json/i);
   });
 
   await t.test('README.zh-CN describes Codex skills as default-discovered content', () => {
     const readmeZh = readFileSync(resolve(ROOT, 'README.zh-CN.md'), 'utf-8');
     assert.match(readmeZh, /codex plugin marketplace|不生成 `.codex\/skills\/`/);
+    assert.ok(readmeZh.includes('.codex-plugin/plugin.json'));
   });
 
   await t.test('.codex/INSTALL.md does not reintroduce legacy or generated skill paths', () => {

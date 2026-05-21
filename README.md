@@ -75,13 +75,13 @@ Claude Code local-plugin installs generate a managed payload once before first u
 node scripts/install.js --platform claude-code --profile developer
 ```
 
-Codex plugin installs use `codex plugin marketplace` and read the plugin checkout's `skills/` directory through default plugin discovery, so they do not generate `.codex/skills/`.
+Codex plugin installs use `codex plugin marketplace`. The repository marketplace in `.agents/plugins/marketplace.json` exposes the plugin, and `.codex-plugin/plugin.json` points Codex at the authored `skills/` directory, so installs do not generate `.codex/skills/`.
 
 Generated Claude Code plugin payloads and `manifests/install-state/` files are local install artifacts, not authored source.
 
 ### Language Rules
 
-Claude Code plugin payloads are generated at install time. The `developer` profile includes `rules-common`; add language-specific rules explicitly when generating the managed payload. Codex reads the authored rules from the marketplace plugin checkout's `skills/` directly.
+Claude Code plugin payloads are generated at install time. The `developer` profile includes `rules-common`; add language-specific rules explicitly when generating the managed payload. Codex reads the authored rules from the plugin manifest's `skills` path directly.
 
 ```bash
 node scripts/install.js --platform claude-code --profile developer --add rules-typescript

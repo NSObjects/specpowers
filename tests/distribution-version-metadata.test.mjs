@@ -40,8 +40,15 @@ test('distribution metadata versions stay aligned with package.json', async (t) 
     assert.equal(plugin.version, packageVersion);
   });
 
+  await t.test('.agents/plugins/marketplace.json advertises the package version', () => {
+    const marketplace = readJson('.agents/plugins/marketplace.json');
+    const plugin = marketplace.plugins.find((entry) => entry.name === 'specpowers');
+    assert.ok(plugin, 'Expected specpowers entry in .agents/plugins/marketplace.json');
+    assert.equal(plugin.version, packageVersion);
+  });
+
   await t.test('marketplace name matches the public upgrade command', () => {
-    assert.equal(readJson('.claude-plugin/marketplace.json').name, 'specpowers');
+    assert.equal(readJson('.agents/plugins/marketplace.json').name, 'specpowers');
   });
 
 });
