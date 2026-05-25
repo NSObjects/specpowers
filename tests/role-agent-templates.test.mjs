@@ -64,24 +64,24 @@ test('role agent templates common structure', async (t) => {
     await t.test(`${tmpl.name} has an Inputs section`, () => {
       assert.match(
         content,
-        /^## (Your Inputs|Inputs)/m,
-        `${tmpl.name} should have a ## Inputs or ## Your Inputs section`,
+        /^## (输入|需要填写的输入|Your Inputs|Inputs)/m,
+        `${tmpl.name} should have a localized Inputs section`,
       );
     });
 
     await t.test(`${tmpl.name} has an Output Format section`, () => {
       assert.match(
         content,
-        /^## (Output Format|Report Format)/m,
-        `${tmpl.name} should have an Output Format or Report Format section`,
+        /^## (输出格式|报告格式|Output Format|Report Format)/m,
+        `${tmpl.name} should have a localized Output Format or Report Format section`,
       );
     });
 
     await t.test(`${tmpl.name} has a Constraints or Process section`, () => {
       assert.match(
         content,
-        /^## (Constraints|Process|Guidance Process|Review Process|Planning Process)/m,
-        `${tmpl.name} should have a Constraints or Process section`,
+        /^## (约束|流程|审查流程|规划流程|操作规则|角色边界|允许使用的工具|审查基本规则|TDD 流程|Constraints|Process|Guidance Process|Review Process|Planning Process)/m,
+        `${tmpl.name} should have a localized Constraints or Process section`,
       );
     });
   }
@@ -107,8 +107,8 @@ test('planner agent template specifics', async (t) => {
   await t.test('restricts to read-only — MUST NOT use Write/Edit', () => {
     assert.match(
       content,
-      /MUST NOT/i,
-      'planner should contain a MUST NOT restriction',
+      /(MUST NOT|不得)/i,
+      'planner should contain a hard restriction',
     );
     assert.match(content, /Write/i, 'planner should mention Write as forbidden');
     assert.match(content, /Edit/i, 'planner should mention Edit as forbidden');
@@ -133,7 +133,7 @@ test('security reviewer template specifics', async (t) => {
   });
 
   await t.test('restricts to read-only — MUST NOT use Write/Edit', () => {
-    assert.match(content, /MUST NOT/i, 'security-reviewer should contain MUST NOT restriction');
+    assert.match(content, /(MUST NOT|不得)/i, 'security-reviewer should contain a hard restriction');
     assert.match(content, /Write/i, 'security-reviewer should mention Write as forbidden');
     assert.match(content, /Edit/i, 'security-reviewer should mention Edit as forbidden');
   });
@@ -197,7 +197,7 @@ test('implementation researcher template specifics', async (t) => {
   const content = templateContents['implementation-researcher'];
 
   await t.test('mentions codebase-first research order', () => {
-    assert.match(content, /codebase first/i, 'implementation-researcher should search the codebase first');
+    assert.match(content, /先搜索当前代码库|codebase first/i, 'implementation-researcher should search the codebase first');
   });
 
   await t.test('requires structured research output', () => {
@@ -207,6 +207,6 @@ test('implementation researcher template specifics', async (t) => {
 
   await t.test('restricts itself to research rather than implementation', () => {
     assert.match(content, /MUST NOT/i, 'implementation-researcher should contain MUST NOT restriction');
-    assert.match(content, /implement/i, 'implementation-researcher should forbid implementation work');
+    assert.match(content, /实现代码|implement/i, 'implementation-researcher should forbid implementation work');
   });
 });

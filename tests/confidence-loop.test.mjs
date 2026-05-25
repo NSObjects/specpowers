@@ -20,8 +20,9 @@ test('confidence-loop skill defines evidence-bound confidence without omniscienc
     content.includes('100% confidence'),
     'confidence-loop should preserve the user-facing confidence gate language',
   );
-  assert.ok(
-    content.includes('not omniscience'),
+  assert.match(
+    content,
+    /不是 omniscience/,
     'confidence-loop should reject literal omniscience as the meaning of 100% confidence',
   );
   assert.ok(
@@ -29,7 +30,7 @@ test('confidence-loop skill defines evidence-bound confidence without omniscienc
     'confidence-loop should expose missing evidence separately from issues',
   );
   assert.ok(
-    content.includes('one full pass produces no new concrete blocking doubt'),
+    content.includes('完整一轮没有产生新的 concrete blocking doubt'),
     'confidence-loop should define a concrete stopping condition',
   );
 });
@@ -49,7 +50,7 @@ test('confidence-loop skill requires repeated doubt inspection before approval',
   }
 
   assert.ok(
-    content.includes('Do not convert speculative concerns into findings'),
+    content.includes('不要把 speculative concerns 转换成 findings'),
     'confidence-loop should prevent speculation from becoming fake certainty',
   );
 });
@@ -72,7 +73,7 @@ test('post-implementation confidence loop covers ordinary edits and bug fixes', 
   }
 });
 
-test('post-implementation confidence loop source guidance stays in English', () => {
+test('post-implementation confidence loop source guidance is localized', () => {
   const content = read('skills/confidence-loop/SKILL.md');
   const start = content.indexOf('## Post-Implementation Confidence Loop');
   assert.notEqual(start, -1, 'missing post-implementation confidence loop section');
@@ -80,7 +81,7 @@ test('post-implementation confidence loop source guidance stays in English', () 
   const nextSection = content.indexOf('\n## ', start + 1);
   const section = nextSection === -1 ? content.slice(start) : content.slice(start, nextSection);
 
-  assert.doesNotMatch(section, /[\u4E00-\u9FFF]/u);
+  assert.match(section, /[\u4E00-\u9FFF]/u);
 });
 
 test('implementer prompt blocks DONE when confidence gaps remain', () => {
@@ -91,7 +92,7 @@ test('implementer prompt blocks DONE when confidence gaps remain', () => {
     'implementer prompt should load or apply confidence-loop',
   );
   assert.ok(
-    content.includes('Before returning DONE'),
+    content.includes('返回 DONE 前'),
     'implementer prompt should run the loop before returning DONE',
   );
   assert.ok(
@@ -99,7 +100,7 @@ test('implementer prompt blocks DONE when confidence gaps remain', () => {
     'implementer prompt should mention unresolved confidence gaps',
   );
   assert.ok(
-    content.includes('must not return DONE'),
+    content.includes('不得返回 DONE'),
     'implementer prompt should forbid DONE with unresolved gaps',
   );
 });
@@ -120,7 +121,7 @@ test('spec-driven-development requires confidence loop evidence before task comp
     'task reports should include confidence-loop evidence',
   );
   assert.ok(
-    content.includes('Do not mark `tasks.md` complete while any unresolved confidence gap remains'),
+    /do not mark `tasks\.md` complete while any unresolved confidence gap remains/i.test(content),
     'task completion should be blocked by unresolved confidence gaps',
   );
 });
@@ -137,7 +138,7 @@ test('verification-before-completion blocks completion claims on confidence gaps
     'completion verification should report unresolved confidence gaps',
   );
   assert.ok(
-    content.includes('must not claim complete, fixed, passing, PR-ready, or approved'),
+    content.includes('不得 claim complete、fixed、passing、PR-ready 或 approved'),
     'completion claims should be blocked when confidence gaps remain',
   );
 });
@@ -151,7 +152,7 @@ test('post-implementation reports include evidence and block completion claims o
     'checked doubts',
     'fixed issues',
     'Unresolved Confidence Gaps',
-    '`PASS | BLOCKED` result',
+    '`PASS | BLOCKED` 结果',
   ]) {
     assert.ok(confidenceLoop.includes(expected), `missing implementation report evidence text: ${expected}`);
   }
@@ -159,7 +160,7 @@ test('post-implementation reports include evidence and block completion claims o
   for (const expected of [
     'ready for review',
     'safe to proceed',
-    'State the actual status and the missing evidence instead',
+    '改为说明 actual status 和 missing evidence',
   ]) {
     assert.ok(completionGate.includes(expected), `missing expanded completion gate text: ${expected}`);
   }
@@ -173,7 +174,7 @@ test('post-implementation trigger preserves existing workflow gates', () => {
   for (const expected of [
     'extends ordinary implementation paths',
     'does not replace spec-driven implementation, review, handoff, or completion gates',
-    'Do not proceed while Critical or Important findings or Unresolved Confidence Gaps remain',
+    'Critical 或 Important findings 或 Unresolved Confidence Gaps 仍存在时不得继续',
   ]) {
     assert.ok(confidenceLoop.includes(expected), `missing existing gate preservation text: ${expected}`);
   }
@@ -230,7 +231,7 @@ test('using-skills treats confidence-loop as a support skill', () => {
     'using-skills should route confidence-loop as support only',
   );
   assert.ok(
-    content.includes('artifact handoff'),
+    /artifact handoff/i.test(content),
     'using-skills should route confidence-loop for artifact handoff gates',
   );
   assert.ok(
@@ -265,23 +266,23 @@ test('post-implementation confidence loop is discoverable before final responses
   const completionGate = read('skills/verification-before-completion/SKILL.md');
 
   for (const expected of [
-    'Use immediately after ordinary code edits, code modifications, or bug fix implementations',
-    'before the final response',
-    'claiming done, complete, fixed, passing, ready for review, or safe to proceed',
+    '普通代码编辑、代码修改或 bug fix 实现后、最终回复前立即使用',
+    '最终回复之前',
+    'done、complete、fixed、passing、ready for review 或 safe to proceed',
   ]) {
     assert.ok(confidenceLoop.includes(expected), `confidence-loop discovery text should include: ${expected}`);
   }
 
   for (const expected of [
     'Before the final response after code edits',
-    'load or apply `confidence-loop`',
-    'load or apply `verification-before-completion`',
+    'load/apply `confidence-loop`',
+    'load/apply `verification-before-completion`',
   ]) {
     assert.ok(usingSkills.includes(expected), `using-skills final-response gate should include: ${expected}`);
   }
 
   for (const expected of [
-    'Use before any final answer or status claim after code implementation',
+    'Code implementation 后，在任何 final answer 或 status claim 前使用',
     'ordinary code edits',
     'bug fix implementations',
   ]) {
@@ -306,14 +307,14 @@ test('review package adequacy gate blocks under-specified subagent reviews', () 
   for (const expected of [
     '## Review Package Adequacy Gate',
     'scope',
-    'current artifact or diff',
+    'current artifact 或 diff',
     'confirmed user decisions',
-    'in-scope and out-of-scope boundaries',
+    'in-scope 和 out-of-scope boundaries',
     'open questions',
-    'relevant specs, design, tasks, and tests',
+    'relevant specs、design、tasks 和 tests',
     'known risks',
-    'prior findings or gaps',
-    'Do not infer missing context',
+    'prior findings 或 gaps',
+    '不要推断缺失上下文',
     'NEEDS_CONTEXT',
     'NEEDS_USER_DECISION',
     'Unresolved Confidence Gaps',
@@ -333,16 +334,16 @@ test('workflow handoff reviewer prompt defines read-only dialogue loop', () => {
 
   for (const expected of [
     'Workflow Handoff Reviewer',
-    'read-only',
-    'Do not edit files',
-    'Handoff Under Review',
-    'Review Package Adequacy Gate',
+    '只读',
+    '不要编辑文件',
+    '待审查的移交',
+    '审查包充分性门槛',
     'Resolution Package',
     'PASS | NEEDS_CHANGES | NEEDS_USER_DECISION',
     'Unresolved Confidence Gaps',
-    'Repeat until PASS or NEEDS_USER_DECISION',
+    '重复执行，直到 PASS 或 NEEDS_USER_DECISION',
     '[source stage → target stage]',
-    'Examples:',
+    '示例：',
   ]) {
     assert.ok(content.includes(expected), `missing reviewer prompt text: ${expected}`);
   }
@@ -360,8 +361,8 @@ test('confidence-loop centralizes workflow handoff reviewer dialogue loop', () =
     '## Workflow Handoff Confidence Loop',
     'workflow-handoff-reviewer-prompt.md',
     'Resolution Package',
-    'repeat until `PASS` or `NEEDS_USER_DECISION`',
-    'Do not proceed while Critical or Important findings or Unresolved Confidence Gaps remain',
+    '重复直到 `PASS` 或 `NEEDS_USER_DECISION`',
+    'Critical 或 Important findings 或 Unresolved Confidence Gaps 仍存在',
   ]) {
     assert.ok(content.includes(expected), `missing centralized handoff loop text: ${expected}`);
   }
@@ -413,11 +414,12 @@ test('artifact workflow handoffs delegate loop mechanics to confidence-loop', ()
       `${file} should reference the handoff reviewer prompt`,
     );
     assert.ok(
-      content.includes('Use the Workflow Handoff Confidence Loop from'),
+      content.includes('使用 `../confidence-loop/SKILL.md` 中的 Workflow Handoff Confidence Loop') ||
+        content.includes('Use the Workflow Handoff Confidence Loop from'),
       `${file} should delegate dialogue mechanics to confidence-loop`,
     );
     assert.ok(
-      content.includes('Review package must include'),
+      content.includes('Review package 必须包含'),
       `${file} should define handoff-specific review package fields`,
     );
     assert.ok(
@@ -446,11 +448,11 @@ test('planning handoff package includes implementation readiness evidence', () =
   }
 
   assert.ok(
-    content.includes('If the handoff loop changes `tasks.md`, assumptions, scope, test commands, or execution-relevant content'),
+    content.includes('如果 handoff loop 改变了 `tasks.md`、assumptions、scope、test commands 或 execution-relevant content'),
     'planning handoff should require renewed approval after execution-relevant plan changes',
   );
   assert.ok(
-    content.includes('obtain user approval and execution mode confirmation again'),
+    content.includes('再次获得用户批准和 execution mode confirmation'),
     'planning handoff should not proceed to implementation after unapproved plan changes',
   );
 });

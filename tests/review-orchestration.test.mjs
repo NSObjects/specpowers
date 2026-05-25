@@ -13,7 +13,7 @@ test('requesting-code-review keeps one surfaced entrypoint while allowing specia
   const content = read('skills/requesting-code-review/SKILL.md');
 
   assert.ok(
-    content.includes('single surfaced entrypoint'),
+    content.includes('单一对外入口'),
     'requesting-code-review should define itself as the single surfaced entrypoint',
   );
   assert.ok(
@@ -21,7 +21,7 @@ test('requesting-code-review keeps one surfaced entrypoint while allowing specia
     'requesting-code-review should describe optional specialist reviewers',
   );
   assert.ok(
-    content.includes('single final conclusion'),
+    content.includes('一个最终 user-facing conclusion'),
     'requesting-code-review should require the main agent to return one final conclusion',
   );
   assert.ok(
@@ -38,7 +38,7 @@ test('code reviewer prompt can recommend specialist deep dives without becoming 
   const content = read('skills/requesting-code-review/code-reviewer-prompt.md');
 
   assert.ok(
-    content.includes('Deep Dive Recommendations'),
+    content.includes('深度审查建议'),
     'code reviewer prompt should allow recommending specialist deep dives',
   );
   assert.ok(
@@ -63,7 +63,7 @@ test('code reviewer prompt requires a factual confidence loop before approval', 
     'code reviewer prompt should expose evidence gaps separately from findings',
   );
   assert.ok(
-    content.includes('Review Package Adequacy Gate'),
+    content.includes('审查包充分性门槛'),
     'code reviewer prompt should check package adequacy before approval',
   );
   assert.ok(
@@ -71,7 +71,7 @@ test('code reviewer prompt requires a factual confidence loop before approval', 
     'code reviewer prompt output should allow NEEDS_CONTEXT',
   );
   assert.ok(
-    content.includes('Return NEEDS_CONTEXT when missing evidence prevents a reliable review'),
+    content.includes('当缺失证据导致无法可靠审查时，返回 NEEDS_CONTEXT'),
     'code reviewer prompt should map missing evidence to NEEDS_CONTEXT',
   );
 });
@@ -88,7 +88,7 @@ test('requesting-code-review re-review loop keeps confidence gaps blocking', () 
     'requesting-code-review final result should support NEEDS_CONTEXT',
   );
   assert.ok(
-    content.includes('Missing context or approval-blocking evidence gap => `NEEDS_CONTEXT`'),
+    content.includes('缺少 context 或存在 approval-blocking evidence gap => `NEEDS_CONTEXT`'),
     'requesting-code-review decision policy should preserve missing-context state',
   );
   assert.ok(
@@ -122,7 +122,7 @@ test('spec-driven-development requires dispatched review gates before task compl
     'spec-driven-development should pin review dispatch between GREEN and task completion',
   );
   assert.ok(
-    content.includes('Do not replace reviewer dispatch with inline self-check'),
+    /do not replace reviewer dispatch with inline self-check/i.test(content),
     'spec-driven-development should not allow inline self-check to silently replace reviewer dispatch',
   );
   assert.match(
@@ -165,7 +165,7 @@ test('task code quality reviewer shares the evidence-backed confidence gate', ()
     'task code quality reviewer should report evidence gaps explicitly',
   );
   assert.ok(
-    content.includes('Return NEEDS_CONTEXT when missing evidence prevents a reliable review'),
+    content.includes('当缺失证据导致无法可靠审查时返回 NEEDS_CONTEXT'),
     'task code quality reviewer should map approval-blocking evidence gaps to NEEDS_CONTEXT',
   );
 });

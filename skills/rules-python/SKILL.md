@@ -1,62 +1,62 @@
 ---
 name: rules-python
-description: Use when writing, reviewing, or modifying Python code — provides Python-specific coding rules that override and extend the universal rules from rules-common
+description: 编写、审查或修改 Python code 时使用；提供 Python-specific coding rules，覆盖并扩展 rules-common 的通用规则。
 language: python
 ---
 
-# Python Coding Rules
+# Python Coding Rules（Python 编码规则）
 
-These rules apply to Python projects. They inherit all rules from `rules-common` and override specific entries where Python conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
-
----
-
-## 1. Coding Style
-
-### 1.1 Naming Conventions `[Overrides common: 1.1]`
-
-**Reason:** Python has PEP 8 naming conventions that are deeply embedded in the ecosystem.
-
-- Variables and functions: `snake_case`
-- Classes: `PascalCase`
-- Constants: `UPPER_SNAKE_CASE`
-- Private members: single leading underscore `_private_method`
-- Name-mangled members: double leading underscore `__mangled` — use sparingly, only to avoid subclass collisions
-- Modules and packages: `snake_case`, short, lowercase
-- Booleans: use `is_`, `has_`, `should_`, `can_` prefixes
-
-### 1.2 Function Size `[Overrides common: 1.2]`
-
-**Reason:** Python's significant whitespace and docstrings affect line counts.
-
-- Aim for ~25 lines of logic (excluding docstring and type hints)
-- Use early returns to reduce nesting — Python's flat-is-better-than-nested philosophy
-- Extract complex comprehensions into named helper functions when they exceed one line of logic
-
-### 1.3 File Organization `[Overrides common: 1.3]`
-
-**Reason:** Python has specific conventions for module structure and `__init__.py`.
-
-- Order: `__future__` imports → stdlib imports → third-party imports → local imports (enforced by `isort`)
-- Use `__init__.py` to define the public API of a package — keep it minimal
-- One class per file is NOT required — group related classes in a single module
-- Use `__all__` to explicitly declare public exports
-
-### 1.4 Formatting `[Overrides common: 1.5]`
-
-**Reason:** Python has converged on specific formatters with strong community adoption.
-
-- Use `black` as the primary formatter — no configuration debates
-- Use `isort` for import sorting, configured to be compatible with `black`
-- Use `ruff` as a fast alternative that combines formatting and linting
-- 4-space indentation (PEP 8 standard, non-negotiable)
+这些规则适用于 Python projects。它们继承 `rules-common` 的全部规则，并在 Python conventions 不同的地方用 `[Overrides common: X.Y]` 标记覆盖条目和原因。
 
 ---
 
-## 2. Type Hints
+## 1. Coding Style（编码风格）
 
-### 2.1 Use Type Hints for Public APIs
+### 1.1 Naming Conventions（命名约定）`[Overrides common: 1.1]`
 
-All public functions, methods, and class attributes must have type hints. Internal helper functions should have type hints when the types are not obvious.
+**Reason:** Python 的 PEP 8 naming conventions 已深度嵌入生态。
+
+- Variables 和 functions：`snake_case`。
+- Classes：`PascalCase`。
+- Constants：`UPPER_SNAKE_CASE`。
+- Private members：单前导下划线 `_private_method`。
+- Name-mangled members：双前导下划线 `__mangled`，谨慎使用，只用于避免 subclass collisions。
+- Modules 和 packages：`snake_case`、短、小写。
+- Booleans：使用 `is_`、`has_`、`should_`、`can_` 前缀。
+
+### 1.2 Function Size（函数规模）`[Overrides common: 1.2]`
+
+**Reason:** Python 的 significant whitespace 和 docstrings 会影响行数。
+
+- 目标约 25 行 logic，不含 docstring 和 type hints。
+- 用 early returns 降低 nesting，符合 Python flat-is-better-than-nested 的哲学。
+- Complex comprehensions 超过一行 logic 时，提取为命名 helper functions。
+
+### 1.3 File Organization（文件组织）`[Overrides common: 1.3]`
+
+**Reason:** Python 对 module structure 和 `__init__.py` 有特定 conventions。
+
+- 顺序：`__future__` imports → stdlib imports → third-party imports → local imports（由 `isort` enforcing）。
+- 使用 `__init__.py` 定义 package 的 public API，并保持 minimal。
+- 不要求 one class per file；related classes 可放在同一个 module。
+- 使用 `__all__` 显式声明 public exports。
+
+### 1.4 Formatting（格式化）`[Overrides common: 1.5]`
+
+**Reason:** Python 社区已收敛到特定 formatters。
+
+- 使用 `black` 作为 primary formatter，避免 configuration debates。
+- 使用 `isort` 排序 imports，并配置为兼容 `black`。
+- 可使用 `ruff` 作为结合 formatting 和 linting 的快速替代。
+- 4-space indentation 是 PEP 8 standard，不可协商。
+
+---
+
+## 2. Type Hints（类型提示）
+
+### 2.1 Use Type Hints for Public APIs（Public API 使用类型提示）
+
+所有 public functions、methods 和 class attributes 必须有 type hints。Internal helper functions 在类型不明显时也应有 type hints。
 
 ```python
 # Good
@@ -68,182 +68,182 @@ def fetch_user(user_id):
     ...
 ```
 
-### 2.2 Use Modern Type Syntax
+### 2.2 Use Modern Type Syntax（使用现代类型语法）
 
-- Use `X | Y` instead of `Union[X, Y]` (Python 3.10+)
-- Use `list[int]` instead of `List[int]` (Python 3.9+)
-- Use `from __future__ import annotations` for older Python versions
-- Use `TypeAlias` for complex type definitions
+- Python 3.10+ 使用 `X | Y`，不用 `Union[X, Y]`。
+- Python 3.9+ 使用 `list[int]`，不用 `List[int]`。
+- 旧版本 Python 使用 `from __future__ import annotations`。
+- 复杂 type definitions 使用 `TypeAlias`。
 
-### 2.3 Runtime Validation at Boundaries
+### 2.3 Runtime Validation at Boundaries（边界做运行时校验）
 
-Type hints are not enforced at runtime. Use `pydantic`, `attrs`, or `dataclasses` with validation for data crossing trust boundaries (API inputs, file parsing, config loading).
-
----
-
-## 3. Testing `[Overrides common: 2.1]`
-
-**Reason:** Python has a rich testing ecosystem with specific conventions.
-
-### 3.1 Test-First with pytest
-
-Use `pytest` as the test runner. Write test functions (not classes) unless you need shared setup. Use fixtures for dependency injection in tests.
-
-### 3.2 Test Coverage Strategy `[Overrides common: 2.4]`
-
-**Reason:** Python's dynamic nature means more runtime bugs — test more aggressively.
-
-- The type checker handles less than in statically typed languages — compensate with more tests
-- Test duck typing contracts explicitly — verify objects implement expected protocols
-- Use `hypothesis` for property-based testing of data transformations and parsers
-- Use `pytest.mark.parametrize` for table-driven tests
+Type hints 不会在 runtime 强制执行。跨 trust boundaries 的 data（API inputs、file parsing、config loading）使用 `pydantic`、`attrs` 或带 validation 的 `dataclasses`。
 
 ---
 
-## 4. Error Handling `[Overrides common: 5.6]`
+## 3. Testing（测试）`[Overrides common: 2.1]`
 
-**Reason:** Python uses exceptions as a primary control flow mechanism (EAFP over LBYL).
+**Reason:** Python 有丰富 testing ecosystem 和特定 conventions。
 
-- Prefer "Easier to Ask Forgiveness than Permission" (EAFP) — use `try/except` over pre-checking
-- Catch specific exceptions, never bare `except:` or `except Exception:`
-- Use custom exception classes for domain errors — inherit from a project-level base exception
-- Use `raise ... from ...` to preserve exception chains
-- Context managers (`with` statement) for resource cleanup — never rely on `__del__`
+### 3.1 Test-First with pytest（使用 pytest 测试先行）
 
----
+使用 `pytest` 作为 test runner。默认写 test functions；只有需要 shared setup 时才使用 classes。Tests 中通过 fixtures 做 dependency injection。
 
-## 5. Resource Cleanup `[Overrides common: 4.3]`
+### 3.2 Test Coverage Strategy（测试覆盖策略）`[Overrides common: 2.4]`
 
-**Reason:** Python has context managers as the idiomatic resource management pattern.
+**Reason:** Python 的 dynamic nature 会带来更多 runtime bugs，因此 tests 要更积极。
 
-- Always use `with` statements for files, database connections, locks, and network sockets
-- Implement `__enter__` / `__exit__` or use `@contextmanager` for custom resource types
-- Use `contextlib.ExitStack` for managing multiple resources dynamically
-- For async resources, use `async with` and `@asynccontextmanager`
+- Type checker 覆盖范围少于 statically typed languages，用更多 tests 补偿。
+- 显式测试 duck typing contracts，验证 objects 是否实现 expected protocols。
+- 对 data transformations 和 parsers 使用 `hypothesis` 做 property-based testing。
+- 使用 `pytest.mark.parametrize` 做 table-driven tests。
 
 ---
 
-## 6. Immutability `[Overrides common: 5.4]`
+## 4. Error Handling（错误处理）`[Overrides common: 5.6]`
 
-**Reason:** Python has specific tools for immutability that differ from other languages.
+**Reason:** Python 将 exceptions 作为主要 control flow mechanism（EAFP over LBYL）。
 
-- Use `tuple` instead of `list` for fixed collections
-- Use `frozenset` instead of `set` for hashable, immutable sets
-- Use `@dataclass(frozen=True)` or `NamedTuple` for immutable data structures
-- Use `types.MappingProxyType` for read-only dict views
-- Avoid mutable default arguments — use `None` and create inside the function
-
----
-
-## 7. Composition and Inheritance `[Overrides common: 5.1]`
-
-**Reason:** Python supports multiple inheritance and mixins — use them carefully.
-
-- Prefer composition over inheritance, but Python's mixin pattern is acceptable for cross-cutting concerns
-- Use `Protocol` (structural subtyping) instead of ABC when possible — it's more Pythonic
-- If using inheritance, keep hierarchies shallow (max 2-3 levels)
-- Use `super()` correctly — understand MRO (Method Resolution Order)
+- 优先 "Easier to Ask Forgiveness than Permission"（EAFP）：使用 `try/except`，而不是事前 pre-checking。
+- Catch specific exceptions；不要使用 bare `except:` 或 `except Exception:`。
+- Domain errors 使用 custom exception classes，并继承 project-level base exception。
+- 使用 `raise ... from ...` 保留 exception chains。
+- Resource cleanup 使用 context managers（`with` statement），不依赖 `__del__`。
 
 ---
 
-## 8. Dependency Injection `[Overrides common: 5.2]`
+## 5. Resource Cleanup（资源清理）`[Overrides common: 4.3]`
 
-**Reason:** Python's dynamic nature enables simpler DI patterns than other languages.
+**Reason:** Python 的 idiomatic resource management pattern 是 context managers。
 
-- Use function parameters and default arguments for simple DI
-- Use `Protocol` classes to define interfaces for dependencies
-- Avoid heavyweight DI frameworks — Python's simplicity makes them unnecessary in most cases
-- Use `pytest` fixtures as the DI mechanism in tests
-
----
-
-## 9. Algorithm Complexity `[Overrides common: 4.2]`
-
-**Reason:** Python's interpreted nature makes algorithmic choices more impactful.
-
-- Python is ~10-100x slower than compiled languages — algorithm choice matters more
-- Use built-in data structures: `dict` and `set` for O(1) lookups, `collections.deque` for O(1) append/pop from both ends
-- Use `itertools` and generators for memory-efficient iteration over large datasets
-- Profile with `cProfile` or `py-spy` before optimizing — don't guess
+- Files、database connections、locks 和 network sockets 始终使用 `with` statements。
+- Custom resource types 实现 `__enter__` / `__exit__`，或使用 `@contextmanager`。
+- 动态管理多个 resources 时使用 `contextlib.ExitStack`。
+- Async resources 使用 `async with` 和 `@asynccontextmanager`。
 
 ---
 
-## 10. Batch Operations `[Overrides common: 4.5]`
+## 6. Immutability（不可变性）`[Overrides common: 5.4]`
 
-**Reason:** Python's per-call overhead makes batching especially important.
+**Reason:** Python 有不同于其他语言的 immutability 工具。
 
-- Use list comprehensions and generator expressions over explicit loops when possible
-- Use `executemany()` for batch database operations
-- Use `asyncio.gather()` for concurrent I/O operations
-- Avoid N+1 query patterns — use eager loading or batch fetching
-
----
-
-## 11. SQL and Injection Prevention `[Overrides common: 3.6]`
-
-**Reason:** Python has specific ORM and query builder patterns.
-
-- Use SQLAlchemy, Django ORM, or Tortoise ORM for database access
-- If raw SQL is necessary, always use parameterized queries with `%s` or `:param` placeholders
-- Never use f-strings or `.format()` to build SQL queries
-- Use `pydantic` to validate and sanitize input before it reaches the database layer
+- Fixed collections 使用 `tuple`，不用 `list`。
+- 需要 hashable immutable sets 时使用 `frozenset`。
+- Immutable data structures 使用 `@dataclass(frozen=True)` 或 `NamedTuple`。
+- Read-only dict views 使用 `types.MappingProxyType`。
+- 避免 mutable default arguments；使用 `None` 并在 function 内创建。
 
 ---
 
-## 12. Git Workflow `[Overrides common: 6.5]`
+## 7. Composition and Inheritance（组合和继承）`[Overrides common: 5.1]`
 
-**Reason:** Python has specific generated files and virtual environment patterns.
+**Reason:** Python 支持 multiple inheritance 和 mixins，需谨慎使用。
 
-- Never commit `__pycache__/`, `.pyc` files, or virtual environments (`venv/`, `.venv/`)
-- Commit `requirements.txt` or `poetry.lock` / `pdm.lock` for reproducible installs
-- Commit `pyproject.toml` — it is the modern standard for Python project configuration
-- Use `.gitignore` templates specific to Python (GitHub's `Python.gitignore`)
+- 优先 composition over inheritance，但 Python 的 mixin pattern 可用于 cross-cutting concerns。
+- 尽可能使用 `Protocol`（structural subtyping）替代 ABC，它更 Pythonic。
+- 使用 inheritance 时，hierarchies 保持 shallow，最多 2-3 层。
+- 正确使用 `super()`，理解 MRO（Method Resolution Order）。
 
 ---
 
-## Red Flags
+## 8. Dependency Injection（依赖注入）`[Overrides common: 5.2]`
+
+**Reason:** Python 的 dynamic nature 支持比其他语言更简单的 DI patterns。
+
+- 简单 DI 使用 function parameters 和 default arguments。
+- 使用 `Protocol` classes 定义 dependency interfaces。
+- 避免 heavyweight DI frameworks；Python 的简单性让它们在多数场景没必要。
+- Tests 中使用 `pytest` fixtures 作为 DI mechanism。
+
+---
+
+## 9. Algorithm Complexity（算法复杂度）`[Overrides common: 4.2]`
+
+**Reason:** Python 是 interpreted language，algorithmic choices 影响更大。
+
+- Python 通常比 compiled languages 慢 10-100 倍，因此 algorithm choice 更重要。
+- 使用 built-in data structures：`dict` 和 `set` 做 O(1) lookups，`collections.deque` 做两端 O(1) append/pop。
+- 大数据集 memory-efficient iteration 使用 `itertools` 和 generators。
+- 优化前用 `cProfile` 或 `py-spy` profile，不要猜。
+
+---
+
+## 10. Batch Operations（批量操作）`[Overrides common: 4.5]`
+
+**Reason:** Python 的 per-call overhead 让 batching 尤其重要。
+
+- 可行时用 list comprehensions 和 generator expressions，而不是 explicit loops。
+- Batch database operations 使用 `executemany()`。
+- Concurrent I/O operations 使用 `asyncio.gather()`。
+- 避免 N+1 query patterns；使用 eager loading 或 batch fetching。
+
+---
+
+## 11. SQL and Injection Prevention（SQL 和注入防护）`[Overrides common: 3.6]`
+
+**Reason:** Python 有特定 ORM 和 query builder patterns。
+
+- Database access 使用 SQLAlchemy、Django ORM 或 Tortoise ORM。
+- 必须写 raw SQL 时，始终使用带 `%s` 或 `:param` placeholders 的 parameterized queries。
+- 不要用 f-strings 或 `.format()` 构建 SQL queries。
+- Input 到达 database layer 前，使用 `pydantic` validate 和 sanitize。
+
+---
+
+## 12. Git Workflow（Git 工作流）`[Overrides common: 6.5]`
+
+**Reason:** Python 有特定 generated files 和 virtual environment patterns。
+
+- 不要 commit `__pycache__/`、`.pyc` files 或 virtual environments（`venv/`、`.venv/`）。
+- Commit `requirements.txt` 或 `poetry.lock` / `pdm.lock`，保证 reproducible installs。
+- Commit `pyproject.toml`，它是现代 Python project configuration 标准。
+- 使用 Python-specific `.gitignore` templates（GitHub 的 `Python.gitignore`）。
+
+---
+
+## Red Flags（风险信号）
 
 | Thought | Reality |
 |---------|---------|
-| "I don't need type hints for this" | Public APIs always need type hints. Your future self and your team need them. |
-| "Bare `except:` will catch everything" | It catches `KeyboardInterrupt` and `SystemExit` too. Catch specific exceptions. |
-| "Mutable default arguments are fine" | `def f(items=[])` is a classic Python bug. Use `None` and create inside. |
-| "I'll just use `global`" | Global mutable state is the root of all evil. Pass it as a parameter. |
-| "This comprehension is readable" | If it's more than one line of logic, extract it into a named function. |
-| "I don't need a virtual environment" | You do. System Python is not your playground. Always use `venv` or equivalent. |
-| "f-strings in SQL are convenient" | They're also SQL injection vectors. Use parameterized queries. |
-| "`isinstance` checks everywhere" | Use Protocols and duck typing. Explicit type checks are often a design smell. |
+| "I don't need type hints for this" | Public APIs 始终需要 type hints。未来的你和团队都需要它们。 |
+| "Bare `except:` will catch everything" | 它也会捕获 `KeyboardInterrupt` 和 `SystemExit`。Catch specific exceptions。 |
+| "Mutable default arguments are fine" | `def f(items=[])` 是经典 Python bug。使用 `None` 并在内部创建。 |
+| "I'll just use `global`" | Global mutable state 是问题根源。通过 parameter 传递。 |
+| "This comprehension is readable" | 如果超过一行 logic，提取成命名 function。 |
+| "I don't need a virtual environment" | 需要。System Python 不是 playground。始终使用 `venv` 或等价工具。 |
+| "f-strings in SQL are convenient" | 它们也是 SQL injection vectors。使用 parameterized queries。 |
+| "`isinstance` checks everywhere" | 使用 Protocols 和 duck typing。大量 explicit type checks 往往是 design smell。 |
 
 ---
 
-## Iron Laws
+## Iron Laws（铁律）
 
-1. **Virtual environments are mandatory.** Never install project dependencies into system Python. Use `venv`, `poetry`, `pdm`, or `conda`.
-2. **Type hints on all public APIs.** No exceptions. Internal helpers get them when types are non-obvious.
-3. **No bare `except:`.** Always catch specific exception types. `except Exception:` is acceptable only at top-level error boundaries.
-4. **No mutable default arguments.** Use `None` sentinel and create mutable objects inside the function body.
-5. **Format with `black` or `ruff`.** No manual formatting debates. The formatter is always right.
-6. **No `global` keyword in production code.** Pass state through function parameters or class attributes.
+1. **Virtual environments are mandatory.** 不要把 project dependencies 安装进 system Python。使用 `venv`、`poetry`、`pdm` 或 `conda`。
+2. **Public APIs 全部加 type hints。** 没有例外。Internal helpers 在 types 不明显时也要添加。
+3. **No bare `except:`。** 始终 catch specific exception types。`except Exception:` 只可用于 top-level error boundaries。
+4. **No mutable default arguments。** 使用 `None` sentinel，并在 function body 内创建 mutable objects。
+5. **用 `black` 或 `ruff` format。** 不做手动 formatting debates，formatter 始终是标准。
+6. **Production code 不使用 `global` keyword。** State 通过 function parameters 或 class attributes 传递。
 
 ---
 
-## Behavioral Shaping
+## Behavioral Shaping（行为塑形）
 
-### When Starting a New Python File
+### When Starting a New Python File（开始新的 Python 文件时）
 
-1. Add `from __future__ import annotations` if supporting Python < 3.10
-2. Set up imports in the correct order: stdlib → third-party → local
-3. Define `__all__` if the module is part of a package's public API
+1. 如果支持 Python < 3.10，添加 `from __future__ import annotations`。
+2. 按正确顺序组织 imports：stdlib → third-party → local。
+3. 如果 module 是 package public API 的一部分，定义 `__all__`。
 
-### When Adding a New Dependency
+### When Adding a New Dependency（新增依赖时）
 
-1. Check if the stdlib already provides the functionality (`pathlib`, `dataclasses`, `itertools`, `functools`)
-2. Verify the package supports your minimum Python version
-3. Add to `pyproject.toml` dependencies, not just `requirements.txt`
+1. 检查 stdlib 是否已提供功能（`pathlib`、`dataclasses`、`itertools`、`functools`）。
+2. 验证 package 支持项目 minimum Python version。
+3. 添加到 `pyproject.toml` dependencies，不只写入 `requirements.txt`。
 
-### When Reviewing Python Code
+### When Reviewing Python Code（审查 Python 代码时）
 
-1. Check for bare `except:` clauses and mutable default arguments
-2. Verify type hints are present on public APIs
-3. Confirm context managers are used for resource management
-4. Look for N+1 query patterns in database access code
+1. 检查 bare `except:` clauses 和 mutable default arguments。
+2. 验证 public APIs 上有 type hints。
+3. 确认 resource management 使用 context managers。
+4. 查找 database access code 中的 N+1 query patterns。

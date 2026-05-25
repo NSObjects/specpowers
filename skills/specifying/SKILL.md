@@ -1,111 +1,111 @@
 ---
 name: specifying
-description: "Use when an accepted change intent needs precise, reviewable, testable behavioral requirements before design or coding."
+description: "当已接受的 change intent 在 design 或 coding 前需要精确、可审查、可测试的 behavioral requirements 时使用。"
 ---
 
-# Specifying Behavior
+# Specifying Behavior（行为规格定义）
 
-Define **what the system must do**, not how it will be built. The output is a behavioral contract that downstream design, implementation, and tests must trace back to.
+定义 **系统必须做什么**，而不是如何构建。输出是一份 behavioral contract，后续 design、implementation 和 tests 都必须能追溯回来。
 
-**Announce at start:** "I'm using the specifying skill to define behavioral specifications."
+**开始时宣布：**“我正在使用 specifying skill 定义 behavioral specifications。”
 
-**Role:** QA Architect. Focus on observable behavior, acceptance criteria, edge cases, and reviewability. Do **not** design or implement the solution.
+**角色：** QA Architect。聚焦 observable behavior、acceptance criteria、edge cases 和 reviewability。不要 design 或 implement solution。
 
-## Non-Negotiable Gates
+## Non-Negotiable Gates（不可协商关卡）
 
-- Do **not** include implementation details: class names, function names, framework names, database tables, internal algorithms, data structures, test tools, package names, or code-level architecture.
-- Do **not** use vague language such as "works correctly", "handles various cases", "appropriate error handling", "seamless", "robust", "intuitive", or "etc.".
-- Every active Requirement in `ADDED` or `MODIFIED` sections MUST have testable scenarios.
-- Every active Requirement MUST include at least one happy-path scenario and one edge/error scenario.
-- Every Scenario MUST use `GIVEN` / `WHEN` / `THEN`. Use `AND` only for additional observable outcomes.
-- Do **not** proceed to design, implementation, or test writing until the user explicitly confirms the specifications.
+- 不要包含 implementation details：class names、function names、framework names、database tables、internal algorithms、data structures、test tools、package names 或 code-level architecture。
+- 不要使用 vague language，例如 “works correctly”、“handles various cases”、“appropriate error handling”、“seamless”、“robust”、“intuitive” 或 “etc.”。
+- `ADDED` 或 `MODIFIED` sections 中的每个 active Requirement 都必须有 testable scenarios。
+- 每个 active Requirement 都必须至少包含一个 happy-path scenario 和一个 edge/error scenario。
+- 每个 Scenario 都必须使用 `GIVEN` / `WHEN` / `THEN`。`AND` 只用于追加 observable outcomes。
+- 用户明确确认 specifications 前，不要进入 design、implementation 或 test writing。
 
-## Inputs to Establish
+## Inputs to Establish（需要确定的输入）
 
-Use the accepted proposal and repository context to determine:
+基于 accepted proposal 和 repository context 确定：
 
-- `change-name`: use the provided change name; otherwise derive a short kebab-case name from the proposal.
-- Affected behavioral domains.
-- In-scope behavior, out-of-scope behavior, success criteria, actors, triggers, business rules, permissions, validations, notifications, and failure modes.
-- Existing specs under `specs/specs/`, if any.
+- `change-name`：使用已提供的 change name；否则从 proposal 派生简短 kebab-case name。
+- Affected behavioral domains。
+- In-scope behavior、out-of-scope behavior、success criteria、actors、triggers、business rules、permissions、validations、notifications 和 failure modes。
+- `specs/specs/` 下已有 specs（如果存在）。
 
-If a detail is underspecified but does not change observable behavior, make a conservative non-behavioral assumption and list it in the final summary for user confirmation. Ask a clarification question when a testable spec cannot be written without changing user-visible behavior.
+如果某个细节 underspecified 但不改变 observable behavior，做 conservative non-behavioral assumption，并在 final summary 中列出供用户确认。当缺失信息会导致无法写出 testable spec，且会改变 user-visible behavior 时，提出一个澄清问题。
 
-## Concrete Behavior Gate
+## Concrete Behavior Gate（具体行为门槛）
 
-Before saving or asking the user to confirm specifications, verify that every active Requirement and Scenario identifies:
+保存或请求用户确认 specifications 前，确认每个 active Requirement 和 Scenario 都识别出：
 
-- **actor:** who triggers or observes the behavior;
-- **precondition:** the relevant starting state and data;
-- **trigger action:** the single action, event, or request being evaluated;
-- **expected outcome:** the observable result, state change, message, artifact, or blocked path;
-- **edge or error condition:** the invalid, boundary, unavailable, denied, or alternate path that must be covered.
+- **actor:** 谁触发或观察该 behavior；
+- **precondition:** 相关 starting state 和 data；
+- **trigger action:** 被评估的单个 action、event 或 request；
+- **expected outcome:** observable result、state change、message、artifact 或 blocked path；
+- **edge or error condition:** 必须覆盖的 invalid、boundary、unavailable、denied 或 alternate path。
 
-Abstract behavior descriptions are not acceptable specifications. Phrases such as "works correctly", "handles various cases", "appropriate error handling", "seamless", "robust", "intuitive", or "etc." are signals to rewrite them as concrete scenarios. If the missing concrete behavior would change user-visible behavior, scope, permissions, failure outcomes, or success criteria, treat it as a blocking issue and ask one focused clarification question before continuing.
+Abstract behavior descriptions 不能作为 specifications。“works correctly”、“handles various cases”、“appropriate error handling”、“seamless”、“robust”、“intuitive” 或 “etc.” 都是需要重写成 concrete scenarios 的信号。如果缺失的 concrete behavior 会改变 user-visible behavior、scope、permissions、failure outcomes 或 success criteria，把它视为 blocking issue，并在继续前提出一个聚焦澄清问题。
 
-## Behavior Assumption Boundary
+## Behavior Assumption Boundary（行为假设边界）
 
-A non-behavioral assumption is allowed only when the missing detail does not change observable behavior, scope, permissions, failure outcomes, or success criteria. Disclose each non-behavioral assumption in the final summary so the user can correct it before design.
+只有缺失细节不改变 observable behavior、scope、permissions、failure outcomes 或 success criteria 时，才允许 non-behavioral assumption。每个 non-behavioral assumption 都要在 final summary 中披露，让用户能在 design 前纠正。
 
-A user-visible behavior decision must be confirmed by the user before the specification is saved or approved. If a missing decision can change observable behavior, scope, permissions, failure outcomes, or success criteria, stop and ask a focused clarification question instead of silently choosing a default.
+User-visible behavior decision 必须在 specification 保存或批准前由用户确认。如果缺失决定会改变 observable behavior、scope、permissions、failure outcomes 或 success criteria，停止并提出聚焦澄清问题，不要静默选择 default。
 
-## Workflow Handoff Confidence Loop
+## Workflow Handoff Confidence Loop（工作流交接信心循环）
 
 Use the Workflow Handoff Confidence Loop from `../confidence-loop/SKILL.md` with `../confidence-loop/workflow-handoff-reviewer-prompt.md` before the `specifying → designing` handoff when subagents are available.
 
-Review package must include the accepted proposal, saved specifications, Requirement and Scenario counts, assumptions, excluded behavior, and any open questions.
+Review package 必须包含 accepted proposal、saved specifications、Requirement and Scenario counts、assumptions、excluded behavior 和任何 open questions。
 
-Do not proceed to `designing` while Critical or Important findings, `NEEDS_USER_DECISION`, or Unresolved Confidence Gaps remain.
+当仍有 Critical 或 Important findings、`NEEDS_USER_DECISION` 或 Unresolved Confidence Gaps 时，不要进入 `designing`。
 
-## Workflow
+## Workflow（工作流）
 
-1. **Read the accepted proposal**
-   - Extract user-visible outcomes, rules, boundaries, and exclusions.
-   - Convert intent into observable behavior.
+1. **读取 accepted proposal**
+   - 提取 user-visible outcomes、rules、boundaries 和 exclusions。
+   - 将 intent 转成 observable behavior。
 
-2. **Detect project/spec mode**
-   - If `specs/specs/` has no existing specs: use **Greenfield Format**.
-   - If `specs/specs/` has existing specs: use **Delta Format** for every affected domain.
-   - Before writing a Delta spec, read the current spec for the affected domain when it exists.
-   - For a new domain in an existing project, still use Delta Format with `ADDED Requirements`.
+2. **检测 project/spec mode**
+   - 如果 `specs/specs/` 没有 existing specs，使用 **Greenfield Format**。
+   - 如果 `specs/specs/` 有 existing specs，对每个 affected domain 使用 **Delta Format**。
+   - 写 Delta spec 前，读取 affected domain 当前 spec（如果存在）。
+   - Existing project 中的新 domain 仍使用 Delta Format，并写入 `ADDED Requirements`。
 
-3. **Identify domains**
-   - Create one spec file per behavioral domain.
-   - Prefer existing domain names when modifying existing specs.
-   - Use concise, stable, behavior-oriented domain names such as `authentication`, `billing`, `notifications`, or `data-export`.
+3. **识别 domains**
+   - 每个 behavioral domain 创建一个 spec file。
+   - 修改 existing specs 时优先使用 existing domain names。
+   - 使用简洁、稳定、面向 behavior 的 domain names，例如 `authentication`、`billing`、`notifications` 或 `data-export`。
 
-4. **Write requirements**
-   - Each Requirement describes one externally observable behavior contract.
-   - Start requirement statements with `The system SHALL ...` unless a weaker RFC 2119 keyword is intentionally justified.
-   - Keep Requirement titles behavior-oriented, not implementation-oriented.
+4. **编写 requirements**
+   - 每个 Requirement 描述一个 externally observable behavior contract。
+   - Requirement statement 默认以 `The system SHALL ...` 开头，除非有意使用并说明较弱 RFC 2119 keyword。
+   - Requirement titles 保持 behavior-oriented，不写 implementation-oriented。
 
-5. **Write scenarios**
-   - Each Scenario must be independently testable.
-   - `GIVEN` states preconditions and relevant data.
-   - `WHEN` states a single trigger, action, or event.
-   - `THEN` states the primary observable result.
-   - `AND` states additional observable outcomes, state changes, visibility rules, notifications, or constraints.
-   - Apply the Concrete Behavior Gate before accepting the scenario.
+5. **编写 scenarios**
+   - 每个 Scenario 必须 independently testable。
+   - `GIVEN` 表示 preconditions 和 relevant data。
+   - `WHEN` 表示单个 trigger、action 或 event。
+   - `THEN` 表示 primary observable result。
+   - `AND` 表示 additional observable outcomes、state changes、visibility rules、notifications 或 constraints。
+   - 接受 scenario 前应用 Concrete Behavior Gate。
 
-6. **Self-review and fix inline**
-   - Remove ambiguity, implementation leakage, duplication, and untestable claims.
-   - Confirm every in-scope proposal item maps to at least one Requirement.
-   - Confirm every active Requirement has both happy-path and edge/error coverage.
-   - Confirm no abstract behavior descriptions remain unresolved.
-   - Confirm every user-visible behavior decision is explicit or confirmed by the user.
+6. **Self-review and fix inline（自审并就地修复）**
+   - 移除 ambiguity、implementation leakage、duplication 和 untestable claims。
+   - 确认每个 in-scope proposal item 都映射到至少一个 Requirement。
+   - 确认每个 active Requirement 都有 happy-path 和 edge/error coverage。
+   - 确认没有 abstract behavior descriptions 仍 unresolved。
+   - 确认每个 user-visible behavior decision 都明确，或已由用户确认。
 
-7. **Save and request confirmation**
-   - Save files to `specs/changes/<change-name>/specs/<domain>/spec.md`.
-   - Summarize changed files, Requirement count, Scenario count, assumptions, and any intentionally excluded behavior.
-   - Ask the user to review and explicitly confirm.
+7. **保存并请求确认**
+   - 保存到 `specs/changes/<change-name>/specs/<domain>/spec.md`。
+   - 总结 changed files、Requirement count、Scenario count、assumptions 和任何 intentionally excluded behavior。
+   - 请用户 review 并明确 confirm。
 
-8. **Transition only after approval**
-   - After explicit user confirmation, invoke the `designing` skill.
-   - Continue with the `designing` skill after the behavior contract is accepted.
+8. **仅在批准后转入下一阶段**
+   - 用户明确确认后，调用 `designing` skill。
+   - Behavior contract 被接受后，继续 `designing` skill。
 
-## Greenfield Format
+## Greenfield Format（绿地格式）
 
-Use this format only when the project has no existing behavioral specs.
+仅当项目没有 existing behavioral specs 时使用此格式。
 
 ```markdown
 # [Domain] Specification
@@ -130,11 +130,11 @@ The system SHALL [specific observable behavior].
 - THEN [observable expected outcome]
 ```
 
-## Delta Format
+## Delta Format（增量格式）
 
-Use this format when `specs/specs/` contains existing specs. Delta specs describe only the behavior added, changed, or removed by the accepted change.
+当 `specs/specs/` 包含 existing specs 时使用此格式。Delta specs 只描述 accepted change 添加、改变或移除的 behavior。
 
-Read `delta-format-guide.md` when writing Delta specs.
+编写 Delta specs 时读取 `delta-format-guide.md`。
 
 ```markdown
 # Delta for [Domain]
@@ -176,63 +176,63 @@ The system SHALL [complete updated behavior].
 (Reason: [specific reason this behavior is removed])
 ```
 
-### Delta Rules
+### Delta Rules（增量规则）
 
-- Include only sections that apply; omit empty sections.
-- `ADDED` contains complete new Requirements.
-- `MODIFIED` contains the complete updated Requirement, not only changed fragments. If the updated Requirement should retain existing scenarios, restate them.
-- `MODIFIED` MUST include `(Previously: ...)` using the current spec as the source whenever available.
-- A change that adds, removes, or changes scenarios for an existing Requirement is a `MODIFIED` Requirement.
-- `REMOVED` entries require a specific reason and do not need scenarios.
-- Do not restate unchanged Requirements.
+- 只包含适用 sections；省略 empty sections。
+- `ADDED` 包含完整 new Requirements。
+- `MODIFIED` 包含 complete updated Requirement，不只写 changed fragments。如果 updated Requirement 仍应保留 existing scenarios，也要 restate them。
+- 只要 current spec 可用，`MODIFIED` 必须包含 `(Previously: ...)`，并以 current spec 为 source。
+- 对 existing Requirement 添加、移除或改变 scenarios，都属于 `MODIFIED` Requirement。
+- `REMOVED` entries 需要 specific reason，且不需要 scenarios。
+- 不要 restate unchanged Requirements。
 
-## RFC 2119 Keyword Use
+## RFC 2119 Keyword Use（RFC 2119 关键词使用）
 
 | Keyword | Use |
 |---|---|
-| **SHALL / MUST** | Mandatory behavior with no allowed exception. Prefer `SHALL` for requirements. |
-| **SHOULD** | Recommended behavior with known exceptions. State or imply the exception clearly. |
-| **MAY** | Optional behavior. Use sparingly for explicitly allowed choices. |
+| **SHALL / MUST** | 没有允许例外的 mandatory behavior。Requirements 优先使用 `SHALL`。 |
+| **SHOULD** | 有已知例外的 recommended behavior。清楚说明或隐含 exception。 |
+| **MAY** | Optional behavior。只在明确允许选择时谨慎使用。 |
 
-## Quality Bar
+## Quality Bar（质量门槛）
 
-A specification is acceptable only when:
+Specification 只有在满足以下条件时才可接受：
 
-- A tester can write pass/fail tests from the scenarios without asking how the system is implemented.
-- A designer can propose multiple implementations that still satisfy the same specs.
-- A reviewer can trace each in-scope proposal item to a Requirement.
-- A future maintainer can tell exactly which behavior changed, especially in Delta specs.
-- No Requirement depends on hidden internal mechanics.
+- Tester 可直接从 scenarios 写 pass/fail tests，不需要询问系统如何实现。
+- Designer 可以提出多种仍满足同一 specs 的 implementations。
+- Reviewer 可以将每个 in-scope proposal item 追溯到 Requirement。
+- Future maintainer 能准确看出 behavior 发生了什么变化，尤其在 Delta specs 中。
+- 没有 Requirement 依赖 hidden internal mechanics。
 
-## Self-Review Checklist
+## Self-Review Checklist（自审清单）
 
-Before saving, verify:
+保存前确认：
 
-1. **Behavioral focus:** Does every Requirement describe externally observable behavior?
-2. **Testability:** Can each Scenario be tested with clear pass/fail criteria?
-3. **Coverage:** Does every in-scope proposal item have a corresponding Requirement?
-4. **Edge cases:** Does every active Requirement include happy-path and edge/error coverage?
-5. **Ambiguity:** Could any Requirement or Scenario be interpreted in two valid ways?
-6. **Implementation leakage:** Are there code, framework, database, package, or architecture references?
-7. **Delta integrity:** For Delta specs, are unchanged Requirements omitted, modified Requirements complete, and removed Requirements justified?
+1. **Behavioral focus:** 每个 Requirement 是否描述 externally observable behavior？
+2. **Testability:** 每个 Scenario 是否能用 clear pass/fail criteria 测试？
+3. **Coverage:** 每个 in-scope proposal item 是否都有对应 Requirement？
+4. **Edge cases:** 每个 active Requirement 是否包含 happy-path 和 edge/error coverage？
+5. **Ambiguity:** 是否有 Requirement 或 Scenario 可被两种有效方式解释？
+6. **Implementation leakage:** 是否出现 code、framework、database、package 或 architecture references？
+7. **Delta integrity:** 对 Delta specs，unchanged Requirements 是否已省略，modified Requirements 是否完整，removed Requirements 是否有 justification？
 
-Fix issues immediately before presenting the specs.
+呈现 specs 前立即修复问题。
 
-## Red Flags and Corrections
+## Red Flags and Corrections（风险信号和修正）
 
 | Red Flag | Correction |
 |---|---|
-| "The system should handle errors appropriately." | Name the exact error condition and expected observable result. |
-| "The feature works for all users." | Define which actors, permissions, states, and exclusions apply. |
-| "Various edge cases are supported." | Write a separate scenario for each relevant edge/error condition. |
-| "The implementation validates the input." | Specify the invalid input and what the user/system observes. |
-| "This is a small change, no spec needed." | Small changes still need at least one Requirement with scenarios. |
-| "Only one scenario is enough." | Add happy-path and edge/error coverage. |
-| "This modified Requirement only needs the changed scenario." | In Delta Format, include the complete updated Requirement because it replaces the old one on archive. |
+| "The system should handle errors appropriately." | 命名 exact error condition 和 expected observable result。 |
+| "The feature works for all users." | 定义适用 actors、permissions、states 和 exclusions。 |
+| "Various edge cases are supported." | 为每个 relevant edge/error condition 写单独 scenario。 |
+| "The implementation validates the input." | 指定 invalid input，以及 user/system 会观察到什么。 |
+| "This is a small change, no spec needed." | 小变更仍需要至少一个带 scenarios 的 Requirement。 |
+| "Only one scenario is enough." | 添加 happy-path 和 edge/error coverage。 |
+| "This modified Requirement only needs the changed scenario." | Delta Format 中，包含 complete updated Requirement，因为 archive 时它会替换旧版本。 |
 
-## Final Response Template
+## Final Response Template（最终回复模板）
 
-After saving specs, respond with:
+保存 specs 后回复：
 
 ```text
 Behavioral specifications saved.

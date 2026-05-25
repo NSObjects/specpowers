@@ -38,8 +38,8 @@ test('exploring requires a reviewable alignment checkpoint before proposing', ()
     );
   }
 
-  assert.match(content, /behavior-affecting open questions/i);
-  assert.match(content, /do not create `proposal\.md`/i);
+  assert.match(content, /影响行为的 open questions|behavior-affecting open question/u);
+  assert.match(content, /不要创建 `proposal\.md`/u);
 });
 
 test('proposing requires a reviewable boundary contract before specifying', () => {
@@ -64,8 +64,8 @@ test('proposing requires a reviewable boundary contract before specifying', () =
     );
   }
 
-  assert.match(content, /behavior-affecting open questions/i);
-  assert.match(content, /do not create behavioral specifications/i);
+  assert.match(content, /影响行为的 open questions|behavior-affecting open question/u);
+  assert.match(content, /不要从未解决的假设创建 behavioral specifications/u);
 });
 
 test('specifying rejects abstract behavior and requires concrete scenarios', () => {
@@ -88,7 +88,7 @@ test('specifying rejects abstract behavior and requires concrete scenarios', () 
   }
 
   assert.match(content, /abstract behavior descriptions/i);
-  assert.match(content, /rewrite them as concrete scenarios/i);
+  assert.match(content, /重写成 concrete scenarios/u);
   assert.match(content, /blocking issue/i);
 });
 
@@ -98,8 +98,8 @@ test('specifying blocks unconfirmed user-visible behavior assumptions', () => {
   assert.match(content, /## Behavior Assumption Boundary/);
   assert.match(content, /non-behavioral assumption/i);
   assert.match(content, /user-visible behavior decision/i);
-  assert.match(content, /scope, permissions, failure outcomes, or success criteria/i);
-  assert.match(content, /must be confirmed by the user/i);
+  assert.match(content, /scope、permissions、failure outcomes 或 success criteria/u);
+  assert.match(content, /由用户确认/u);
 });
 
 test('designing requires adequate specifications before technical design', () => {
@@ -120,8 +120,8 @@ test('designing requires adequate specifications before technical design', () =>
     );
   }
 
-  assert.match(content, /return to `specifying`/i);
-  assert.match(content, /trace.*Requirement/i);
+  assert.match(content, /回到 `specifying`/u);
+  assert.match(content, /Requirement.*追溯/u);
 });
 
 test('requirement alignment gate coverage names every front-half workflow stage', () => {

@@ -37,7 +37,7 @@ test('subagent prompts require concrete language rules instead of unresolved pla
       `${name} prompt should require the controller to provide resolved language rules`,
     );
     assert.ok(
-      content.includes('Do not dispatch') && content.includes('specpowers:rules-{language}'),
+      content.includes('不要派发此 prompt') && content.includes('specpowers:rules-{language}'),
       `${name} prompt should block dispatch when the language placeholder is unresolved`,
     );
     assert.doesNotMatch(
@@ -64,7 +64,7 @@ test('spec-driven-development resolves language rules before dispatching workers
     'controller workflow should resolve rules from task files and changed files',
   );
   assert.ok(
-    content.includes('Do not dispatch') && content.includes('specpowers:rules-{language}'),
+    /do not dispatch/i.test(content) && content.includes('specpowers:rules-{language}'),
     'controller workflow should block unresolved language placeholders before dispatch',
   );
 });

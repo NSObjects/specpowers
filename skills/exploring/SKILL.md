@@ -1,239 +1,239 @@
 ---
 name: exploring
-description: "Use when a request is vague, incomplete, strategically ambiguous, or needs project context before deciding what should be built."
+description: "当请求含糊、不完整、有战略歧义，或在决定构建什么之前需要项目上下文时使用。"
 ---
 
-# Exploring Ideas
+# 探索想法（Exploring Ideas）
 
-Turn an unclear idea into shared, actionable understanding through a short collaborative dialogue. Use the minimum exploration necessary: enough to avoid wrong assumptions, not enough to become a design phase.
+通过简短协作对话，把不清楚的想法变成共享、可行动的理解。使用最少必要探索：足以避免错误假设，但不要多到变成 design 阶段。
 
-**Announce once at start:** "I'm using the exploring skill to understand what we're building."
+**开始时只宣布一次：**“我正在使用 exploring skill 理解我们要构建什么。”
 
-## Hard Gate
+## 硬门槛（Hard Gate）
 
-During `exploring`, the agent MUST NOT:
+在 `exploring` 期间，agent MUST NOT：
 
-- create or edit project artifacts such as `proposal.md`, specs, design docs, task lists, tickets, or implementation files;
-- invoke implementation, design, task-planning, or coding skills;
-- start building while requirements are still being discovered;
-- treat implementation research as a separate visible workflow stage.
+- 创建或编辑 project artifacts，例如 `proposal.md`、specs、design docs、task lists、tickets 或 implementation files；
+- 调用 implementation、design、task-planning 或 coding skills；
+- 在需求仍在发现阶段时开始构建；
+- 把 implementation research 当成单独可见 workflow stage。
 
-The only visible output is conversational: questions, summaries, trade-offs, recommendations, and alignment checks.
+唯一可见输出是对话：问题、摘要、trade-offs、recommendations 和 alignment checks。
 
-The terminal transition is `proposing` only after the user confirms the explored direction.
+只有在用户确认已探索方向后，终止转换才是 `proposing`。
 
-## When To Use
+## 使用时机（When To Use）
 
-Use `exploring` when any of these are true:
+当以下任一情况成立时，使用 `exploring`：
 
-- The user describes a goal but not the concrete outcome.
-- Requirements, constraints, users, success criteria, or scope are missing.
-- The request may include several independent features or subsystems.
-- The right approach depends on existing codebase patterns, dependencies, integrations, or prior art.
-- The user asks for a solution but multiple valid solution shapes are plausible.
+- 用户描述了目标，但没有描述具体 outcome。
+- Requirements、constraints、users、success criteria 或 scope 缺失。
+- 请求可能包含多个独立 features 或 subsystems。
+- 正确 approach 取决于既有 codebase patterns、dependencies、integrations 或 prior art。
+- 用户请求 solution，但存在多个有效 solution shapes。
 
-Do not overuse this skill for already-specific implementation requests. If the requested change is concrete and bounded, hand off to the appropriate next skill instead.
+不要对已经具体且有边界的 implementation requests 过度使用此 skill。如果请求的变更具体且有界，转交给合适的下一个 skill。
 
-## Operating Loop
+## 操作循环（Operating Loop）
 
-1. **Inspect available context**
-    - Check existing files, docs, recent commits, project structure, and existing specs when available.
-    - Identify whether this is greenfield or brownfield work.
-    - Check for existing behavior specifications, especially under known spec directories such as `specs/` or `specs/specs/` when present.
+1. **检查可用上下文**
+   - 检查现有 files、docs、recent commits、project structure 和已有 specs。
+   - 识别这是 greenfield 还是 brownfield work。
+   - 检查现有 behavior specifications，尤其是 `specs/` 或 `specs/specs/` 等已知 spec directories。
 
-2. **Assess scope before details**
-    - Decide whether the request is one feature, one workflow, or multiple independent subsystems.
-    - If the request is too broad, decompose before asking detailed product questions.
+2. **先评估 scope，再问细节**
+   - 判断请求是一个 feature、一个 workflow，还是多个独立 subsystems。
+   - 如果请求太宽，先拆解，再问产品细节。
 
-3. **Clarify one thing at a time**
-    - Ask one question per message.
-    - Prefer multiple-choice questions when they reduce effort for the user.
-    - Focus on purpose, users, constraints, exclusions, success criteria, and acceptable trade-offs.
-    - Do not ask questions already answered by available context.
+3. **一次澄清一件事**
+   - 每条消息只问一个问题。
+   - 当 multiple-choice questions 能降低用户负担时优先使用。
+   - 聚焦 purpose、users、constraints、exclusions、success criteria 和可接受 trade-offs。
+   - 不要询问可用上下文已经回答的问题。
 
-4. **Research only when it changes the decision**
-    - First search the current codebase.
-    - Then check relevant external sources only if codebase context is insufficient and external evidence would materially affect the recommendation.
-    - Keep research bounded and synthesize it into the exploration conversation.
+4. **只有当研究会改变决策时才研究**
+   - 先搜索当前代码库。
+   - 只有当 codebase context 不足，且外部证据会实质影响 recommendation 时，才查相关外部来源。
+   - 保持研究有界，并把它综合进 exploration conversation。
 
-5. **Present options**
-    - Once context is sufficient, propose 2-3 viable approaches.
-    - Lead with the recommended approach.
-    - For each option, summarize trade-offs, risk, complexity, and fit with existing patterns.
+5. **呈现选项**
+   - 上下文足够后，提出 2-3 个可行 approaches。
+   - 以推荐 approach 开头。
+   - 对每个 option，总结 trade-offs、risk、complexity，以及它和既有 patterns 的契合度。
 
-6. **Confirm alignment**
-    - Restate the agreed problem, scope, non-goals, constraints, and recommended direction.
-    - Present the Alignment Checkpoint below before asking to proceed.
-    - Ask whether to proceed to `proposing`.
+6. **确认对齐**
+   - 重述已达成一致的问题、scope、non-goals、constraints 和推荐方向。
+   - 在请求继续前，呈现下面的 Alignment Checkpoint。
+   - 询问是否进入 `proposing`。
 
-7. **Transition**
-    - Only after the user confirms, invoke `proposing`.
-    - Do not invoke implementation skills from `exploring`.
+7. **转换**
+   - 只有用户确认后，才调用 `proposing`。
+   - 不要从 `exploring` 调用 implementation skills。
 
-## Alignment Checkpoint
+## Alignment Checkpoint（对齐检查点）
 
-Before leaving `exploring`, present a user-reviewable alignment checkpoint that includes:
+离开 `exploring` 前，呈现一份用户可审查的 alignment checkpoint，包含：
 
-- **problem statement:** the concrete problem or outcome being pursued;
-- **target users:** who uses or benefits from the change;
-- **primary workflow:** what happens before, during, and after the change;
-- **inputs and outputs:** the important information, actions, artifacts, or visible results involved;
-- **in-scope behavior:** what the first change will cover;
-- **out-of-scope behavior:** what will explicitly not be covered;
-- **constraints:** technical, product, security, compatibility, schedule, or operational limits;
-- **failure modes:** expected invalid states, errors, blocked paths, or unavailable dependencies;
-- **open questions:** remaining decisions, separated into blocking and non-blocking questions.
+- **problem statement:** 正在追求的具体问题或结果；
+- **target users:** 谁使用或受益于该变更；
+- **primary workflow:** 变更前、变更中、变更后发生什么；
+- **inputs and outputs:** 相关的重要信息、动作、artifacts 或可见结果；
+- **in-scope behavior:** 第一版变更覆盖什么；
+- **out-of-scope behavior:** 明确不覆盖什么；
+- **constraints:** 技术、产品、安全、兼容性、日程或运营限制；
+- **failure modes:** 预期 invalid states、errors、blocked paths 或 unavailable dependencies；
+- **open questions:** 剩余 decisions，分为 blocking 和 non-blocking。
 
-Behavior-affecting open questions block transition. If any open question can change user-visible behavior, scope boundaries, permissions, failure outcomes, or success criteria, ask one focused clarification question or state the blocker. Do not create `proposal.md` until the blocker is resolved or the user explicitly narrows the scope to exclude it.
+影响行为的 open questions 会阻塞转换。如果任何 open question 会改变用户可见行为、scope boundaries、permissions、failure outcomes 或 success criteria，提出一个聚焦澄清问题或说明 blocker。在 blocker 解决前，或用户明确缩小 scope 排除它前，不要创建 `proposal.md`。
 
-## Workflow Handoff Confidence Loop
+## Workflow Handoff Confidence Loop（工作流移交信心循环）
 
-Use the Workflow Handoff Confidence Loop from `../confidence-loop/SKILL.md` with `../confidence-loop/workflow-handoff-reviewer-prompt.md` before the `exploring → proposing` handoff when subagents are available.
+当 subagents 可用时，在 `exploring → proposing` handoff 前使用 `../confidence-loop/SKILL.md` 中的 Workflow Handoff Confidence Loop，并使用 `../confidence-loop/workflow-handoff-reviewer-prompt.md`。
 
-Review package must include the alignment checkpoint, confirmed user answers, open questions, scope boundaries, constraints, and intended proposal direction.
+Review package 必须包含 alignment checkpoint、已确认用户回答、open questions、scope boundaries、constraints 和 intended proposal direction。
 
-Do not proceed to `proposing` while Critical or Important findings, `NEEDS_USER_DECISION`, or Unresolved Confidence Gaps remain.
+当仍有 Critical 或 Important findings、`NEEDS_USER_DECISION` 或 Unresolved Confidence Gaps 时，不要进入 `proposing`。
 
-## Scope Assessment
+## Scope 评估（Scope Assessment）
 
-Before detailed clarification, classify the request:
+详细澄清前，对请求分类：
 
 | Scope | Signal | Action |
 |---|---|---|
-| Single feature | One user goal, one main workflow, clear boundary | Continue normal exploration |
-| Compound feature | One goal with several dependent parts | Clarify dependencies and minimal first slice |
-| Multiple subsystems | Separate domains such as auth, billing, analytics, chat, storage, admin, integrations | Stop detailed questioning and decompose first |
-| Platform/product | Broad product vision or many user roles/workflows | Define phases and choose the first sub-project |
+| Single feature | 一个用户目标、一个主 workflow、边界清楚 | 继续正常 exploration |
+| Compound feature | 一个目标包含多个依赖部分 | 澄清依赖和最小 first slice |
+| Multiple subsystems | auth、billing、analytics、chat、storage、admin、integrations 等独立 domains | 停止细节追问，先拆解 |
+| Platform/product | 宽泛产品愿景或多个 user roles/workflows | 定义 phases，并选择第一个 sub-project |
 
-If decomposition is needed, say this directly:
+如果需要拆解，直接说明：
 
 > "This looks like several independent features. Let's break it into sub-projects before refining details."
 
-Then help identify:
+然后帮助识别：
 
-- the independent pieces;
-- how they depend on each other;
-- the smallest valuable first slice;
-- which sub-project should enter the spec cycle first.
+- 独立部分；
+- 它们如何彼此依赖；
+- 最小有价值 first slice；
+- 哪个 sub-project 应先进入 spec cycle。
 
-Each sub-project should get its own `specs/changes/<name>/` cycle when the workflow supports that structure.
+当 workflow 支持该结构时，每个 sub-project 都应有自己的 `specs/changes/<name>/` cycle。
 
-## Questioning Guidelines
+## 提问指南（Questioning Guidelines）
 
-Good exploration questions are specific and decision-oriented.
+好的 exploration questions 要具体且面向决策。
 
-Prefer:
+优先：
 
 > "Should this be optimized for speed of delivery, long-term extensibility, or lowest operational risk?"
 
-Avoid:
+避免：
 
 > "Tell me more about what you want."
 
-Use questions to discover:
+用问题发现：
 
-- **Outcome:** what should be true when the work is done;
-- **User:** who uses or benefits from it;
-- **Workflow:** what happens before, during, and after the feature;
-- **Constraints:** technology, security, performance, budget, schedule, compliance;
-- **Success criteria:** observable acceptance conditions;
-- **Non-goals:** what should explicitly stay out of scope.
+- **Outcome:** 工作完成后应当成为什么状态；
+- **User:** 谁使用或受益；
+- **Workflow:** feature 之前、期间、之后发生什么；
+- **Constraints:** technology、security、performance、budget、schedule、compliance；
+- **Success criteria:** 可观察验收条件；
+- **Non-goals:** 明确保持在 scope 外的内容。
 
-## Implementation Research Inside Exploring
+## Exploring 中的实现研究（Implementation Research Inside Exploring）
 
-Implementation research is allowed only to improve exploration quality. It does not change the visible stage.
+Implementation research 只允许用于提升 exploration 质量。它不会改变可见阶段。
 
-### Use research when
+### 何时研究
 
-- choosing between adopting an existing solution and building custom code;
-- comparing dependencies, integrations, or architectural patterns;
-- checking whether similar behavior already exists in the current codebase;
-- evaluating risk, compatibility, migration cost, or maintenance burden;
-- validating assumptions that would materially affect the recommended approach.
+- 在 adopting existing solution 与 building custom code 之间选择；
+- 比较 dependencies、integrations 或 architectural patterns；
+- 检查当前代码库是否已有相似 behavior；
+- 评估 risk、compatibility、migration cost 或 maintenance burden；
+- 验证会实质影响推荐 approach 的假设。
 
-### Skip research when
+### 何时跳过研究
 
-- the request can be clarified through normal questioning;
-- existing project patterns clearly determine the direction;
-- the result would not change the recommendation;
-- the question belongs in design or implementation rather than exploration.
+- 请求可以通过正常提问澄清；
+- 既有项目 patterns 已经清楚决定方向；
+- 结果不会改变 recommendation；
+- 问题属于 design 或 implementation，而不是 exploration。
 
-### Research order
+### 研究顺序
 
-1. Search the current codebase first.
-2. Check internal docs/specs next.
-3. Use external sources only when needed.
-4. Return concise evidence and translate it into trade-offs.
+1. 先搜索当前代码库。
+2. 再检查内部 docs/specs。
+3. 仅在需要时使用外部来源。
+4. 返回简洁证据，并将其转化为 trade-offs。
 
-### Platform dispatch
+### 平台派发（Platform dispatch）
 
-Use the filled `./implementation-researcher-prompt.md` template when delegating research. This is optional subagent delegation for bounded research only.
+委派研究时使用填好的 `./implementation-researcher-prompt.md` template。这是有界 research 的可选 subagent delegation。
 
-- Claude Code: use the `Agent` tool with the general-purpose agent. `Task` may exist as a backward-compatible alias in older environments.
-- **Codex:** use `spawn_agent(message=...)`.
+- Claude Code：使用 `Agent` tool 和 general-purpose agent。旧环境中 `Task` 可能作为 backward-compatible alias 存在。
+- **Codex：** 使用 `spawn_agent(message=...)`。
 
-The main agent remains responsible for synthesis, recommendation, and user alignment.
+主 Agent 仍负责 synthesis、recommendation 和 user alignment。
 
-## Completion Criteria
+## 完成标准（Completion Criteria）
 
-Exploration is complete only when all of these are true:
+只有全部条件满足时，exploration 才完成：
 
-- The problem statement is clear.
-- The user and primary workflow are clear enough to propose against.
-- Inputs, outputs, in-scope behavior, out-of-scope behavior, constraints, and failure modes have been stated.
-- Scope and non-goals are explicit.
-- Major constraints and risks are known or deliberately deferred.
-- Behavior-affecting open questions have been resolved, or the user has explicitly excluded them from the first change.
-- A recommended approach has been presented with alternatives.
-- The user has agreed to proceed to `proposing`.
+- Problem statement 清楚。
+- User 和 primary workflow 足够清楚，可以据此 proposing。
+- Inputs、outputs、in-scope behavior、out-of-scope behavior、constraints 和 failure modes 已说明。
+- Scope 和 non-goals 明确。
+- Major constraints 和 risks 已知，或被有意延后。
+- 影响行为的 open questions 已解决，或用户已明确把它们排除在 first change 之外。
+- 已呈现带 alternatives 的 recommended approach。
+- 用户已同意进入 `proposing`。
 
-## Red Flags
+## 红旗（Red Flags）
 
-If any of these thoughts appear, stop and return to exploration:
+如果出现以下想法，停止并回到 exploration：
 
 | Thought | Corrective action |
 |---|---|
-| "I already know what they want." | Ask or verify the missing assumption. |
-| "I'll explore while implementing." | Do not implement; clarify first. |
-| "The scope is probably fine." | Classify scope before details. |
-| "This is too simple to explore." | Use a shorter exploration, not zero exploration. |
-| "The user will correct me later." | Make assumptions visible now. |
-| "One more question would be annoying." | Ask only the highest-value next question. |
-| "Research would be interesting." | Research only if it can change the decision. |
+| "I already know what they want." | 询问或验证缺失假设。 |
+| "I'll explore while implementing." | 不要实现；先澄清。 |
+| "The scope is probably fine." | 先分类 scope，再问细节。 |
+| "This is too simple to explore." | 使用更短 exploration，而不是零 exploration。 |
+| "The user will correct me later." | 现在就让假设可见。 |
+| "One more question would be annoying." | 只问最高价值的下一个问题。 |
+| "Research would be interesting." | 只有研究会改变决策时才研究。 |
 
-## Common Rationalizations
+## 常见合理化（Common Rationalizations）
 
 | Excuse | Reality |
 |---|---|
-| "The user said just build it." | That clarifies urgency, not requirements. |
-| "I'll figure out details as I go." | Details are requirements; guessing creates rework. |
-| "Asking questions wastes time." | Building the wrong thing wastes more. |
-| "This resembles another project." | Similarity is useful, but differences define the work. |
+| "The user said just build it." | 这只说明紧迫性，不说明 requirements。 |
+| "I'll figure out details as I go." | 细节就是 requirements；猜测会造成返工。 |
+| "Asking questions wastes time." | 构建错误东西更浪费时间。 |
+| "This resembles another project." | 相似性有用，但差异定义工作。 |
 
-## Handoff To Proposing
+## 移交到 Proposing（Handoff To Proposing）
 
-When ready, summarize in conversation:
+准备好后，在对话中总结：
 
-- agreed problem;
-- target users/workflow;
-- scope and non-goals;
-- constraints and risks;
-- recommended approach;
-- open questions that can safely be resolved during proposing.
+- agreed problem；
+- target users/workflow；
+- scope 和 non-goals；
+- constraints 和 risks；
+- recommended approach；
+- 可以在 proposing 中安全解决的 open questions。
 
-Then ask:
+然后询问：
 
 > "I have a clear understanding of what we're building. Ready to create a proposal. Shall I proceed?"
 
-After confirmation, invoke `proposing` and do not invoke implementation skills.
+确认后，调用 `proposing`，不要调用 implementation skills。
 
-## Key Principles
+## 关键原则（Key Principles）
 
-- Scope before details.
-- One question at a time.
-- Multiple choice when helpful.
-- Prefer the smallest valuable first slice.
-- Make assumptions explicit.
-- Explore alternatives before committing.
-- Research only when evidence changes the decision.
-- No artifacts during `exploring`.
+- Scope before details。
+- 一次一个问题。
+- 有帮助时使用 multiple choice。
+- 优先最小有价值 first slice。
+- 让假设明确可见。
+- 承诺前先探索 alternatives。
+- 只有证据会改变决策时才研究。
+- `exploring` 期间不创建 artifacts。

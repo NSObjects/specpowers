@@ -20,7 +20,7 @@ test('planning defines level-2 task groups as feature-group boundaries', () => {
   );
   assert.match(
     planning,
-    /`Task N\.M`[\s\S]*subtasks? within that feature group/i,
+    /`Task N\.M`[\s\S]*该 feature group 中的 subtasks/u,
   );
 });
 

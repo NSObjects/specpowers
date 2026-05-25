@@ -15,7 +15,7 @@ function readMaterialized(tmpRoot, relativePath) {
 }
 
 const sourceExpectations = [
-  ['skills/exploring/SKILL.md', /Claude Code: use the `Agent` tool/i],
+  ['skills/exploring/SKILL.md', /Claude Code：使用 `Agent` tool/i],
   ['skills/requesting-code-review/SKILL.md', /Claude Code: use `Agent` tool/i],
   ['skills/spec-driven-development/implementer-prompt.md', /^Agent tool \(general-purpose\):/m],
   ['skills/spec-driven-development/spec-reviewer-prompt.md', /^Agent tool \(general-purpose\):/m],
@@ -29,7 +29,7 @@ const sourceExpectations = [
 ];
 
 const materializedRelativePaths = [
-  ['.codex/skills/exploring/SKILL.md', /Claude Code: use the `Agent` tool/i],
+  ['.codex/skills/exploring/SKILL.md', /Claude Code：使用 `Agent` tool/i],
   ['.codex/skills/requesting-code-review/SKILL.md', /Claude Code: use `Agent` tool/i],
   ['.codex/skills/spec-driven-development/implementer-prompt.md', /^Agent tool \(general-purpose\):/m],
   ['.codex/skills/spec-driven-development/spec-reviewer-prompt.md', /^Agent tool \(general-purpose\):/m],

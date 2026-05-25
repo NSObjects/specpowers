@@ -37,7 +37,7 @@ test('using-skills does not treat every why-question as a bug diagnostic', () =>
 
   assert.doesNotMatch(content, /or why-question defaults/i);
   assert.match(content, /failure-related why-question/i);
-  assert.match(content, /design, trade-off, architecture, workflow, or explanation-only why-questions/i);
+  assert.match(content, /Design、trade-off、architecture、workflow.*explanation-only why-questions/u);
   assert.match(content, /do not treat it as a bug diagnostic/i);
 });
 
@@ -47,7 +47,7 @@ test('using-skills keeps ordinary bug diagnostics out of the full artifact workf
   assert.match(content, /ordinary bug diagnostics/i);
   assert.match(content, /lightweight path/i);
   assert.match(content, /read-only diagnostic work does not require `proposing`, `specifying`, `designing`, or `planning`/i);
-  assert.match(content, /behavior change or expanded scope/i);
+  assert.match(content, /behavior change 或 expanded scope/u);
 });
 
 test('using-skills keeps authorized bug fixes bound to specs or existing contracts', () => {
@@ -71,12 +71,12 @@ test('systematic-debugging requires read-only discussion before fixes', () => {
     'A bug report is not edit authorization',
     'diagnostic discussion mode',
     'read-only',
-    'Do not edit files',
-    'Do not generate patches',
-    'Do not refactor',
-    'Do not attempt fixes',
+    'do not edit files',
+    'do not generate patches',
+    'do not refactor',
+    'do not attempt fixes',
   ]) {
-    assert.ok(content.includes(expected), `systematic-debugging should include ${expected}`);
+    assert.match(content, new RegExp(expected, 'i'), `systematic-debugging should include ${expected}`);
   }
 });
 

@@ -1,288 +1,289 @@
 ---
 name: rules-common
-description: Use when writing, reviewing, or modifying code in any language — provides universal coding rules that apply across all programming languages and can be overridden by language-specific rule skills
+description: 编写、审查或修改任何语言的代码时使用；提供跨语言通用编码规则，并可被语言专属 rule skills 覆盖。
 ---
 
-# Universal Coding Rules
+# 通用编码规则（Universal Coding Rules）
 
-These rules apply to all programming languages. Language-specific rule skills (e.g., `rules-typescript`, `rules-python`) inherit these rules and may override entries marked `[Overridable]`.
+这些规则适用于所有 programming languages。语言专属 rule skills（例如 `rules-typescript`、`rules-python`）继承这些规则，并可覆盖标记为 `[Overridable]` 的条目。
 
-**Override mechanism:** When a language rule declares `[Overrides common: X.Y]`, that language-specific version replaces the common rule for projects using that language.
-
----
-
-## 1. Coding Style
-
-### 1.1 Naming Clarity `[Overridable]`
-
-Use descriptive, intention-revealing names. Avoid abbreviations unless they are universally understood within the domain (e.g., `id`, `url`, `http`).
-
-- Variables: describe what they hold, not their type
-- Functions: describe what they do, starting with a verb
-- Booleans: use `is`, `has`, `should`, `can` prefixes
-
-### 1.2 Function Size `[Overridable]`
-
-Keep functions focused on a single responsibility. A function that requires a comment to explain "what it does" is too complex — split it.
-
-- Aim for functions that fit on one screen (~30 lines)
-- Extract helper functions when logic branches exceed 2 levels of nesting
-
-### 1.3 File Organization `[Overridable]`
-
-One module = one concept. Group related functionality into cohesive files. Avoid "utils" or "helpers" grab-bags — name files after what they contain.
-
-### 1.4 Comments and Documentation
-
-Write comments that explain **why**, not **what**. The code explains what; comments explain intent, trade-offs, and non-obvious decisions.
-
-- Document public APIs with purpose, parameters, return values, and edge cases
-- Remove commented-out code — version control remembers
-
-### 1.5 Consistent Formatting `[Overridable]`
-
-Use the project's established formatter. If none exists, adopt the language community's standard formatter. Never mix formatting styles within a project.
-
-### 1.6 Magic Values
-
-No magic numbers or strings in logic. Extract them into named constants with descriptive names that explain their purpose.
+**覆盖机制：** 当语言规则声明 `[Overrides common: X.Y]` 时，该语言专属版本会替换使用该语言的项目中的 common rule。
 
 ---
 
-## 2. Testing
+## 1. Coding Style（编码风格）
 
-### 2.1 Test-First When Possible `[Overridable]`
+### 1.1 Naming Clarity（命名清晰度）`[Overridable]`
 
-Write tests before or alongside implementation. Tests are specifications — they document what the code should do.
+使用描述性、能表达意图的命名。除非缩写在领域内被普遍理解（例如 `id`、`url`、`http`），否则避免缩写。
 
-### 2.2 Test Naming
+- Variables：描述保存的内容，而不是类型。
+- Functions：描述要做的动作，通常以动词开头。
+- Booleans：使用 `is`、`has`、`should`、`can` 等前缀。
 
-Test names describe the scenario, not the implementation. Use the pattern: `[unit] [condition] [expected result]`.
+### 1.2 Function Size（函数规模）`[Overridable]`
 
-### 2.3 Test Independence
+函数应聚焦单一责任。如果函数需要注释解释“它做什么”，说明它已经太复杂，应拆分。
 
-Each test must be independent — no shared mutable state between tests, no ordering dependencies. A test that fails in isolation but passes in a suite (or vice versa) is broken.
+- 目标是函数能放进一个屏幕内（约 30 行）。
+- 当逻辑分支超过 2 层嵌套时，考虑提取 helper functions。
 
-### 2.4 Test Coverage Strategy `[Overridable]`
+### 1.3 File Organization（文件组织）`[Overridable]`
 
-Test the behavior, not the implementation. Focus on:
-- Happy path (the common case)
-- Edge cases (empty inputs, boundaries, nulls)
-- Error paths (invalid inputs, failures)
-- Property-based tests for algorithmic logic
+一个 module 对应一个概念。把相关功能放进内聚文件。避免 “utils” 或 “helpers” 大杂烩；文件名应表达其中包含的概念。
 
-### 2.5 No Mocks for Core Logic
+### 1.4 Comments and Documentation（注释和文档）
 
-Do not mock the system under test. Mocks are for external dependencies (network, filesystem, databases), not for the code you're verifying.
+注释解释 **why**，不是 **what**。代码说明发生了什么；注释说明意图、取舍和不明显的决定。
 
-### 2.6 Assertion Quality
+- Public APIs 需要记录 purpose、parameters、return values 和 edge cases。
+- 删除 commented-out code；version control 已经保存历史。
 
-Each test should have clear, specific assertions. Avoid testing too many things in one test. One logical assertion per test — multiple `assert` calls are fine if they verify one behavior.
+### 1.5 Consistent Formatting（一致格式化）`[Overridable]`
 
----
+使用项目既有 formatter。若项目没有 formatter，采用语言社区标准 formatter。不要在同一项目中混用多种格式风格。
 
-## 3. Security
+### 1.6 Magic Values（魔法值）
 
-### 3.1 Input Validation
-
-Validate all external input at system boundaries. Never trust data from users, APIs, files, or environment variables without validation.
-
-### 3.2 Secrets Management
-
-Never hardcode secrets, API keys, tokens, or passwords. Use environment variables or secret management systems. Never log secrets, even at debug level.
-
-### 3.3 Least Privilege
-
-Request only the permissions needed. File access, network access, database access — scope them to the minimum required.
-
-### 3.4 Dependency Awareness
-
-Know your dependencies. Audit new dependencies before adding them. Prefer well-maintained packages with active security response. Pin versions in production.
-
-### 3.5 Error Message Safety
-
-Error messages shown to users must not leak internal details (stack traces, file paths, database schemas, internal IPs). Log details internally; show generic messages externally.
-
-### 3.6 SQL and Injection Prevention `[Overridable]`
-
-Use parameterized queries or prepared statements. Never concatenate user input into queries, commands, or templates.
+逻辑中不要出现 magic numbers 或 magic strings。将它们提取为命名常量，并用名称说明用途。
 
 ---
 
-## 4. Performance
+## 2. Testing（测试）
 
-### 4.1 Measure Before Optimizing
+### 2.1 Test-First When Possible（可行时测试先行）`[Overridable]`
 
-Do not optimize without evidence. Profile first, identify the bottleneck, then optimize that specific path. Premature optimization obscures intent.
+在实现前或实现过程中编写 tests。Tests 是 specifications；它们记录代码应做什么。
 
-### 4.2 Algorithm Complexity Awareness `[Overridable]`
+### 2.2 Test Naming（测试命名）
 
-Choose appropriate data structures and algorithms. Know the Big-O of your operations. An O(n²) loop hidden inside an O(n) loop is O(n³) — watch for nested iterations.
+Test names 描述场景，而不是实现。使用模式：`[unit] [condition] [expected result]`。
 
-### 4.3 Resource Cleanup `[Overridable]`
+### 2.3 Test Independence（测试独立性）
 
-Close what you open. File handles, database connections, network sockets, timers — ensure cleanup happens even on error paths. Use language-provided resource management patterns (try-with-resources, defer, using, context managers).
+每个 test 必须独立；不要在 tests 之间共享 mutable state，也不要依赖执行顺序。单独运行失败但 suite 中通过，或反过来的 test，都是有问题的。
 
-### 4.4 Avoid Premature Caching
+### 2.4 Test Coverage Strategy（测试覆盖策略）`[Overridable]`
 
-Caching adds complexity (invalidation, staleness, memory pressure). Add caching only when measurement shows it's needed, and always define an invalidation strategy.
+测试 behavior，而不是 implementation。重点覆盖：
 
-### 4.5 Batch Over Chatty `[Overridable]`
+- Happy path（常见路径）。
+- Edge cases（空输入、边界、nulls）。
+- Error paths（无效输入、失败）。
+- Algorithmic logic 的 property-based tests。
 
-Prefer batch operations over many small ones. One query returning 100 rows beats 100 queries returning 1 row each. This applies to database calls, API requests, and file I/O.
+### 2.5 No Mocks for Core Logic（核心逻辑不做 mock）
 
----
+不要 mock system under test。Mocks 用于 external dependencies（network、filesystem、databases），不是用于正在验证的代码。
 
-## 5. Design Patterns
+### 2.6 Assertion Quality（断言质量）
 
-### 5.1 Composition Over Inheritance `[Overridable]`
-
-Prefer composing behavior from small, focused components over deep inheritance hierarchies. Inheritance creates tight coupling; composition creates flexibility.
-
-### 5.2 Dependency Injection `[Overridable]`
-
-Pass dependencies in rather than creating them internally. This makes code testable and configurable. Hard-coded dependencies are hidden coupling.
-
-### 5.3 Fail Fast
-
-Validate preconditions early and fail immediately with clear error messages. Do not let invalid state propagate through the system.
-
-### 5.4 Immutability by Default `[Overridable]`
-
-Prefer immutable data structures. Mutation is a common source of bugs, especially in concurrent code. When mutation is necessary, contain it — minimize the scope of mutable state.
-
-### 5.5 Interface Segregation
-
-Don't force consumers to depend on methods they don't use. Prefer small, focused interfaces over large, general-purpose ones.
-
-### 5.6 Error Handling Strategy `[Overridable]`
-
-Handle errors explicitly. Don't swallow exceptions silently. Choose a consistent error handling pattern for the project (exceptions, result types, error codes) and stick with it.
-
-### 5.7 Research Before Reinvention
-
-Before recommending custom code, research what already exists. Start with the current codebase, then check the most relevant external solutions for the project's language and runtime.
-
-- Search the project codebase first to avoid duplicating internal implementations
-- Use research when making implementation or technology decisions, not as a separate workflow stage
-- Make the decision explicit: **Adopt / Extend / Compose / Build**
-- If you choose Build, document why existing solutions were not sufficient
+每个 test 应有清晰、具体的 assertions。避免一个 test 验证太多事情。每个 test 聚焦一个 logical assertion；如果多个 `assert` 调用验证的是同一行为，也可以接受。
 
 ---
 
-## 6. Git Workflow
+## 3. Security（安全）
 
-### 6.1 Atomic Commits
+### 3.1 Input Validation（输入校验）
 
-Each commit should represent one logical change. Don't mix refactoring with feature work. Don't mix formatting changes with behavior changes.
+在 system boundaries 校验所有 external input。来自 users、APIs、files 或 environment variables 的数据，未经 validation 一律不可信。
 
-### 6.2 Commit Messages
+### 3.2 Secrets Management（密钥管理）
 
-Write commit messages that explain **why** the change was made, not just what changed. The diff shows what; the message explains intent.
+不要 hardcode secrets、API keys、tokens 或 passwords。使用 environment variables 或 secret management systems。即使是 debug level，也不要记录 secrets。
 
-Format: `<type>: <short summary>` with optional body for context.
+### 3.3 Least Privilege（最小权限）
 
-### 6.3 Branch Hygiene
+只请求所需 permissions。File access、network access、database access 都应限制到最小必要范围。
 
-Keep branches short-lived and focused. One branch = one feature or fix. Rebase or merge from main regularly to avoid drift.
+### 3.4 Dependency Awareness（依赖意识）
 
-### 6.4 Review Before Merge
+了解 dependencies。新增 dependency 前先 audit。优先选择维护良好、具备活跃 security response 的 packages。Production 中固定 versions。
 
-All code changes should be reviewed before merging. Self-review at minimum — read your own diff as if someone else wrote it.
+### 3.5 Error Message Safety（错误信息安全）
 
-### 6.5 No Generated Files in VCS `[Overridable]`
+展示给 users 的 error messages 不得泄露 internal details（stack traces、file paths、database schemas、internal IPs）。内部日志可记录细节，外部只展示 generic messages。
 
-Don't commit generated files (build artifacts, compiled output, lock files for non-root packages). Use `.gitignore` to exclude them. Exception: lock files at the project root (e.g., `package-lock.json`, `pnpm-lock.yaml`) should be committed.
+### 3.6 SQL and Injection Prevention（SQL 和注入防护）`[Overridable]`
 
-### 6.6 Sensitive Data Protection
-
-Never commit secrets, credentials, or PII to version control. Use pre-commit hooks or scanning tools to catch accidental commits. If a secret is committed, rotate it immediately — removing from history is not enough.
+使用 parameterized queries 或 prepared statements。不要把 user input 拼接进 queries、commands 或 templates。
 
 ---
 
-## 7. Change Discipline
+## 4. Performance（性能）
 
-### 7.1 Minimum Necessary Complexity
+### 4.1 Measure Before Optimizing（优化前先测量）
 
-Prefer the least complex solution that satisfies the confirmed user request, specifications, task, tests, and repository constraints.
+没有 evidence 不做优化。先 profile，识别 bottleneck，再优化具体路径。Premature optimization 会遮蔽意图。
 
-- Treat current evidence as the boundary for added structure: confirmed requirements, failing tests, safety constraints, compatibility needs, or established repository patterns.
-- Add abstraction, configuration, extension points, caching, strategy layers, or wrappers only when that current evidence requires them.
-- If extra structure is necessary, make the reason traceable in the implementation notes, review notes, or nearby documentation.
+### 4.2 Algorithm Complexity Awareness（算法复杂度意识）`[Overridable]`
 
-### 7.2 No Speculative Complexity
+选择合适的数据结构和 algorithms。了解 operations 的 Big-O。隐藏在 O(n) loop 内的 O(n²) loop 实际是 O(n³)；注意 nested iterations。
 
-Do not add complexity for hypothetical future requirements.
+### 4.3 Resource Cleanup（资源清理）`[Overridable]`
 
-- Reject speculative configuration, plugin points, strategy interfaces, multi-backend support, generalized parameters, caches, adapters, or wrappers when they only serve unconfirmed future needs.
-- If a future extension seems useful but is outside the current scope, report it only as out-of-scope observations instead of implementing it.
+打开的资源要关闭。File handles、database connections、network sockets、timers 都必须在 error paths 上也能 cleanup。使用语言提供的 resource management patterns（try-with-resources、defer、using、context managers）。
 
-### 7.3 Current-Change Orphan Cleanup Only
+### 4.4 Avoid Premature Caching（避免过早缓存）
 
-Limit cleanup to current-change orphan cleanup unless the user or accepted specification explicitly asks for broader cleanup.
+Caching 会增加 complexity（invalidation、staleness、memory pressure）。只有 measurement 表明需要时才添加 caching，并且必须定义 invalidation strategy。
 
-- Remove or update imports, variables, functions, test helpers, or documentation fragments that the current change directly makes unused or invalid.
-- Preserve pre-existing dead code, bad names, formatting inconsistencies, or neighboring design problems when they do not affect the current request, task, failing test, or review feedback.
-- Report pre-existing unrelated issues as out-of-scope observations instead of fixing them inside the current change.
+### 4.5 Batch Over Chatty（批量优先）`[Overridable]`
+
+优先使用 batch operations，避免大量小操作。一次 query 返回 100 rows 优于 100 次 query 各返回 1 row。Database calls、API requests 和 file I/O 都适用。
 
 ---
 
-## Red Flags
+## 5. Design Patterns（设计模式）
 
-These thoughts mean you're about to violate a rule — stop and reconsider:
+### 5.1 Composition Over Inheritance（组合优于继承）`[Overridable]`
+
+优先从小而聚焦的 components 组合 behavior，避免深层 inheritance hierarchies。Inheritance 会产生 tight coupling；composition 更灵活。
+
+### 5.2 Dependency Injection（依赖注入）`[Overridable]`
+
+通过参数传入 dependencies，而不是在内部创建。这样代码更容易测试和配置。Hard-coded dependencies 是隐藏耦合。
+
+### 5.3 Fail Fast（快速失败）
+
+尽早验证 preconditions，并用清晰 error messages 立即失败。不要让 invalid state 在系统中继续传播。
+
+### 5.4 Immutability by Default（默认不可变）`[Overridable]`
+
+优先使用 immutable data structures。Mutation 是常见 bug 来源，尤其在 concurrent code 中。需要 mutation 时，要限制范围，最小化 mutable state。
+
+### 5.5 Interface Segregation（接口隔离）
+
+不要强迫 consumers 依赖不用的方法。优先使用小而聚焦的 interfaces，而不是庞大的 general-purpose interfaces。
+
+### 5.6 Error Handling Strategy（错误处理策略）`[Overridable]`
+
+显式处理 errors。不要静默吞掉 exceptions。为项目选择一致 error handling pattern（exceptions、result types、error codes）并坚持使用。
+
+### 5.7 Research Before Reinvention（复用前先调研）
+
+推荐 custom code 前，先研究已有方案。先看 current codebase，再查看项目 language 和 runtime 中最相关的 external solutions。
+
+- 先搜索 project codebase，避免重复内部实现。
+- Research 用于 implementation 或 technology decisions，不作为单独 workflow stage。
+- 决策必须明确：**Adopt / Extend / Compose / Build**。
+- 选择 Build 时，记录 existing solutions 为什么不足。
+
+---
+
+## 6. Git Workflow（Git 工作流）
+
+### 6.1 Atomic Commits（原子提交）
+
+每个 commit 表示一个 logical change。不要混合 refactoring 与 feature work；不要混合 formatting changes 与 behavior changes。
+
+### 6.2 Commit Messages（提交信息）
+
+Commit messages 解释变更的 **why**，不仅是 what。Diff 展示改了什么；message 说明意图。
+
+格式：`<type>: <short summary>`，可选 body 用于补充 context。
+
+### 6.3 Branch Hygiene（分支卫生）
+
+Branches 应短生命周期且聚焦。一个 branch 对应一个 feature 或 fix。定期从 main rebase 或 merge，避免漂移。
+
+### 6.4 Review Before Merge（合并前审查）
+
+所有 code changes 合并前都应 review。最低要求是 self-review；像审查别人写的代码一样读自己的 diff。
+
+### 6.5 No Generated Files in VCS（VCS 中不提交生成文件）`[Overridable]`
+
+不要 commit generated files（build artifacts、compiled output、非 root packages 的 lock files）。用 `.gitignore` 排除。例外：project root 的 lock files（如 `package-lock.json`、`pnpm-lock.yaml`）应提交。
+
+### 6.6 Sensitive Data Protection（敏感数据保护）
+
+不要把 secrets、credentials 或 PII commit 到 version control。使用 pre-commit hooks 或 scanning tools 捕捉误提交。若 secret 已提交，应立即 rotate；仅从 history 移除不够。
+
+---
+
+## 7. Change Discipline（变更纪律）
+
+### 7.1 Minimum Necessary Complexity（最小必要复杂度）
+
+优先选择满足已确认 user request、specifications、task、tests 和 repository constraints 的最简单方案（minimum necessary complexity / least complex solution）。
+
+- 以 current evidence 作为新增结构的边界：confirmed user request, specifications, task, tests, and repository constraints、failing tests、safety constraints、compatibility needs 或 established repository patterns。
+- 只有 current evidence 要求时，才添加 abstraction、configuration、extension points、caching、strategy layers 或 wrappers。
+- 如果 extra structure 必要，要在 implementation notes、review notes 或附近 documentation 中让原因可追溯。
+
+### 7.2 No Speculative Complexity（不添加猜测性复杂度）
+
+不要为 hypothetical future requirements 增加 complexity。
+
+- 当 speculative configuration、plugin points、strategy interfaces、multi-backend support、generalized parameters、caches、adapters 或 wrappers 只服务于未确认未来需求时，拒绝实现它们。
+- 如果 future extension 有价值但超出当前 scope，只作为 out-of-scope observations 报告，不放进当前实现。
+
+### 7.3 Current-Change Orphan Cleanup Only（仅清理当前变更产生的孤儿）
+
+除非用户或已接受 specification 明确要求更大范围 cleanup，否则 cleanup 限制为 current-change orphan cleanup。
+
+- 删除或更新当前变更直接导致 unused 或 invalid 的 imports, variables, functions, test helpers, or documentation fragments。
+- 保留 pre-existing dead code、bad names, formatting inconsistencies, or neighboring design problems，只要它们不影响当前 request、task、failing test 或 review feedback。
+- 将既有无关问题作为 out-of-scope observations 报告，不要混入当前 change。
+
+---
+
+## Red Flags（风险信号）
+
+出现这些想法时，说明你可能要违反规则；停下来重新判断：
 
 | Thought | Reality |
 |---------|---------|
-| "I'll clean this up later" | If the cleanup belongs to the current scope, fix it now; otherwise report it as an out-of-scope observation. |
-| "It's just a small hack" | Small hacks compound. Follow the rule or document the exception. |
-| "Nobody will see this code" | You will see it in 3 months and not remember why. |
-| "The tests are slowing me down" | Tests are saving future-you hours of debugging. |
-| "I'll add tests after" | Code without tests ships without tests. Write them now. |
-| "This secret is just for testing" | Test secrets leak to production. Use env vars from the start. |
-| "Performance doesn't matter yet" | True, but O(n³) matters always. Know your complexity. |
-| "I know this works, no need to test" | Confidence without evidence is the #1 source of bugs. |
-| "Let me just commit everything together" | Atomic commits make debugging, reverting, and reviewing possible. |
-| "This override is fine without documenting why" | Undocumented overrides become mysterious bugs. Always explain. |
-| "I'll just build it; research can come later" | Reinventing existing solutions creates avoidable maintenance burden. Search first, then decide. |
+| "I'll clean this up later" | 如果 cleanup 属于 current scope，现在处理；否则作为 out-of-scope observation 报告。 |
+| "It's just a small hack" | 小 hack 会累积。遵守规则，或记录例外原因。 |
+| "Nobody will see this code" | 三个月后你会再看到它，并忘记当时为什么这样写。 |
+| "The tests are slowing me down" | Tests 正在帮未来的你节省调试时间。 |
+| "I'll add tests after" | 没有 tests 的代码通常会以没有 tests 的状态交付。现在写。 |
+| "This secret is just for testing" | Test secrets 也会泄漏到 production。从一开始就用 env vars。 |
+| "Performance doesn't matter yet" | 也许暂时不重要，但 O(n³) 永远重要。知道你的 complexity。 |
+| "I know this works, no need to test" | 没有 evidence 的 confidence 是 bug 的首要来源。 |
+| "Let me just commit everything together" | Atomic commits 让 debugging、reverting 和 reviewing 成为可能。 |
+| "This override is fine without documenting why" | 未记录原因的 override 会变成难解的 bug。始终解释。 |
+| "I'll just build it; research can come later" | 重造已有方案会制造可避免的 maintenance burden。先搜索，再决定。 |
 
 ---
 
-## Iron Laws
+## Iron Laws（铁律）
 
-These are non-negotiable. No exceptions, no "just this once."
+这些规则不可协商；没有例外，也没有“就这一次”。
 
-1. **No secrets in code.** Ever. Not "temporarily." Not "just for local dev." Environment variables or secret managers only.
-2. **No untested code ships.** If it's worth writing, it's worth testing. If it can't be tested, redesign it.
-3. **No silent failures.** Every error path must be handled explicitly. Swallowed exceptions are hidden bugs.
-4. **No unvalidated external input.** All data crossing a trust boundary gets validated. No exceptions.
-5. **No commit without review.** At minimum, review your own diff. Preferably, have someone else review it.
-6. **No magic values in logic.** Every literal in a conditional or calculation gets a named constant.
-7. **No copy-paste duplication.** If you're copying code, extract it. Duplication is a maintenance multiplier.
+1. **代码中不得出现 secrets。** 永远不行。不是“临时”，也不是“只给本地开发”。只用 environment variables 或 secret managers。
+2. **未经测试的代码不得交付。** 值得写的代码也值得测试。若无法测试，重新设计。
+3. **不得静默失败。** 每条 error path 都必须显式处理。Swallowed exceptions 是隐藏 bug。
+4. **外部输入必须校验。** 所有跨 trust boundary 的 data 都要 validation，没有例外。
+5. **没有 review 不合并。** 至少 review 自己的 diff；最好让其他人 review。
+6. **逻辑中不得有 magic values。** Conditional 或 calculation 里的 literal 都应有 named constant。
+7. **不得复制粘贴重复代码。** 如果在复制代码，就应抽取。Duplication 会放大维护成本。
 
 ---
 
-## Behavioral Shaping
+## Behavioral Shaping（行为塑形）
 
-### When Starting a New File
+### When Starting a New File（开始新文件时）
 
-1. Check if the project has an established structure for this type of file
-2. Follow existing patterns — consistency beats personal preference
-3. Add the file to the appropriate location in the project hierarchy
+1. 检查项目是否已有同类型文件的 established structure。
+2. 遵循 existing patterns；一致性优先于个人偏好。
+3. 将文件放到项目层级中的合适位置。
 
-### When Modifying Existing Code
+### When Modifying Existing Code（修改既有代码时）
 
-1. Read the surrounding code first — understand the local conventions
-2. Match the existing style, even if you prefer a different one
-3. If the existing style violates these rules, fix the style in a separate commit
+1. 先读 surrounding code，理解 local conventions。
+2. 匹配 existing style，即使你个人偏好不同。
+3. 如果 existing style 违反这些规则，把风格修复放在独立 change 中处理。
 
-### When Adding Dependencies
+### When Adding Dependencies（新增依赖时）
 
-1. Search the project codebase first — the functionality may already exist
-2. Evaluate the dependency: maintenance status, security record, license compatibility, size
-3. Pin the version. Document why this dependency was chosen.
+1. 先搜索 project codebase；功能可能已经存在。
+2. 评估 dependency：maintenance status、security record、license compatibility、size。
+3. 固定 version，并记录为什么选择这个 dependency。
 
-### When Reviewing Code
+### When Reviewing Code（审查代码时）
 
-1. Check against these rules systematically — don't rely on gut feeling
-2. Prioritize: security issues > correctness bugs > design problems > style nits
-3. Provide specific, actionable feedback with examples
+1. 系统地按这些规则检查，不要只靠直觉。
+2. 优先级：security issues > correctness bugs > design problems > style nits。
+3. 给出具体、可执行、带 examples 的 feedback。

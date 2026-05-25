@@ -16,15 +16,15 @@ test('planning tasks forbid embedding implementation content', () => {
 
   assert.match(
     planning,
-    /Do \*\*not\*\* include code blocks, diffs, pseudocode, function bodies, imports, concrete control flow, or inline implementation snippets/i,
+    /不要包含 code blocks、diffs、pseudocode、function bodies、imports、具体 control flow 或 inline implementation snippets/u,
   );
   assert.match(
     planning,
-    /Tasks may name files, tests, responsibilities, observable behavior, acceptance criteria, and verification commands only/i,
+    /Tasks 只能命名 files、tests、responsibilities、observable behavior、acceptance criteria 和 verification commands/u,
   );
   assert.match(
     planning,
-    /Leave exact code to `spec-driven-development`/i,
+    /精确代码留给 `spec-driven-development`/u,
   );
 });
 
@@ -33,7 +33,7 @@ test('planning GREEN step describes responsibility instead of code', () => {
 
   assert.match(
     planning,
-    /GREEN: describe the smallest production responsibility that satisfies the test, without writing code/i,
+    /GREEN：描述满足测试的最小 production responsibility，不写代码/u,
   );
   assert.match(
     planning,

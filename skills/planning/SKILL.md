@@ -1,95 +1,95 @@
 ---
 name: planning
-description: "Use when approved requirements and design need a traceable, bite-sized, test-first implementation plan."
+description: "当已批准的 requirements 和 design 需要一份可追溯、bite-sized、test-first 的实现计划时使用。"
 ---
 
-# Planning Skill
+# 规划 Skill（Planning Skill）
 
-Use this skill when requirements/spec scenarios and the design direction are already agreed, and the next step is to create an implementation plan made of small, test-first tasks.
+当 requirements/spec scenarios 和 design direction 已经达成一致，下一步是创建由小型 test-first tasks 组成的 implementation plan 时，使用此 skill。
 
-**Start announcement:** "I'm using the planning skill to create the implementation plan."
+**开始时宣布：**“我正在使用 planning skill 创建 implementation plan。”
 
-**Role:** Tech Lead. Break approved specs and design into executable, independently verifiable tasks. Each task must be specific enough for another engineer or agent to implement without guessing.
+**角色：Tech Lead。** 把 approved specs 和 design 拆成可执行、可独立验证的 tasks。每个 task 必须足够具体，让另一个 engineer 或 agent 不需要猜测即可实现。
 
-**Primary output:** `specs/changes/<change-name>/tasks.md`
+**主要输出：** `specs/changes/<change-name>/tasks.md`
 
-## Hard Gates
+## 硬门槛（Hard Gates）
 
-- Do **not** write implementation code in this skill.
-- Do **not** include code blocks, diffs, pseudocode, function bodies, imports, concrete control flow, or inline implementation snippets in task descriptions.
-- Tasks may name files, tests, responsibilities, observable behavior, acceptance criteria, and verification commands only. Leave exact code to `spec-driven-development`.
-- Do **not** proceed to implementation without explicit user approval of the plan.
-- Read the relevant specs, design, and existing code before writing tasks. If a required source cannot be found, ask one focused question instead of inventing details.
-- Every task must include a `Covers specs:` field.
-- Business-logic, validation, error-handling, integration, and UI tasks must map to at least one concrete Spec Scenario.
-- Pure infrastructure tasks are allowed only when needed to enable later behavior. Mark them as `Covers specs: Infrastructure — enables <specific scenario/task>`.
-- Every behavior task must start with a failing test step and include RED/GREEN verification.
-- Every task must list concrete file paths, test command(s), and acceptance criteria.
-- No placeholders: never write `TBD`, `TODO`, `implement later`, `similar to above`, or vague instructions such as "add validation" without exact acceptance criteria.
+- 不要在此 skill 中写 implementation code。
+- Task descriptions 中不要包含 code blocks、diffs、pseudocode、function bodies、imports、具体 control flow 或 inline implementation snippets。
+- Tasks 只能命名 files、tests、responsibilities、observable behavior、acceptance criteria 和 verification commands。精确代码留给 `spec-driven-development`。
+- 没有用户明确批准 plan 前，不要进入 implementation。
+- 写 tasks 前读取相关 specs、design 和 existing code。如果找不到必需 source，提出一个聚焦问题，不要发明细节。
+- 每个 task 必须包含 `Covers specs:` field。
+- Business-logic、validation、error-handling、integration 和 UI tasks 必须映射到至少一个具体 Spec Scenario。
+- Pure infrastructure tasks 只有在启用后续行为时才允许。标记为 `Covers specs: Infrastructure — enables <specific scenario/task>`。
+- 每个 behavior task 必须以 failing test step 开始，并包含 RED/GREEN verification。
+- 每个 task 必须列出具体 file paths、test command(s) 和 acceptance criteria。
+- No placeholders：绝不写 `TBD`、`TODO`、`implement later`、`similar to above`，也不要写没有确切 acceptance criteria 的含糊说明，例如 "add validation"。
 
-## Required Inputs
+## 必需输入（Required Inputs）
 
-Before planning, identify or infer:
+Planning 前，识别或推断：
 
-- **Change name:** used for `specs/changes/<change-name>/tasks.md`.
-- **Spec files:** scenario definitions, requirements, acceptance criteria, or GIVEN/WHEN/THEN statements.
-- **Design files:** architecture, API choices, data model, interfaces, constraints, or implementation approach.
-- **Repository context:** source layout, naming conventions, test framework, existing commands.
-- **Execution constraints:** user preferences, language rules, CI expectations, backwards-compatibility constraints.
+- **Change name:** 用于 `specs/changes/<change-name>/tasks.md`。
+- **Spec files:** scenario definitions、requirements、acceptance criteria 或 GIVEN/WHEN/THEN statements。
+- **Design files:** architecture、API choices、data model、interfaces、constraints 或 implementation approach。
+- **Repository context:** source layout、naming conventions、test framework、existing commands。
+- **Execution constraints:** user preferences、language rules、CI expectations、backwards-compatibility constraints。
 
-If multiple interpretations are possible, prefer the one most directly supported by the provided specs/design. State any assumption in the plan under `Assumptions`.
+如果存在多种解释，选择最直接被 specs/design 支持的一种。在 plan 的 `Assumptions` 下写明任何假设。
 
-## Planning Workflow
+## 规划工作流（Planning Workflow）
 
-1. **Read specs and design**
-    - Extract every Spec Scenario into a scenario inventory.
-    - Capture each scenario's preconditions, action, expected result, and edge cases.
+1. **读取 specs 和 design**
+   - 把每个 Spec Scenario 抽取到 scenario inventory。
+   - 捕获每个 scenario 的 preconditions、action、expected result 和 edge cases。
 
-2. **Read existing code**
-    - Identify existing modules, interfaces, test conventions, fixtures, mocks, and command patterns.
-    - Reuse established naming and structure where possible.
+2. **读取 existing code**
+   - 识别 existing modules、interfaces、test conventions、fixtures、mocks 和 command patterns。
+   - 尽可能复用 established naming 和 structure。
 
-3. **Map files**
-    - Decide exactly which files will be created or modified.
-    - Separate production files from test files.
-    - Note dependencies between files and tasks.
+3. **映射 files**
+   - 精确决定哪些 files 会被创建或修改。
+   - 区分 production files 和 test files。
+   - 记录 files 与 tasks 之间的依赖。
 
-4. **Decompose into tasks**
-    - Each task should implement one coherent behavior or one enabling infrastructure unit.
-    - Business behavior must trace back to Spec Scenarios.
-    - Edge cases and error handling are first-class behavior, not afterthoughts.
+4. **拆解 tasks**
+   - 每个 task 应实现一个连贯 behavior 或一个 enabling infrastructure unit。
+   - Business behavior 必须追溯到 Spec Scenarios。
+   - Edge cases 和 error handling 是一等行为，不是事后补充。
 
-5. **Order by dependency**
-    - Foundation first: configuration, types, interfaces, fixtures.
-    - Core behavior next: business rules and domain logic.
-    - Integration/wiring next: API routes, adapters, handlers, UI wiring.
-    - Edge cases, error paths, and regression coverage as soon as their dependencies exist.
+5. **按依赖排序**
+   - Foundation first：configuration、types、interfaces、fixtures。
+   - Core behavior next：business rules 和 domain logic。
+   - Integration/wiring next：API routes、adapters、handlers、UI wiring。
+   - Edge cases、error paths 和 regression coverage 在依赖存在后尽早处理。
 
-6. **Write TDD steps**
-    - RED: write a failing test with a specific name and expected failure reason.
-    - GREEN: describe the smallest production responsibility that satisfies the test, without writing code.
-    - VERIFY: run the concrete test command and expected result.
+6. **写 TDD steps**
+   - RED：写一个带具体名称和预期失败原因的 failing test。
+   - GREEN：描述满足测试的最小 production responsibility，不写代码。
+   - VERIFY：运行具体 test command，并写明 expected result。
 
-7. **Self-review and repair**
-    - Check traceability, granularity, dependency order, file paths, commands, and placeholder language.
-    - Fix issues in the plan before presenting it.
+7. **自审和修复**
+   - 检查 traceability、granularity、dependency order、file paths、commands 和 placeholder language。
+   - 在呈现 plan 前修复问题。
 
-8. **Stop for approval**
-    - Present or save the plan.
-    - Ask the user to choose an execution mode.
-    - Do not invoke implementation until the user approves.
+8. **停止等待批准**
+   - 呈现或保存 plan。
+   - 请用户选择 execution mode。
+   - 用户批准前，不要调用 implementation。
 
-Use the Workflow Handoff Confidence Loop from `../confidence-loop/SKILL.md` with `../confidence-loop/workflow-handoff-reviewer-prompt.md` before the `planning → spec-driven-development` handoff when subagents are available, after the user approves the plan and chooses an execution mode.
+当 subagents 可用时，在用户批准 plan 并选择 execution mode 后、`planning → spec-driven-development` handoff 前，使用 `../confidence-loop/SKILL.md` 中的 Workflow Handoff Confidence Loop，并使用 `../confidence-loop/workflow-handoff-reviewer-prompt.md`。
 
-Review package must include `tasks.md`, the `Spec Coverage Summary`, relevant specs, relevant design constraints, exact test commands, execution mode decision, assumptions, repository constraints, and any `Open Planning Blockers`.
+Review package 必须包含 `tasks.md`、`Spec Coverage Summary`、相关 specs、相关 design constraints、精确 test commands、execution mode decision、assumptions、repository constraints 和任何 `Open Planning Blockers`。
 
-Do not proceed to `spec-driven-development` while Critical or Important findings, `NEEDS_USER_DECISION`, or Unresolved Confidence Gaps remain.
+当仍有 Critical 或 Important findings、`NEEDS_USER_DECISION` 或 Unresolved Confidence Gaps 时，不要进入 `spec-driven-development`。
 
-If the handoff loop changes `tasks.md`, assumptions, scope, test commands, or execution-relevant content, present the updated plan and obtain user approval and execution mode confirmation again before proceeding to `spec-driven-development`.
+如果 handoff loop 改变了 `tasks.md`、assumptions、scope、test commands 或 execution-relevant content，必须呈现更新后的 plan，并再次获得用户批准和 execution mode confirmation，然后才能进入 `spec-driven-development`。
 
-## Scenario Inventory Format
+## Scenario Inventory 格式
 
-Before the task list, include a concise inventory so coverage can be audited:
+在 task list 前包含简洁 inventory，便于审计 coverage：
 
 ```markdown
 ## Spec Coverage Summary
@@ -99,46 +99,46 @@ Before the task list, include a concise inventory so coverage can be audited:
 | `specs/<domain>/spec.md` → Scenario "<name>" | "<requirement name>" | Task 1.1 | <important constraint or edge case> |
 ```
 
-Every scenario must appear in this table. If a scenario cannot be planned because the spec is missing or contradictory, list it under `Open Planning Blockers` instead of silently omitting it.
+每个 scenario 都必须出现在表中。如果某个 scenario 因 spec 缺失或矛盾而无法规划，把它列入 `Open Planning Blockers`，不要静默遗漏。
 
-## Task Granularity Rules
+## Task 粒度规则（Task Granularity Rules）
 
-A good task is:
+好的 task：
 
-- Completable in one short implementation pass.
-- Testable with 1-3 focused tests.
-- Describable in one sentence.
-- Suitable for one meaningful commit.
-- Independently compilable and testable after completion.
+- 能在一次短实现中完成。
+- 可用 1-3 个聚焦 tests 验证。
+- 能用一句话描述。
+- 适合一个有意义 commit。
+- 完成后可独立 compile 和 test。
 
-A task is **too large** if any of these are true:
+如果满足以下任一条件，task **太大**：
 
-- It touches more than 3 production files.
-- It has more than 5 steps.
-- It covers more than 2 Spec Scenarios.
-- It mixes unrelated concerns, such as schema changes, business rules, and API wiring.
-- It cannot be summarized in one sentence.
+- 触碰超过 3 个 production files。
+- 超过 5 个 steps。
+- 覆盖超过 2 个 Spec Scenarios。
+- 混合无关 concerns，例如 schema changes、business rules 和 API wiring。
+- 无法用一句话总结。
 
-A task is **too small** if any of these are true:
+如果满足以下任一条件，task **太小**：
 
-- It only renames a variable or adds an import.
-- It has no observable behavior, compile, or test impact.
-- It would produce a meaningless commit.
+- 只重命名一个变量或添加一个 import。
+- 没有 observable behavior、compile 或 test impact。
+- 会产生无意义 commit。
 
-When a task is too large, split it by behavior, dependency, or boundary. When tasks are too small, merge them with the nearest related behavior task.
+Task 太大时，按 behavior、dependency 或 boundary 拆分。Task 太小时，合并到最近的相关 behavior task。
 
-## Dependency Rules
+## 依赖规则（Dependency Rules）
 
-Tasks must be ordered so that each completed task leaves the project in a working state.
+Tasks 必须排序，确保每个 task 完成后项目仍处于可工作状态。
 
-- If Task B imports or calls something created in Task A, Task A comes first.
-- If Task B modifies a file created by Task A, mention that dependency explicitly.
-- If a task needs a fixture, mock, schema, or interface, create it in an earlier infrastructure task or within the same small task.
-- Never write a task that intentionally leaves compilation or tests broken until a later task.
+- 如果 Task B import 或 call Task A 创建的内容，Task A 必须先做。
+- 如果 Task B 修改 Task A 创建的文件，明确说明依赖。
+- 如果 task 需要 fixture、mock、schema 或 interface，在更早 infrastructure task 中创建，或在同一个小 task 中创建。
+- 绝不要写一个故意让 compilation 或 tests 坏到后续 task 才修复的 task。
 
-## Task Format
+## Task 格式
 
-Use `## N. [Module or Feature Boundary]` for a feature group. `## 1. [Module Name]` is the canonical feature group heading shape. Use `### Task N.M: [Specific behavior]` for each task; `Task N.M` entries are subtasks within that feature group.
+使用 `## N. [Module or Feature Boundary]` 表示 feature group。`## 1. [Module Name]` 是 canonical feature group heading shape。每个 task 使用 `### Task N.M: [Specific behavior]`；`Task N.M` entries 是该 feature group 中的 subtasks。
 
 ````markdown
 # Tasks
@@ -186,9 +186,9 @@ Use `## N. [Module or Feature Boundary]` for a feature group. `## 1. [Module Nam
   Expected: PASS
 ````
 
-### Infrastructure Task Variant
+### 基础设施任务变体（Infrastructure Task Variant）
 
-Use this only for setup that enables later behavior tasks.
+仅在 setup 会启用后续 behavior tasks 时使用此变体。
 
 ````markdown
 ### Task 1.0: [Specific infrastructure setup]
@@ -212,23 +212,23 @@ Use this only for setup that enables later behavior tasks.
   Expected: PASS
 ````
 
-## No-Placeholder Rules
+## 禁止占位符规则（No-Placeholder Rules）
 
-These are plan failures and must be rewritten before presenting the plan:
+以下内容会让 plan 失败，呈现 plan 前必须重写：
 
-- `TBD`, `TODO`, `later`, `future work`, `fill in details`.
-- `Add proper error handling` without a named error condition and expected behavior.
-- `Add validation` without exact invalid inputs and expected outputs.
-- `Write tests` without test file, test name, GIVEN/WHEN/THEN, and expected RED reason.
-- `Implement the logic` without source file and responsibility.
-- Any fenced code block, diff, pseudocode, function body, import list, or concrete control-flow sequence in a task.
-- `Same as previous task`, `similar to Task N`, or references that force the reader to infer missing details.
-- A file path that is approximate instead of exact.
-- A command that is approximate instead of exact.
+- `TBD`、`TODO`、`later`、`future work`、`fill in details`。
+- 没有命名 error condition 和 expected behavior 的 `Add proper error handling`。
+- 没有确切 invalid inputs 和 expected outputs 的 `Add validation`。
+- 没有 test file、test name、GIVEN/WHEN/THEN 和 expected RED reason 的 `Write tests`。
+- 没有 source file 和 responsibility 的 `Implement the logic`。
+- Task 中出现任何 fenced code block、diff、pseudocode、function body、import list 或具体 control-flow sequence。
+- `Same as previous task`、`similar to Task N`，或迫使读者推断缺失细节的引用。
+- 不精确 file path。
+- 不精确 command。
 
-## Self-Review Checklist
+## 自审清单（Self-Review Checklist）
 
-After drafting the complete plan, perform this review and include the result at the end.
+起草完整 plan 后，执行此 review 并在结尾包含结果。
 
 ```markdown
 ## Self-Review
@@ -246,22 +246,22 @@ After drafting the complete plan, perform this review and include the result at 
 - [ ] **Consistency:** Later tasks reference files, types, and responsibilities created by earlier tasks accurately.
 ```
 
-If any item fails, revise the plan before presenting it.
+如果任何条目失败，在呈现 plan 前修订。
 
-## Red Flags and Corrections
+## 红旗和修正（Red Flags and Corrections）
 
 | Red Flag | Correction |
 | --- | --- |
-| "This is one big task, but it is all related." | Split by behavior, file boundary, or scenario. |
-| "The implementation details can be decided later." | Planning defines what behavior changes and where. Do not specify internal algorithms unless the design requires them. |
-| "Tests are obvious." | Write the GIVEN/WHEN/THEN and expected RED reason. |
-| "Dependency order does not matter." | Reorder tasks until each task can pass independently. |
-| "Error handling can be a later task." | Error handling is behavior. Map it to the relevant scenario or create a scenario-backed error-path task. |
-| "This infrastructure task has no spec mapping." | Mark it as infrastructure and name the scenario or task it enables. |
+| "This is one big task, but it is all related." | 按 behavior、file boundary 或 scenario 拆分。 |
+| "The implementation details can be decided later." | Planning 定义哪些 behavior 改变以及在哪里改变。除非 design 要求，不要指定 internal algorithms。 |
+| "Tests are obvious." | 写出 GIVEN/WHEN/THEN 和 expected RED reason。 |
+| "Dependency order does not matter." | 重新排序 tasks，直到每个 task 都能独立通过。 |
+| "Error handling can be a later task." | Error handling 是 behavior。把它映射到相关 scenario，或创建 scenario-backed error-path task。 |
+| "This infrastructure task has no spec mapping." | 把它标为 infrastructure，并命名它启用的 scenario 或 task。 |
 
-## Final Response After Planning
+## Planning 后最终回复（Final Response After Planning）
 
-After saving or presenting the plan, respond with:
+保存或呈现 plan 后，回复：
 
 ```markdown
 Implementation plan saved to `specs/changes/<change-name>/tasks.md`.
@@ -279,4 +279,4 @@ Two execution modes are available:
 Which mode should be used?
 ```
 
-After the user chooses a mode, transition to the implementation skill, such as `spec-driven-development` or the repository's configured execution skill.
+用户选择 mode 后，转入 implementation skill，例如 `spec-driven-development` 或仓库配置的 execution skill。

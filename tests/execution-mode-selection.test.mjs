@@ -21,7 +21,7 @@ test('workflow guidance requires choosing an execution mode before resuming unch
   );
   assert.match(
     execution,
-    /Use Fast Mode only when the user explicitly asks for it\. Otherwise use Step-by-Step Mode\./i,
+    /Fast Mode 只在用户明确要求时使用；否则使用 Step-by-Step Mode/u,
   );
 });
 
@@ -31,10 +31,10 @@ test('execution guidance keeps mode selection explicit across skills and docs', 
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
 
-  assert.match(planning, /Ask the user to choose an execution mode\./);
+  assert.match(planning, /请用户选择 execution mode/u);
   assert.match(
     execution,
-    /Determine execution mode:[\s\S]*explicit user request for Fast Mode → Fast Mode[\s\S]*otherwise → Step-by-Step Mode/i,
+    /确定 execution mode：[\s\S]*用户明确要求 Fast Mode → Fast Mode[\s\S]*否则 → Step-by-Step Mode/u,
   );
   assert.match(
     readme,

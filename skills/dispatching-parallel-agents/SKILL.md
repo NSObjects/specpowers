@@ -1,70 +1,70 @@
 ---
 name: dispatching-parallel-agents
-description: Use when a request can be split into 2+ independent workstreams that can run concurrently without shared mutable state, file ownership conflicts, or sequential dependencies.
+description: 当请求可以拆成 2 个以上可并发运行的独立 workstreams，并且没有 shared mutable state、file ownership conflicts 或 sequential dependencies 时使用。
 ---
 
-# Dispatching Parallel Agents
+# 并行派发 Agents（Dispatching Parallel Agents）
 
-## Purpose
+## 目的（Purpose）
 
-Use this skill to coordinate multiple isolated specialist agents when a task has independent problem domains. The orchestrator remains the single owner of the user-facing answer, task decomposition, integration, verification, and final judgment.
+当一个任务包含彼此独立的问题域时，使用此 skill 协调多个隔离的 specialist agents。Orchestrator 仍然是 user-facing answer、task decomposition、integration、verification 和 final judgment 的唯一负责人。
 
-Sub-agents do **not** inherit the current conversation, hidden assumptions, or each other's work. Every dispatched task must include the exact context, scope, constraints, and expected output needed for that agent to succeed independently.
+Sub-agents 不会继承当前对话、隐藏假设或彼此的工作。每个派发任务都必须包含该 agent 独立完成所需的精确 context、scope、constraints 和 expected output。
 
-**Core principle:** dispatch one agent per independent domain, then integrate their findings through a single orchestration layer.
+**核心原则：** 每个 independent domain 派发一个 agent，然后通过单一 orchestration layer 整合 findings。
 
-## Activation Criteria
+## 激活条件（Activation Criteria）
 
-Use this skill only when all of the following are true:
+只有以下条件全部成立时，才使用此 skill：
 
-- There are **2 or more separable workstreams**.
-- Each workstream has a clear boundary, such as a file, subsystem, feature slice, test group, or review dimension.
-- No workstream needs another workstream's result before it can begin.
-- Agents can avoid editing the same files or mutating the same external state.
-- The orchestrator can inspect, reconcile, and verify the returned work.
+- 存在 **2 个或更多可分离 workstreams**。
+- 每个 workstream 都有清楚边界，例如 file、subsystem、feature slice、test group 或 review dimension。
+- 没有 workstream 需要另一个 workstream 的结果才能开始。
+- Agents 能避免编辑同一批文件或修改同一个 external state。
+- Orchestrator 能检查、调和并验证返回结果。
 
-Prefer this skill for:
+优先在这些场景使用：
 
-- Multiple failing test files with likely different causes.
-- Independent bugs in separate modules or services.
-- Large investigations that can be split by subsystem, API, package, platform, or concern.
-- Mixed expert analysis where each specialist has a bounded role, such as planning, security review, test strategy, and implementation review.
+- 多个 failing test files 可能有不同原因。
+- 独立 bugs 位于不同 modules 或 services。
+- 大型 investigations 可以按 subsystem、API、package、platform 或 concern 拆分。
+- 混合专家分析中，每个 specialist 都有有界角色，例如 planning、security review、test strategy 和 implementation review。
 
-Do **not** use this skill when:
+不要在这些场景使用：
 
-- Failures may share a root cause and should be diagnosed together first.
-- The task requires a single coherent mental model of the whole system.
-- Agents would edit the same files, migrations, generated artifacts, dependency manifests, or global configuration.
-- The work is exploratory and the boundaries are not yet known.
-- The task is small enough that orchestration overhead would exceed the benefit.
+- Failures 可能共享 root cause，应先一起诊断。
+- 任务需要对整个系统保持单一连贯 mental model。
+- Agents 会编辑相同 files、migrations、generated artifacts、dependency manifests 或 global configuration。
+- 工作仍处于 exploratory，边界尚不清楚。
+- 任务太小，orchestration overhead 超过收益。
 
-If independence is uncertain, first do a short triage pass. Dispatch read-only planning agents before writer agents when boundaries are unclear.
+如果 independence 不确定，先做短 triage pass。边界不清时，在 writer agents 前派发 read-only planning agents。
 
-## Parallel Readiness Checklist
+## 并行就绪清单（Parallel Readiness Checklist）
 
-Before dispatching, answer these questions:
+派发前回答这些问题：
 
 | Check | Ready Signal | If Not Ready |
 |------|--------------|--------------|
-| Domain boundary | Each agent owns a distinct file set, subsystem, or concern | Do a triage/planning pass first |
-| Dependency order | Agents do not need each other's outputs to start | Run sequentially or split into phases |
-| Write conflicts | Writable paths do not overlap | Assign one writer and make others read-only |
-| Shared state | No shared test database, service, branch state, or generated artifact conflict | Serialize the risky steps |
-| Verification | You know how to validate each result and the integrated result | Define focused and full verification first |
+| Domain boundary | 每个 agent 拥有独立 file set、subsystem 或 concern | 先做 triage/planning pass |
+| Dependency order | Agents 不需要彼此 outputs 就能开始 | 顺序执行或拆成 phases |
+| Write conflicts | 可写 paths 不重叠 | 指派一个 writer，其他设为 read-only |
+| Shared state | 没有 shared test database、service、branch state 或 generated artifact conflict | 串行化风险步骤 |
+| Verification | 已知如何验证每个结果和集成结果 | 先定义 focused 和 full verification |
 
-## Workflow
+## 工作流（Workflow）
 
-### 1. Partition the Work
+### 1. 拆分工作（Partition the Work）
 
-Group the request by independent problem domain:
+按独立 problem domain 对请求分组：
 
-- failing test file or test category
-- module, package, service, or API boundary
-- platform or environment
-- review concern, such as security, correctness, performance, or testability
-- delivery phase, such as planning, implementation, verification, or review
+- failing test file 或 test category
+- module、package、service 或 API boundary
+- platform 或 environment
+- review concern，例如 security、correctness、performance 或 testability
+- delivery phase，例如 planning、implementation、verification 或 review
 
-For each domain, record:
+对每个 domain，记录：
 
 - owner agent role
 - allowed scope
@@ -73,31 +73,31 @@ For each domain, record:
 - verification method
 - possible integration conflicts
 
-### 2. Choose the Agent Type
+### 2. 选择 Agent Type
 
-Use the smallest specialist role that can complete the domain:
+使用能完成该 domain 的最小 specialist role：
 
 | Role | Template | Use When |
 |------|----------|----------|
-| Planner | [`./planner-agent-prompt.md`](./planner-agent-prompt.md) | You need read-only codebase analysis, dependency mapping, implementation sequencing, or risk assessment before editing. |
-| Security Reviewer | [`./security-reviewer-prompt.md`](./security-reviewer-prompt.md) | You need a security-focused read-only review with severity, evidence, confidence, and coverage boundaries. Usually invoke through `requesting-code-review`. |
-| TDD Guide | [`./tdd-guide-prompt.md`](./tdd-guide-prompt.md) | You need a test-first plan, behavior matrix, or red-green-refactor coaching for a feature. |
-| Code Reviewer | [`../requesting-code-review/code-reviewer-prompt.md`](../requesting-code-review/code-reviewer-prompt.md) | You need general code quality review. Invoke through `requesting-code-review`, not as a separate user-facing flow. |
-| Debug/Fix Agent | Inline prompt | You need a bounded implementation or investigation against one file, subsystem, or failing test group. |
+| Planner | [`./planner-agent-prompt.md`](./planner-agent-prompt.md) | 需要在编辑前做 read-only codebase analysis、dependency mapping、implementation sequencing 或 risk assessment。 |
+| Security Reviewer | [`./security-reviewer-prompt.md`](./security-reviewer-prompt.md) | 需要带 severity、evidence、confidence 和 coverage boundaries 的安全只读审查。通常通过 `requesting-code-review` 调用。 |
+| TDD Guide | [`./tdd-guide-prompt.md`](./tdd-guide-prompt.md) | 需要 feature 的 test-first plan、behavior matrix 或 red-green-refactor coaching。 |
+| Code Reviewer | [`../requesting-code-review/code-reviewer-prompt.md`](../requesting-code-review/code-reviewer-prompt.md) | 需要通用 code quality review。通过 `requesting-code-review` 调用，不要作为单独 user-facing flow。 |
+| Debug/Fix Agent | Inline prompt | 需要针对一个 file、subsystem 或 failing test group 的有界 implementation 或 investigation。 |
 
-### 3. Build a Self-Contained Dispatch Packet
+### 3. 构造自包含 Dispatch Packet
 
-Every agent prompt must include:
+每个 agent prompt 必须包含：
 
-- **Objective:** the concrete outcome for this agent.
-- **Scope:** files, directories, tests, modules, or concerns it owns.
-- **Context:** relevant errors, requirements, constraints, diffs, assumptions, and prior findings.
-- **Allowed actions:** read-only, write-limited, test-running permissions, or other tool constraints.
-- **Forbidden actions:** files not to edit, behaviors not to change, commands not to run.
-- **Success criteria:** how the agent knows the work is complete.
-- **Return contract:** the exact summary format the orchestrator needs.
+- **Objective:** 该 agent 的具体 outcome。
+- **Scope:** 它负责的 files、directories、tests、modules 或 concerns。
+- **Context:** 相关 errors、requirements、constraints、diffs、assumptions 和 prior findings。
+- **Allowed actions:** read-only、write-limited、test-running permissions 或其他 tool constraints。
+- **Forbidden actions:** 不可编辑的 files、不可改变的 behaviors、不可运行的 commands。
+- **Success criteria:** agent 如何判断工作完成。
+- **Return contract:** orchestrator 需要的确切 summary format。
 
-Use this template for ad hoc agents:
+Ad hoc agents 使用此模板：
 
 ```markdown
 You are a focused sub-agent working on one independent domain.
@@ -139,101 +139,101 @@ You are a focused sub-agent working on one independent domain.
 [Remaining concerns, integration risks, or open questions]
 ```
 
-### 4. Dispatch Concurrently
+### 4. 并发派发（Dispatch Concurrently）
 
-Dispatch agents in parallel only after the scopes are separated. Treat the following as shared resources owned by the orchestrator unless explicitly assigned:
+只有 scopes 已分离后，才并行派发 agents。除非明确指派，否则以下 shared resources 由 orchestrator 拥有：
 
-- dependency manifests and lockfiles
+- dependency manifests 和 lockfiles
 - global config files
 - migrations
 - generated files
 - test snapshots
 - build scripts
 - shared fixtures
-- public interfaces used by multiple domains
+- 被多个 domains 使用的 public interfaces
 
-If two agents may need the same shared file, make one agent read-only or sequence the edits.
+如果两个 agents 可能需要同一个 shared file，把其中一个设为 read-only，或按顺序编辑。
 
-### 5. Integrate the Results
+### 5. 整合结果（Integrate the Results）
 
-When agents return:
+Agents 返回后：
 
-1. Read each summary before accepting any change.
-2. Check whether any files, assumptions, or interfaces overlap.
-3. Inspect diffs or recommendations for behavior regressions.
-4. Resolve contradictions explicitly.
-5. Run focused verification for each domain when possible.
-6. Run the broadest practical integration verification.
-7. Apply the AI-generated code review checklist before presenting the final result.
+1. 接受任何变更前，先阅读每份 summary。
+2. 检查 files、assumptions 或 interfaces 是否重叠。
+3. 检查 diffs 或 recommendations 是否造成 behavior regressions。
+4. 明确解决矛盾。
+5. 可行时为每个 domain 运行 focused verification。
+6. 运行最广泛且实际可行的 integration verification。
+7. 在呈现最终结果前，应用 AI-generated code review checklist。
 
-Do not blindly concatenate sub-agent outputs. The orchestrator must produce one coherent final conclusion.
+不要盲目拼接 sub-agent outputs。Orchestrator 必须产出一个连贯 final conclusion。
 
-### 6. Report to the User
+### 6. 向用户报告
 
-The final response should include:
+最终回复应包含：
 
-- what workstreams were split out
-- the integrated result
-- important fixes or findings
-- verification performed
-- unresolved risks or incomplete parts
+- 拆分出了哪些 workstreams
+- integrated result
+- 重要 fixes 或 findings
+- 已执行 verification
+- unresolved risks 或 incomplete parts
 
-Avoid exposing raw sub-agent transcripts unless the user asks for detailed logs.
+除非用户要求详细 logs，否则避免暴露 raw sub-agent transcripts。
 
-## Review Orchestration Boundary
+## Review Orchestration 边界
 
-Review-oriented specialists should sit behind a **unified review orchestration** layer. Use `requesting-code-review` as the user-facing review entrypoint. Dispatch security, general code quality, or other review specialists only as internal helpers for that unified review flow.
+Review-oriented specialists 应位于 **unified review orchestration** layer 背后。使用 `requesting-code-review` 作为 user-facing review entrypoint。Security、general code quality 或其他 review specialists 只作为 unified review flow 的内部 helpers 派发。
 
-The user should receive one review conclusion, not separate uncoordinated reviewer opinions.
+用户应收到一个 review conclusion，而不是彼此不协调的多个 reviewer opinions。
 
-## AI-Generated Code Review Checklist
+## AI 生成代码审查清单（AI-Generated Code Review Checklist）
 
-Apply these checks to code or recommendations produced by sub-agents:
+对 sub-agents 产出的 code 或 recommendations 应用这些检查：
 
-- **Behavior regression:** compare before/after behavior for affected call sites.
-- **Security assumptions:** ensure validations, authorization checks, trust boundaries, and secret handling were not weakened.
-- **Hidden coupling:** look for new dependencies on globals, shared state, timing, ordering, or environment.
-- **Over-broad edits:** reject changes outside the assigned scope unless justified.
-- **Unnecessary complexity:** remove abstractions, helpers, or layers that do not pay for themselves.
-- **Verification gaps:** separate verified claims from unverified assumptions.
+- **Behavior regression:** 对比 affected call sites 的前后行为。
+- **Security assumptions:** 确保 validations、authorization checks、trust boundaries 和 secret handling 没有被削弱。
+- **Hidden coupling:** 查找对 globals、shared state、timing、ordering 或 environment 的新依赖。
+- **Over-broad edits:** 拒绝 assigned scope 外的变更，除非有理由。
+- **Unnecessary complexity:** 移除不值得存在的 abstractions、helpers 或 layers。
+- **Verification gaps:** 区分 verified claims 和 unverified assumptions。
 
-## Examples
+## 示例（Examples）
 
-### Good Parallel Dispatch
+### 好的并行派发（Good Parallel Dispatch）
 
-Scenario: six test failures across three unrelated files after a refactor.
+Scenario：一次 refactor 后，三个无关文件中出现六个 test failures。
 
 Claude Code dispatch example: `Agent("Fix agent-tool-abort.test.ts failures")`
 
-- Agent 1 owns `agent-tool-abort.test.ts` timing failures.
-- Agent 2 owns `batch-completion-behavior.test.ts` event-shape failures.
-- Agent 3 owns `tool-approval-race-conditions.test.ts` async completion failures.
+- Agent 1 负责 `agent-tool-abort.test.ts` timing failures。
+- Agent 2 负责 `batch-completion-behavior.test.ts` event-shape failures。
+- Agent 3 负责 `tool-approval-race-conditions.test.ts` async completion failures。
 
-Each agent receives the failing test names, error messages, relevant scope, constraints, and return contract. The orchestrator later inspects the changes, checks for file overlap, and runs the full suite.
+每个 agent 都收到 failing test names、error messages、relevant scope、constraints 和 return contract。Orchestrator 随后检查 changes、检查 file overlap，并运行 full suite。
 
-### Bad Parallel Dispatch
+### 坏的并行派发（Bad Parallel Dispatch）
 
-Scenario: several failures all involve the same request lifecycle state machine.
+Scenario：多个 failures 都涉及同一个 request lifecycle state machine。
 
-Do not dispatch separate writer agents by failing test file. First investigate the shared state machine as one domain. After the root cause is understood, split only independent follow-up work.
+不要按 failing test file 派发多个 writer agents。先把 shared state machine 作为一个 domain 调查。理解 root cause 后，只拆分独立 follow-up work。
 
-## Common Mistakes
+## 常见错误（Common Mistakes）
 
 | Mistake | Why It Fails | Better Approach |
 |--------|--------------|-----------------|
-| “Fix all tests” | Too broad; agent loses focus | Assign one failing file or root-cause domain |
-| Missing error context | Agent repeats discovery work or guesses | Include test names, errors, logs, and relevant constraints |
-| Overlapping write scope | Agents produce conflicts or inconsistent behavior | Assign exclusive writable ownership |
-| No return contract | Orchestrator cannot integrate results reliably | Require outcome, findings, changes, verification, risks |
-| Skipping verification | Parallel fixes may conflict silently | Run focused checks and integration checks |
+| “Fix all tests” | 太宽；agent 会失去焦点 | 指派一个 failing file 或 root-cause domain |
+| Missing error context | Agent 会重复 discovery work 或猜测 | 包含 test names、errors、logs 和相关 constraints |
+| Overlapping write scope | Agents 会产生 conflicts 或 inconsistent behavior | 指派独占 writable ownership |
+| No return contract | Orchestrator 无法可靠整合 results | 要求 outcome、findings、changes、verification、risks |
+| Skipping verification | Parallel fixes 可能静默冲突 | 运行 focused checks 和 integration checks |
 
-## Verification Protocol
+## 验证协议（Verification Protocol）
 
-After all agents return, complete as much of this protocol as practical:
+所有 agents 返回后，尽可能完成以下 protocol：
 
-1. Confirm each domain's success criteria.
-2. Inspect changed files or recommendations against the original scope.
-3. Check for overlapping edits and shared-interface drift.
-4. Run targeted tests for each changed domain.
-5. Run full test suite or broad integration check when feasible.
-6. Document any verification that could not be performed.
+1. 确认每个 domain 的 success criteria。
+2. 根据 original scope 检查 changed files 或 recommendations。
+3. 检查 overlapping edits 和 shared-interface drift。
+4. 为每个 changed domain 运行 targeted tests。
+5. 可行时运行 full test suite 或 broad integration check。
+6. 记录任何无法执行的 verification。

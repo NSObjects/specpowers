@@ -1,278 +1,278 @@
 ---
 name: rules-rust
-description: Use when writing, reviewing, or modifying Rust code — provides Rust-specific coding rules that override and extend the universal rules from rules-common
+description: 编写、审查或修改 Rust code 时使用；提供 Rust-specific coding rules，覆盖并扩展 rules-common 的通用规则。
 language: rust
 ---
 
-# Rust Coding Rules
+# Rust Coding Rules（Rust 编码规则）
 
-These rules apply to Rust projects. They inherit all rules from `rules-common` and override specific entries where Rust conventions differ. Overrides are marked with `[Overrides common: X.Y]` and include the reason.
-
----
-
-## 1. Coding Style
-
-### 1.1 Naming Conventions `[Overrides common: 1.1]`
-
-**Reason:** Rust has strict naming conventions enforced by `clippy` lints.
-
-- Types, traits, enums: `PascalCase` (`HttpClient`, `Display`, `Option`)
-- Functions, methods, variables, modules: `snake_case`
-- Constants and statics: `UPPER_SNAKE_CASE`
-- Lifetimes: short lowercase (`'a`, `'b`), descriptive for complex cases (`'input`, `'conn`)
-- Crates: `kebab-case` in `Cargo.toml`, `snake_case` when imported (`use my_crate::...`)
-- Type parameters: single uppercase letter (`T`, `E`, `K`, `V`) or descriptive (`Item`, `Error`)
-- Conversion methods: `as_` (cheap, borrowed), `to_` (expensive, owned), `into_` (consuming)
-
-### 1.2 Function Size `[Overrides common: 1.2]`
-
-**Reason:** Rust's ownership, lifetime annotations, and pattern matching add visual weight.
-
-- Aim for ~40 lines including match arms and error handling
-- Extract complex match arms into named helper functions
-- Use `?` operator to keep error propagation concise — avoid nested `match` on `Result`
-
-### 1.3 File Organization `[Overrides common: 1.3]`
-
-**Reason:** Rust has a module system with specific file layout conventions.
-
-- Module tree mirrors directory structure: `mod foo;` looks for `foo.rs` or `foo/mod.rs`
-- Prefer `foo.rs` over `foo/mod.rs` (Rust 2018+ convention) unless the module has submodules
-- Use `pub(crate)` for crate-internal visibility — avoid making everything `pub`
-- Re-export key types from `lib.rs` for a clean public API
-- Group: `use` imports at top, then types, then implementations, then tests at bottom
-
-### 1.4 Formatting `[Overrides common: 1.5]`
-
-**Reason:** Rust has a single canonical formatter — there is no debate.
-
-- Use `rustfmt` — it is the only accepted formatter
-- Configure via `rustfmt.toml` only for project-wide settings (e.g., `edition`, `max_width`)
-- Run `cargo fmt` before every commit
-- Use `cargo clippy` alongside `rustfmt` — clippy catches idiomatic issues that formatting doesn't
+这些规则适用于 Rust projects。它们继承 `rules-common` 的全部规则，并在 Rust conventions 不同的地方用 `[Overrides common: X.Y]` 标记覆盖条目和原因。
 
 ---
 
-## 2. Ownership and Borrowing
+## 1. Coding Style（编码风格）
 
-### 2.1 Prefer Borrowing Over Cloning
+### 1.1 Naming Conventions（命名约定）`[Overrides common: 1.1]`
 
-Pass references (`&T`, `&mut T`) instead of cloning data. Clone only when ownership transfer is genuinely needed or when the cost is negligible (small types, `Arc`, `Rc`).
+**Reason:** Rust 有由 `clippy` lints 强化的严格 naming conventions。
 
-### 2.2 Minimize Lifetime Annotations
+- Types、traits、enums：`PascalCase`（`HttpClient`、`Display`、`Option`）。
+- Functions、methods、variables、modules：`snake_case`。
+- Constants 和 statics：`UPPER_SNAKE_CASE`。
+- Lifetimes：短小 lower-case（`'a`、`'b`），复杂情况可描述性命名（`'input`、`'conn`）。
+- Crates：`Cargo.toml` 中用 `kebab-case`，import 时用 `snake_case`（`use my_crate::...`）。
+- Type parameters：单个大写字母（`T`、`E`、`K`、`V`）或描述性名称（`Item`、`Error`）。
+- Conversion methods：`as_`（cheap、borrowed）、`to_`（expensive、owned）、`into_`（consuming）。
 
-Let the compiler infer lifetimes when possible (lifetime elision rules). Add explicit annotations only when the compiler requires them. If a function needs many lifetime parameters, consider restructuring to reduce them.
+### 1.2 Function Size（函数规模）`[Overrides common: 1.2]`
 
-### 2.3 Use Smart Pointers Appropriately
+**Reason:** Rust 的 ownership、lifetime annotations 和 pattern matching 会增加视觉重量。
 
-- `Box<T>`: heap allocation for large types or recursive structures
-- `Rc<T>` / `Arc<T>`: shared ownership (single-threaded / multi-threaded)
-- `RefCell<T>` / `Mutex<T>`: interior mutability (single-threaded / multi-threaded)
-- Avoid `Rc<RefCell<T>>` chains — they indicate a design that fights the borrow checker. Restructure instead.
+- 目标约 40 行，包含 match arms 和 error handling。
+- 将复杂 match arms 提取成命名 helper functions。
+- 使用 `?` operator 保持 error propagation 简洁，避免对 `Result` 做 nested `match`。
 
----
+### 1.3 File Organization（文件组织）`[Overrides common: 1.3]`
 
-## 3. Error Handling `[Overrides common: 5.6]`
+**Reason:** Rust 有特定 module system 和 file layout conventions。
 
-**Reason:** Rust uses `Result<T, E>` and `Option<T>` as its primary error handling mechanism — no exceptions.
+- Module tree 映射 directory structure：`mod foo;` 查找 `foo.rs` 或 `foo/mod.rs`。
+- Rust 2018+ 优先 `foo.rs`，除非 module 有 submodules。
+- Crate-internal visibility 使用 `pub(crate)`，避免所有内容都 `pub`。
+- 从 `lib.rs` re-export key types，形成清晰 public API。
+- 顺序：顶部 `use` imports，然后 types、implementations，最后 tests。
 
-### 3.1 Use the Type System for Errors
+### 1.4 Formatting（格式化）`[Overrides common: 1.5]`
 
-- Return `Result<T, E>` for operations that can fail — never `panic!` for expected errors
-- Use `Option<T>` for values that may be absent — never sentinel values (`-1`, `null`)
-- Use `?` operator for concise error propagation
-- Define custom error enums for library crates — implement `std::error::Error`
+**Reason:** Rust 有单一 canonical formatter。
 
-### 3.2 Error Libraries
-
-- Use `thiserror` for library error types (derive `Error` trait with structured variants)
-- Use `anyhow` for application error handling (when you don't need callers to match on error variants)
-- Never use `anyhow` in library crates — callers need structured errors to handle them
-
-### 3.3 Panic Discipline
-
-- `panic!` is for programmer errors (invariant violations, unreachable code)
-- `unwrap()` and `expect()` are acceptable only in tests and prototypes
-- In production code, use `unwrap_or()`, `unwrap_or_else()`, `unwrap_or_default()`, or propagate with `?`
-- Use `expect("reason")` over `unwrap()` when you must — the message documents the invariant
+- 使用 `rustfmt`，它是唯一 accepted formatter。
+- 仅用 `rustfmt.toml` 配置 project-wide settings（如 `edition`、`max_width`）。
+- 每次 commit 前运行 `cargo fmt`。
+- `rustfmt` 搭配 `cargo clippy`；clippy 捕获 formatting 之外的 idiomatic issues。
 
 ---
 
-## 4. Testing `[Overrides common: 2.1]`
+## 2. Ownership and Borrowing（所有权和借用）
 
-**Reason:** Rust has a built-in test framework with specific conventions.
+### 2.1 Prefer Borrowing Over Cloning（借用优先于克隆）
 
-### 4.1 Test-First with `#[cfg(test)]`
+传 references（`&T`、`&mut T`），不要随意 clone data。只有真正需要 ownership transfer，或成本可忽略（small types、`Arc`、`Rc`）时才 clone。
 
-Place unit tests in a `#[cfg(test)] mod tests` block at the bottom of each source file. Integration tests go in the `tests/` directory.
+### 2.2 Minimize Lifetime Annotations（最小化生命周期标注）
 
-### 4.2 Test Coverage Strategy `[Overrides common: 2.4]`
+尽可能让 compiler infer lifetimes（lifetime elision rules）。只有 compiler 要求时才添加 explicit annotations。如果一个 function 需要很多 lifetime parameters，考虑重构以减少它们。
 
-**Reason:** Rust's type system and ownership model eliminate many bug classes — focus testing on logic.
+### 2.3 Use Smart Pointers Appropriately（适当使用智能指针）
 
-- The compiler handles: null safety, data races, use-after-free, type mismatches
-- Focus tests on: business logic, state transitions, error handling paths, serialization/deserialization
-- Use `proptest` or `quickcheck` for property-based testing
-- Use `#[should_panic]` for tests that verify panic behavior
-- Use `assert_eq!`, `assert_ne!`, `assert!(matches!(...))` for clear assertions
-
----
-
-## 5. Immutability `[Overrides common: 5.4]`
-
-**Reason:** Rust variables are immutable by default — this is a core language feature.
-
-- Variables are immutable by default (`let x = 5;`) — use `mut` only when mutation is needed
-- Prefer returning new values over mutating in place, unless performance requires it
-- Use `const` for compile-time constants, `static` for global state (with `Mutex` or `RwLock` for mutability)
-- Shadowing (`let x = x + 1;`) is idiomatic for transformations — it's not mutation
+- `Box<T>`：用于 large types 或 recursive structures 的 heap allocation。
+- `Rc<T>` / `Arc<T>`：shared ownership（single-threaded / multi-threaded）。
+- `RefCell<T>` / `Mutex<T>`：interior mutability（single-threaded / multi-threaded）。
+- 避免 `Rc<RefCell<T>>` chains；它们说明设计在对抗 borrow checker，应重构。
 
 ---
 
-## 6. Resource Cleanup `[Overrides common: 4.3]`
+## 3. Error Handling（错误处理）`[Overrides common: 5.6]`
 
-**Reason:** Rust's ownership system provides automatic resource cleanup via `Drop`.
+**Reason:** Rust 使用 `Result<T, E>` 和 `Option<T>` 作为主要 error handling mechanism，没有 exceptions。
 
-- Resources are cleaned up automatically when they go out of scope (RAII via `Drop` trait)
-- Implement `Drop` for types that manage external resources (file handles, network connections)
-- Use `scopeguard` crate for ad-hoc cleanup that doesn't warrant a `Drop` implementation
-- For async resources, use `tokio::spawn` with proper cancellation handling
+### 3.1 Use the Type System for Errors（用类型系统表达错误）
 
----
+- 可能失败的 operations 返回 `Result<T, E>`；expected errors 不使用 `panic!`。
+- 可能缺失的 values 使用 `Option<T>`；不使用 sentinel values（`-1`、`null`）。
+- 使用 `?` operator 做 concise error propagation。
+- Library crates 定义 custom error enums，并实现 `std::error::Error`。
 
-## 7. Traits and Composition `[Overrides common: 5.1]`
+### 3.2 Error Libraries（错误库）
 
-**Reason:** Rust has no inheritance — traits and composition are the only abstraction mechanisms.
+- Library error types 使用 `thiserror`（derive `Error` trait，structured variants）。
+- Application error handling 使用 `anyhow`，适用于 callers 不需要 match error variants 的情况。
+- Library crates 不使用 `anyhow`；callers 需要 structured errors 才能处理。
 
-- Use traits to define shared behavior — they are Rust's interfaces
-- Prefer trait bounds (`fn process<T: Display>(item: T)`) over trait objects (`&dyn Display`) for performance
-- Use trait objects (`Box<dyn Trait>`) when you need runtime polymorphism or heterogeneous collections
-- Implement standard traits: `Debug`, `Clone`, `PartialEq` (derive when possible)
-- Use `#[derive(...)]` liberally — it's idiomatic and reduces boilerplate
+### 3.3 Panic Discipline（Panic 纪律）
 
----
-
-## 8. Dependency Injection `[Overrides common: 5.2]`
-
-**Reason:** Rust uses generics and trait bounds for compile-time DI.
-
-- Use generic parameters with trait bounds for dependency injection: `fn new<S: Storage>(storage: S) -> Self`
-- Use trait objects (`Box<dyn Trait>`) when generic parameters would infect the entire API
-- No DI frameworks — Rust's type system makes them unnecessary
-- Wire dependencies in `main()` — it's the composition root
+- `panic!` 用于 programmer errors（invariant violations、unreachable code）。
+- `unwrap()` 和 `expect()` 只在 tests 和 prototypes 中可接受。
+- Production code 使用 `unwrap_or()`、`unwrap_or_else()`、`unwrap_or_default()`，或用 `?` propagate。
+- 必须使用时，优先 `expect("reason")` 而不是 `unwrap()`；message 记录 invariant。
 
 ---
 
-## 9. Algorithm Complexity `[Overrides common: 4.2]`
+## 4. Testing（测试）`[Overrides common: 2.1]`
 
-**Reason:** Rust's zero-cost abstractions and ownership model affect performance patterns.
+**Reason:** Rust 有内置 test framework 和特定 conventions。
 
-- Iterators are zero-cost — prefer `.iter().map().filter().collect()` over manual loops
-- Use `Vec` for most collections, `HashMap` / `HashSet` for O(1) lookups
-- Pre-allocate with `Vec::with_capacity()` and `HashMap::with_capacity()` when size is known
-- Use `&str` over `String` for function parameters that don't need ownership
-- Use `Cow<'_, str>` when a function sometimes needs to allocate and sometimes doesn't
+### 4.1 Test-First with `#[cfg(test)]`（使用 `#[cfg(test)]` 测试先行）
 
----
+Unit tests 放在每个 source file 底部的 `#[cfg(test)] mod tests` block 中。Integration tests 放在 `tests/` directory。
 
-## 10. Concurrency
+### 4.2 Test Coverage Strategy（测试覆盖策略）`[Overrides common: 2.4]`
 
-### 10.1 Fearless Concurrency
+**Reason:** Rust type system 和 ownership model 消除了许多 bug classes，因此 testing 聚焦 logic。
 
-Rust's type system prevents data races at compile time. Leverage this:
-
-- Use `std::thread` for CPU-bound parallelism
-- Use `tokio` or `async-std` for I/O-bound concurrency
-- Use `rayon` for data parallelism (parallel iterators)
-- `Send` and `Sync` traits are automatically derived — if your type doesn't implement them, there's a reason
-
-### 10.2 Shared State
-
-- Use `Arc<Mutex<T>>` for shared mutable state across threads
-- Use `RwLock` when reads vastly outnumber writes
-- Use channels (`std::sync::mpsc`, `crossbeam`, `tokio::sync::mpsc`) for message passing
-- Prefer message passing over shared state when possible
+- Compiler 负责：null safety、data races、use-after-free、type mismatches。
+- Tests 聚焦：business logic、state transitions、error handling paths、serialization/deserialization。
+- 使用 `proptest` 或 `quickcheck` 做 property-based testing。
+- 使用 `#[should_panic]` 验证 panic behavior。
+- 使用 `assert_eq!`、`assert_ne!`、`assert!(matches!(...))` 写清晰 assertions。
 
 ---
 
-## 11. SQL and Injection Prevention `[Overrides common: 3.6]`
+## 5. Immutability（不可变性）`[Overrides common: 5.4]`
 
-**Reason:** Rust has type-safe database access patterns.
+**Reason:** Rust variables 默认 immutable，这是核心 language feature。
 
-- Use `sqlx` for compile-time checked SQL queries
-- Use `diesel` for type-safe ORM with schema DSL
-- Use `sea-orm` for async ORM
-- Never use `format!()` to build SQL queries with user input
-- Use parameterized queries with `$1`, `?` placeholders
-
----
-
-## 12. Unsafe Code
-
-### 12.1 Minimize `unsafe`
-
-- Use `unsafe` only when the safe alternative is impossible or has unacceptable performance cost
-- Document every `unsafe` block with a `// SAFETY:` comment explaining why it's sound
-- Encapsulate `unsafe` in safe abstractions — callers should never need to use `unsafe`
-- Audit all `unsafe` blocks during code review with extra scrutiny
+- Variables 默认 immutable（`let x = 5;`）；只有需要 mutation 时才使用 `mut`。
+- 除非 performance 需要，优先返回 new values，而不是原地 mutate。
+- Compile-time constants 使用 `const`；global state 使用 `static`，若需 mutability 搭配 `Mutex` 或 `RwLock`。
+- Shadowing（`let x = x + 1;`）是 transformation 的 idiomatic 写法，不是 mutation。
 
 ---
 
-## 13. Git Workflow `[Overrides common: 6.5]`
+## 6. Resource Cleanup（资源清理）`[Overrides common: 4.3]`
 
-**Reason:** Rust has specific build artifacts and generated files.
+**Reason:** Rust ownership system 通过 `Drop` 自动 resource cleanup。
 
-- Never commit `target/` directory (build artifacts)
-- Commit `Cargo.lock` for binary crates (reproducible builds), but NOT for library crates
-- Commit `Cargo.toml` — it defines the project and dependencies
-- Use `.gitignore` with Rust-specific patterns
+- Resources 在离开 scope 时通过 RAII / `Drop` trait 自动 cleanup。
+- 管理 external resources（file handles、network connections）的 types 实现 `Drop`。
+- Ad-hoc cleanup 可使用 `scopeguard` crate，不必强行写 `Drop` implementation。
+- Async resources 使用 `tokio::spawn` 时要有 proper cancellation handling。
 
 ---
 
-## Red Flags
+## 7. Traits and Composition（Traits 和组合）`[Overrides common: 5.1]`
+
+**Reason:** Rust 没有 inheritance；traits 和 composition 是主要 abstraction mechanisms。
+
+- 使用 traits 定义 shared behavior，它们是 Rust 的 interfaces。
+- 性能敏感时优先 trait bounds（`fn process<T: Display>(item: T)`），少用 trait objects（`&dyn Display`）。
+- 需要 runtime polymorphism 或 heterogeneous collections 时使用 trait objects（`Box<dyn Trait>`）。
+- 实现 standard traits：`Debug`、`Clone`、`PartialEq`，可 derive 时优先 derive。
+- 大量使用 `#[derive(...)]`，这是 idiomatic 且减少 boilerplate。
+
+---
+
+## 8. Dependency Injection（依赖注入）`[Overrides common: 5.2]`
+
+**Reason:** Rust 使用 generics 和 trait bounds 做 compile-time DI。
+
+- Dependency injection 使用带 trait bounds 的 generic parameters：`fn new<S: Storage>(storage: S) -> Self`。
+- Generic parameters 会污染整个 API 时，使用 trait objects（`Box<dyn Trait>`）。
+- 不需要 DI frameworks；Rust type system 已足够。
+- 在 `main()` 中 wire dependencies，它是 composition root。
+
+---
+
+## 9. Algorithm Complexity（算法复杂度）`[Overrides common: 4.2]`
+
+**Reason:** Rust 的 zero-cost abstractions 和 ownership model 会影响 performance patterns。
+
+- Iterators 是 zero-cost；优先 `.iter().map().filter().collect()`，而不是 manual loops。
+- 大多数 collections 使用 `Vec`；O(1) lookups 使用 `HashMap` / `HashSet`。
+- 已知 size 时，用 `Vec::with_capacity()` 和 `HashMap::with_capacity()` pre-allocate。
+- Function parameters 不需要 ownership 时，使用 `&str` 而不是 `String`。
+- 函数有时需要 allocate、有时不需要时，使用 `Cow<'_, str>`。
+
+---
+
+## 10. Concurrency（并发）
+
+### 10.1 Fearless Concurrency（无畏并发）
+
+Rust type system 在 compile time 防止 data races。利用这一点：
+
+- CPU-bound parallelism 使用 `std::thread`。
+- I/O-bound concurrency 使用 `tokio` 或 `async-std`。
+- Data parallelism 使用 `rayon`（parallel iterators）。
+- `Send` 和 `Sync` traits 会自动 derive；如果 type 没有实现，通常有原因。
+
+### 10.2 Shared State（共享状态）
+
+- 跨 threads 的 shared mutable state 使用 `Arc<Mutex<T>>`。
+- Reads 远多于 writes 时使用 `RwLock`。
+- Message passing 使用 channels（`std::sync::mpsc`、`crossbeam`、`tokio::sync::mpsc`）。
+- 可行时，message passing 优于 shared state。
+
+---
+
+## 11. SQL and Injection Prevention（SQL 和注入防护）`[Overrides common: 3.6]`
+
+**Reason:** Rust 有 type-safe database access patterns。
+
+- 使用 `sqlx` 做 compile-time checked SQL queries。
+- 使用 `diesel` 做 type-safe ORM with schema DSL。
+- 使用 `sea-orm` 做 async ORM。
+- 不要用 `format!()` 拼接包含 user input 的 SQL queries。
+- 使用带 `$1`、`?` placeholders 的 parameterized queries。
+
+---
+
+## 12. Unsafe Code（Unsafe 代码）
+
+### 12.1 Minimize `unsafe`（最小化 `unsafe`）
+
+- 只有 safe alternative 不可能或 performance cost 不可接受时，才使用 `unsafe`。
+- 每个 `unsafe` block 都要有 `// SAFETY:` comment，解释为什么 sound。
+- 将 `unsafe` 封装在 safe abstractions 中；callers 不应需要使用 `unsafe`。
+- Code review 时对所有 `unsafe` blocks 做额外 scrutiny。
+
+---
+
+## 13. Git Workflow（Git 工作流）`[Overrides common: 6.5]`
+
+**Reason:** Rust 有特定 build artifacts 和 generated files。
+
+- 不要 commit `target/` directory（build artifacts）。
+- Binary crates commit `Cargo.lock` 以保证 reproducible builds；library crates 不提交。
+- Commit `Cargo.toml`，它定义 project 和 dependencies。
+- 使用 Rust-specific `.gitignore` patterns。
+
+---
+
+## Red Flags（风险信号）
 
 | Thought | Reality |
 |---------|---------|
-| "I'll just `unwrap()` here" | Use `?` or `expect("reason")`. `unwrap()` is a hidden panic. |
-| "I'll clone to satisfy the borrow checker" | Cloning is a band-aid. Restructure ownership instead. |
-| "I need `unsafe` for this" | Probably not. Check if there's a safe abstraction in a crate first. |
-| "This `Rc<RefCell<T>>` chain is fine" | It means you're fighting the borrow checker. Redesign the data flow. |
-| "`anyhow` is fine for my library" | Libraries need structured errors (`thiserror`). `anyhow` is for applications. |
-| "I'll add lifetimes everywhere" | If you need many lifetimes, the design may need restructuring. Simplify ownership. |
-| "I'll use `String` for everything" | Use `&str` for borrows, `Cow<str>` for maybe-owned. `String` implies ownership. |
-| "Trait objects are simpler than generics" | They have runtime cost (vtable). Use generics when performance matters. |
+| "I'll just `unwrap()` here" | 使用 `?` 或 `expect("reason")`。`unwrap()` 是隐藏 panic。 |
+| "I'll clone to satisfy the borrow checker" | Cloning 是临时补丁。应重构 ownership。 |
+| "I need `unsafe` for this" | 多半不需要。先检查 crate 是否已有 safe abstraction。 |
+| "This `Rc<RefCell<T>>` chain is fine" | 这说明你在和 borrow checker 对抗。重新设计 data flow。 |
+| "`anyhow` is fine for my library" | Libraries 需要 structured errors（`thiserror`）。`anyhow` 属于 applications。 |
+| "I'll add lifetimes everywhere" | 如果需要很多 lifetimes，design 可能需要重构。简化 ownership。 |
+| "I'll use `String` for everything" | Borrow 用 `&str`，maybe-owned 用 `Cow<str>`。`String` 表示 ownership。 |
+| "Trait objects are simpler than generics" | 它们有 runtime cost（vtable）。性能重要时使用 generics。 |
 
 ---
 
-## Iron Laws
+## Iron Laws（铁律）
 
-1. **No `unwrap()` in production code.** Use `?`, `expect("reason")`, or `unwrap_or_*` variants. Every `unwrap()` is a potential panic.
-2. **Every `unsafe` block has a `// SAFETY:` comment.** No exceptions. If you can't explain why it's sound, it probably isn't.
-3. **`cargo clippy` passes clean.** Fix all clippy warnings. They catch real bugs and non-idiomatic patterns.
-4. **`cargo fmt` on every commit.** No manual formatting. `rustfmt` is the standard.
-5. **Libraries use `thiserror`, applications use `anyhow`.** Never mix them up. Callers of libraries need structured errors.
-6. **No `Rc<RefCell<T>>` without justification.** If you need it, document why. It usually means the ownership model needs rethinking.
+1. **Production code 不用 `unwrap()`。** 使用 `?`、`expect("reason")` 或 `unwrap_or_*` variants。每个 `unwrap()` 都可能 panic。
+2. **每个 `unsafe` block 都有 `// SAFETY:` comment。** 没有例外；解释不了 soundness，通常就不 sound。
+3. **`cargo clippy` clean 通过。** 修复所有 clippy warnings；它们会捕捉真实 bugs 和 non-idiomatic patterns。
+4. **每次 commit 前运行 `cargo fmt`。** 不做 manual formatting；`rustfmt` 是标准。
+5. **Libraries 用 `thiserror`，applications 用 `anyhow`。** 不要混用；library callers 需要 structured errors。
+6. **没有理由不使用 `Rc<RefCell<T>>`。** 如果需要它，记录原因；它通常说明 ownership model 需要重想。
 
 ---
 
-## Behavioral Shaping
+## Behavioral Shaping（行为塑形）
 
-### When Starting a New Rust File
+### When Starting a New Rust File（开始新的 Rust 文件时）
 
-1. Add `#![deny(clippy::all)]` or configure in `clippy.toml` for the workspace
-2. Derive standard traits (`Debug`, `Clone`, `PartialEq`) on all public types
-3. Place `#[cfg(test)] mod tests` at the bottom of the file
+1. 添加 `#![deny(clippy::all)]`，或在 workspace 的 `clippy.toml` 中配置。
+2. 对所有 public types derive standard traits（`Debug`、`Clone`、`PartialEq`）。
+3. 将 `#[cfg(test)] mod tests` 放在文件底部。
 
-### When Adding a New Dependency
+### When Adding a New Dependency（新增依赖时）
 
-1. Check if the standard library provides the functionality (`std::collections`, `std::fs`, `std::io`)
-2. Evaluate with `crates.io` downloads, last update, and `lib.rs` documentation
-3. Use `cargo add` to add dependencies — it updates `Cargo.toml` correctly
-4. Check for `unsafe` usage in the dependency with `cargo geiger`
+1. 检查 standard library 是否已提供功能（`std::collections`、`std::fs`、`std::io`）。
+2. 通过 `crates.io` downloads、last update 和 `lib.rs` documentation 评估。
+3. 使用 `cargo add` 添加 dependencies，确保正确更新 `Cargo.toml`。
+4. 用 `cargo geiger` 检查 dependency 中的 `unsafe` usage。
 
-### When Reviewing Rust Code
+### When Reviewing Rust Code（审查 Rust 代码时）
 
-1. Check for `unwrap()` and `expect()` in non-test code — each must be justified
-2. Verify `unsafe` blocks have `// SAFETY:` comments and are minimal
-3. Confirm error types are appropriate (`thiserror` for libs, `anyhow` for apps)
-4. Look for unnecessary clones — suggest borrowing or restructuring ownership
+1. 检查 non-test code 中的 `unwrap()` 和 `expect()`；每处都必须 justified。
+2. 验证 `unsafe` blocks 有 `// SAFETY:` comments 且最小化。
+3. 确认 error types 适当：libs 用 `thiserror`，apps 用 `anyhow`。
+4. 查找不必要 clones，并建议 borrowing 或 restructuring ownership。

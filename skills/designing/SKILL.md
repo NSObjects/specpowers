@@ -1,87 +1,90 @@
 ---
 name: designing
-description: "Use when the expected behavior is agreed and the implementation approach, tradeoffs, or file boundaries still need to be decided before coding."
+description: "当预期行为已经达成一致，但编码前仍需决定实现方式、取舍或文件边界时使用。"
 ---
 
-# Designing Architecture
+# 设计架构（Designing Architecture）
 
-Define **how** to implement the specified behavior. Technical decisions, architecture, and file-level planning.
+定义指定行为将**如何**实现。这里处理技术决策、架构和文件级规划。
 
-**Announce at start:** "I'm using the designing skill to create the technical design."
+**开始时宣布：**“我正在使用 designing skill 创建技术设计。”
 
-**Role: System Architect.** You make technical decisions based on the specs. You do NOT write code.
+**角色：System Architect。** 你基于 specs 做技术决策。你不写代码。
 
 <HARD-GATE>
-Do NOT write actual code (code snippets for illustration are fine).
-Do NOT skip specs — read ALL specs before designing.
-Every Requirement in the specs MUST have a corresponding technical approach in the design.
-Do NOT continue designing when the specs are not adequate; return to `specifying` or an earlier stage when behavior is still unclear.
-Do NOT proceed to planning without user confirmation.
+不要写实际代码（用于说明的 code snippets 可以）。
+不要跳过 specs；设计前读取所有 specs。
+Specs 中的每个 Requirement 都必须在 design 中有对应 technical approach。
+当 specs 不充分时，不要继续 designing；如果行为仍不清楚，回到 `specifying` 或更早阶段。
+没有用户确认前，不要进入 planning。
 </HARD-GATE>
 
-## Checklist
+## 检查清单
 
-1. **Read specs** — understand all Requirements and Scenarios
-2. **Explore codebase** — understand existing patterns, dependencies, architecture
-3. **Detect existing patterns** — naming, file structure, state management, error handling
-4. **Make architecture decisions** — choose approaches with documented trade-offs
-5. **Design for isolation** — each unit has one purpose, clear interface, testable independently
-6. **Map file changes** — which files to create, modify, delete (exact paths)
-7. **Self-review** — verify all Requirements are covered, patterns are followed
-8. **User confirms** — wait for explicit approval
-9. **Transition** — invoke `planning` skill
+1. **读取 specs** — 理解所有 Requirements 和 Scenarios
+2. **探索代码库** — 理解既有 patterns、dependencies、architecture
+3. **识别既有 patterns** — naming、file structure、state management、error handling
+4. **做 architecture decisions** — 选择方案并记录 trade-offs
+5. **按隔离性设计** — 每个单元有一个目的、清楚接口，并可独立测试
+6. **映射 file changes** — 哪些文件会 create、modify、delete（使用精确 paths）
+7. **自审** — 验证所有 Requirements 都被覆盖，并遵循既有 patterns
+8. **用户确认** — 等待明确批准
+9. **转入下一阶段** — 调用 `planning` skill
 
-## Spec Adequacy Gate
+## Spec Adequacy Gate（Spec 充分性门槛）
 
-Before making technical decisions, inspect the approved specifications for adequacy.
+做技术决策前，检查已批准 specifications 是否充分。
 
-Adequate specifications must provide enough behavior detail for design to trace every Requirement to a technical approach:
+充分的 specifications 必须提供足够行为细节，使 design 能把每个 Requirement 追溯到 technical approach：
 
-- each in-scope behavior has a concrete Requirement;
-- each active Requirement has happy-path and edge or error coverage;
-- key terms, actors, boundaries, and observable outcomes are defined;
-- no behavior-affecting open question remains.
+- 每个 in-scope behavior 都有具体 Requirement；
+- 每个 active Requirement 都有 happy-path 和 edge 或 error 覆盖；
+- 关键 terms、actors、boundaries 和 observable outcomes 已定义；
+- 没有剩余 behavior-affecting open question。
 
-Stop designing and return to `specifying` or an earlier stage if the specs contain any of these blockers:
+如果 specs 包含以下任一 blocker，停止 designing，并回到 `specifying` 或更早阶段：
 
-- unresolved behavioral questions;
-- undefined terms;
-- missing edge or error scenarios;
-- unclear boundaries;
-- abstract expected outcomes.
+- unresolved behavioral questions；
+- undefined terms；
+- missing edge or error scenarios；
+- unclear boundaries；
+- abstract expected outcomes。
 
-When this gate fails, report the specific Requirement or Scenario that is blocked and the missing behavioral detail. Do not fill the gap with a technical assumption.
+当此 gate 失败时，报告被阻塞的具体 Requirement 或 Scenario，以及缺失的行为细节。不要用技术假设填补空白。
 
-## Workflow Handoff Confidence Loop
+## Workflow Handoff Confidence Loop（工作流移交信心循环）
 
-Use the Workflow Handoff Confidence Loop from `../confidence-loop/SKILL.md` with `../confidence-loop/workflow-handoff-reviewer-prompt.md` before the `designing → planning` handoff when subagents are available.
+当 subagents 可用时，在 `designing → planning` handoff 前使用 `../confidence-loop/SKILL.md` 中的 Workflow Handoff Confidence Loop，并使用 `../confidence-loop/workflow-handoff-reviewer-prompt.md`。
 
-Review package must include the approved specs, design draft, Requirement mapping, Architecture Decisions, Data Flow, File Changes, test strategy, and explicit trade-offs.
+Review package 必须包含 approved specs、design draft、Requirement mapping、Architecture Decisions、Data Flow、File Changes、test strategy 和 explicit trade-offs。
 
-Do not proceed to `planning` while Critical or Important findings, `NEEDS_USER_DECISION`, or Unresolved Confidence Gaps remain.
+当仍有 Critical 或 Important findings、`NEEDS_USER_DECISION` 或 Unresolved Confidence Gaps 时，不要进入 `planning`。
 
-## Design for Isolation and Clarity
+## 隔离性和清晰度设计（Design for Isolation and Clarity）
 
-Break the system into smaller units that each:
-- Have **one clear purpose**
-- Communicate through **well-defined interfaces**
-- Can be **understood and tested independently**
+把系统拆成更小的单元，每个单元都要：
 
-For each unit, you should be able to answer:
-- What does it do?
-- How do you use it?
-- What does it depend on?
+- 有**一个清楚目的**
+- 通过**定义明确的接口**沟通
+- 能够**独立理解和测试**
 
-**Test your design:**
-- Can someone understand what a unit does without reading its internals?
-- Can you change the internals without breaking consumers?
-- If not, the boundaries need work.
+对每个单元，你都应该能回答：
 
-**File size signal:** When a file grows large, that's often a signal it's doing too much. If your design puts 200+ lines in one file, consider splitting.
+- 它做什么？
+- 如何使用它？
+- 它依赖什么？
 
-## Existing Pattern Detection
+**测试你的设计：**
 
-**BEFORE making architecture decisions, study the existing codebase:**
+- 别人是否能不读内部实现就理解这个单元做什么？
+- 是否能改变内部实现而不破坏消费者？
+- 如果不能，边界需要调整。
+
+**文件大小信号：** 文件变大通常说明它承担太多职责。如果你的设计会让某个文件新增 200+ 行，考虑拆分。
+
+## 既有模式识别（Existing Pattern Detection）
+
+**做 architecture decisions 前，先研究现有代码库：**
 
 ```
 FOR each relevant directory:
@@ -94,20 +97,20 @@ FOR each relevant directory:
 YOUR DESIGN MUST follow these patterns unless you document why you're deviating.
 ```
 
-**Deviation requires justification:** If you introduce a new pattern (e.g., a new state management approach in a project that already has one), you MUST add an Architecture Decision explaining why the existing pattern doesn't work for this case.
+**偏离需要理由：** 如果引入新 pattern（例如项目已有 state management 方案时又引入新方案），必须添加 Architecture Decision，解释为什么既有 pattern 不适合这个场景。
 
-## Design Format
+## Design 格式
 
 ```markdown
 # Design: [Change Name]
 
 ## Technical Approach
-[2-3 sentences describing the overall approach]
+[用 2-3 句话描述整体 approach]
 
 ## Architecture Decisions
 
 ### Decision: [Decision Name]
-When making technology choices, apply the research-first guidance from `rules-common`: check the codebase and other relevant existing solutions before recommending custom building. Include the resulting Adopt / Extend / Compose / Build decision in the Architecture Decision.
+做 technology choices 时，应用 `rules-common` 中的 research-first 指导：先检查代码库和其他相关既有方案，再推荐 custom building。在 Architecture Decision 中包含最终 Adopt / Extend / Compose / Build decision。
 
 Chose [A] over [B] because:
 - [Reason 1]
@@ -118,55 +121,56 @@ Trade-offs:
 - [What we give up]
 
 ## Data Flow
-[Text description or ASCII diagram showing how data moves through the system]
+[用文字描述或 ASCII diagram 说明数据如何流经系统]
 
 ## File Changes
-- Create: `exact/path/to/new-file.ts` — [what it does, ~estimated lines]
-- Modify: `exact/path/to/existing.ts` — [what changes]
-- Test: `tests/exact/path/to/test.ts` — [what it tests]
+- Create: `exact/path/to/new-file.ts` — [它做什么，约多少行]
+- Modify: `exact/path/to/existing.ts` — [改什么]
+- Test: `tests/exact/path/to/test.ts` — [测试什么]
 ```
 
-## Iron Laws
+## 铁律（Iron Laws）
 
-- **Every Requirement in specs MUST map to something in the design.** If a Requirement has no technical approach, the design is incomplete.
-- **Architecture Decisions MUST have trade-offs.** "We chose X" without explaining alternatives is not a decision — it's an assertion.
-- **File paths MUST be exact.** "Add a new component" is not acceptable. `src/components/ThemeToggle.tsx` is.
-- **Follow existing patterns.** In existing codebases, match the established architecture unless there's a documented reason to deviate.
-- **No god files.** If your design creates or modifies a file with 300+ lines of new logic, split it. Each file should have one clear responsibility.
-- **Interfaces before internals.** Define how components talk to each other before designing their internals.
+- **Specs 中每个 Requirement 都必须映射到 design 中的某个内容。** 如果某个 Requirement 没有 technical approach，design 就不完整。
+- **Architecture Decisions 必须有 trade-offs。** “We chose X” 但不解释替代方案，不是 decision，只是 assertion。
+- **File paths 必须精确。** “Add a new component” 不可接受；`src/components/ThemeToggle.tsx` 才是精确路径。
+- **遵循既有 patterns。** 在现有代码库中，除非有记录在案的偏离理由，否则匹配既有 architecture。
+- **不要 god files。** 如果 design 会创建或修改一个包含 300+ 行新逻辑的文件，拆分它。每个文件应有一个清楚职责。
+- **先定义接口，再设计内部。** 先定义 components 如何彼此沟通，再设计内部。
 
-## Self-Review
+## 自审
 
-After writing the design:
-1. **Spec coverage:** Can you point to a section of the design for every Requirement in the specs?
-2. **File completeness:** Are all files that will be touched listed in File Changes?
-3. **Pattern consistency:** Do new files follow the project's existing naming and structure conventions?
-4. **Isolation check:** Does each new file/module have one clear purpose? Could you explain what it does in one sentence?
-5. **Size check:** Are any files estimated at 200+ lines? If so, can they be split?
+写完 design 后：
 
-## Red Flags
+1. **Spec coverage：** 是否能为每个 Requirement 指向 design 中的某个 section？
+2. **File completeness：** 所有会被触碰的文件是否都列在 File Changes 中？
+3. **Pattern consistency：** 新文件是否遵循项目既有 naming 和 structure conventions？
+4. **Isolation check：** 每个新 file/module 是否有一个清楚目的？是否能用一句话解释？
+5. **Size check：** 是否有文件预计 200+ 行？如果有，能否拆分？
+
+## 红旗（Red Flags）
 
 | Thought | Reality |
 |---------|---------|
-| "I'll put everything in one file for now, refactor later" | "Later" never comes. Design for isolation from the start. |
-| "This framework/library would be perfect" | Does the project already use something for this? Use what exists. |
-| "I know the best way to do this" | Check the existing codebase first. Your "best way" might conflict with established patterns. |
-| "The design is obvious, I'll keep it brief" | Brief designs = vague designs = AI making stuff up during implementation. Be specific. |
-| "I'll figure out the file structure during planning" | File structure IS design. If you haven't decided where code goes, you haven't designed. |
-| "This is a small change, no Architecture Decisions needed" | Every design choice is a decision. Even "follow existing pattern" is a decision worth documenting. |
+| "I'll put everything in one file for now, refactor later" | “Later” 通常不会来。从一开始就按隔离性设计。 |
+| "This framework/library would be perfect" | 项目是否已经有处理这个问题的方案？优先使用既有方案。 |
+| "I know the best way to do this" | 先检查现有代码库。你的“最佳方式”可能和既有模式冲突。 |
+| "The design is obvious, I'll keep it brief" | 过短 design 往往等于含糊 design，之后 AI 会在 implementation 中发明细节。保持具体。 |
+| "I'll figure out the file structure during planning" | File structure 本身就是 design。还没决定代码放哪，就还没完成设计。 |
+| "This is a small change, no Architecture Decisions needed" | 每个 design choice 都是 decision。即使“follow existing pattern”也值得记录。 |
 
-## Common Rationalizations
+## 常见合理化（Common Rationalizations）
 
 | Excuse | Reality |
 |--------|---------|
-| "I can't know the exact file paths without starting to code" | Explore the codebase. The paths are there. If new, decide them now. |
-| "Trade-offs are obvious, no need to write them down" | If they're obvious, writing them takes 30 seconds. Do it. |
-| "The existing code doesn't follow any pattern" | Every codebase has patterns. You haven't looked hard enough. |
+| "I can't know the exact file paths without starting to code" | 探索代码库。路径已经在那里；如果是新路径，现在就决定。 |
+| "Trade-offs are obvious, no need to write them down" | 如果它们显而易见，写下来只要 30 秒。写。 |
+| "The existing code doesn't follow any pattern" | 每个代码库都有 patterns。你还没看够。 |
 
-## After Designing
+## Designing 之后
 
-Save to `specs/changes/<change-name>/design.md`.
+保存到 `specs/changes/<change-name>/design.md`。
 
 > "Technical design saved. Please review and confirm, then I'll create the implementation plan."
 
-Wait for user confirmation. Then invoke `planning` skill.
+等待用户确认。然后调用 `planning` skill。

@@ -13,8 +13,8 @@ const disciplineGateCoverage = [
   { surface: 'rules-common', file: 'skills/rules-common/SKILL.md', marker: '## 7. Change Discipline' },
   { surface: 'spec-driven-development', file: 'skills/spec-driven-development/SKILL.md', marker: 'Maintain traceable changes' },
   { surface: 'implementer-prompt', file: 'skills/spec-driven-development/implementer-prompt.md', marker: 'Complexity Evidence' },
-  { surface: 'task-code-quality-reviewer', file: 'skills/spec-driven-development/code-quality-reviewer-prompt.md', marker: '## Scope and Simplicity Discipline' },
-  { surface: 'standalone-code-reviewer', file: 'skills/requesting-code-review/code-reviewer-prompt.md', marker: '### Focused Diff Discipline' },
+  { surface: 'task-code-quality-reviewer', file: 'skills/spec-driven-development/code-quality-reviewer-prompt.md', marker: '## 范围和简洁纪律（Scope and Simplicity Discipline）' },
+  { surface: 'standalone-code-reviewer', file: 'skills/requesting-code-review/code-reviewer-prompt.md', marker: '### 聚焦 Diff 纪律' },
 ];
 
 test('rules-common requires evidence-based simplicity default', () => {
@@ -60,8 +60,8 @@ test('spec-driven-development and implementer enforce surgical task boundaries',
   const implementer = read('skills/spec-driven-development/implementer-prompt.md');
 
   for (const content of [controller, implementer]) {
-    assert.match(content, /traceable changes/i);
-    assert.match(content, /current request, accepted specification, task, failing test, review feedback, or current-change orphan cleanup/i);
+    assert.match(content, /traceable changes|保持变更可追溯/i);
+    assert.match(content, /current request(?:,\s*|、)accepted specification(?:,\s*|、)task(?:,\s*|、)failing test(?:,\s*|、)review feedback(?:,\s*or| 或) current-change orphan cleanup/i);
     assert.match(content, /drive-by refactors/i);
     assert.match(content, /comment rewrites/i);
     assert.match(content, /formatting noise/i);
@@ -80,8 +80,8 @@ test('implementer report records complexity evidence and current orphan cleanup'
     assert.ok(content.includes(expected), `implementer report should include ${expected}`);
   }
 
-  assert.match(content, /extra structure/i);
-  assert.match(content, /current evidence/i);
+  assert.match(content, /extra structure|额外结构/i);
+  assert.match(content, /current evidence|当前证据/i);
 });
 
 test('task code quality reviewer blocks inflated or untraceable diffs', () => {
@@ -95,7 +95,7 @@ test('task code quality reviewer blocks inflated or untraceable diffs', () => {
     'formatting noise',
     'unexplained complexity',
     'untraceable complexity',
-    'NEEDS_CHANGES or NEEDS_CONTEXT',
+    'NEEDS_CHANGES 或 NEEDS_CONTEXT',
   ]) {
     assert.ok(content.includes(expected), `task reviewer should include ${expected}`);
   }
@@ -105,10 +105,10 @@ test('standalone code reviewer checks focused and inflated diff discipline', () 
   const content = read('skills/requesting-code-review/code-reviewer-prompt.md');
 
   for (const expected of [
-    'Focused Diff Discipline',
+    '聚焦 Diff 纪律',
     'focused diff',
     'inflated diff',
-    'current-change orphan cleanup',
+    '当前改动造成的 orphan cleanup',
     'scope drift',
     'over-abstracted implementation',
     'formatting noise',

@@ -44,8 +44,8 @@ test('workflow skill descriptions focus on trigger conditions, not workflow summ
 
     assert.match(
       description,
-      /^Use when /,
-      `${relativePath} should start with "Use when" to stay discovery-friendly`,
+      /^当.+时使用。?$/,
+      `${relativePath} should describe the trigger condition in localized discovery copy`,
     );
 
     for (const pattern of forbiddenWorkflowShortcuts) {
@@ -93,7 +93,7 @@ test('using-skills keeps routing in one primary decision table', () => {
     'using-skills should make primary route selection table-driven',
   );
   assert.ok(
-    content.includes('| `quality-gate` | The user asks for automated quality checks or an active workflow reaches that checkpoint. |'),
+    content.includes('| `quality-gate` | 用户要求 automated quality checks，或 active workflow 到达该 checkpoint。 |'),
     'quality-gate should remain a support checkpoint, not a top-level route',
   );
   assert.ok(
@@ -140,15 +140,15 @@ test('receiving-code-review defines how to obtain missing feedback', () => {
     'receiving-code-review should define the boundary for obtaining review feedback',
   );
   assert.ok(
-    content.includes('configured review source'),
+    content.includes('配置好的 review source'),
     'receiving-code-review should use the configured review source instead of assuming one provider',
   );
   assert.ok(
-    content.includes('ask the user for the missing comments, link, review identifier, platform, or permissions'),
+    content.includes('向用户请求继续所需的 missing comments、link、review identifier、platform 或 permissions'),
     'receiving-code-review should ask for missing review input instead of inventing comments',
   );
   assert.ok(
-    content.includes('Do not invent, infer, or simulate review comments'),
+    content.includes('不要发明、推断或模拟 review comments'),
     'receiving-code-review should forbid fabricated review feedback',
   );
 });
@@ -161,11 +161,11 @@ test('receiving-code-review routes review comment acquisition by platform', () =
     'receiving-code-review should define how to acquire comments before processing them',
   );
   assert.ok(
-    content.includes('native repository or code-host integration'),
+    content.includes('native repository 或 code-host integration'),
     'receiving-code-review should allow platform-native repository integrations',
   );
   assert.ok(
-    content.includes('MCP or platform integration'),
+    content.includes('MCP 或 platform integration'),
     'receiving-code-review should route platform integrations without naming a specific provider',
   );
   assert.ok(
@@ -183,7 +183,7 @@ test('receiving-code-review discovers review comments from repository context be
   const acquisition = content.split('## Review Comment Acquisition')[1]?.split('## Default Workflow')[0] ?? '';
 
   assert.ok(
-    acquisition.includes('current repository context'),
+    acquisition.includes('当前 repository context'),
     'receiving-code-review should explicitly use current repository context when no comments are pasted',
   );
   assert.ok(
@@ -191,11 +191,11 @@ test('receiving-code-review discovers review comments from repository context be
     'receiving-code-review should use the active branch and repository remote as discovery signals',
   );
   assert.ok(
-    acquisition.includes('discover an associated pull request or merge request'),
+    acquisition.includes('先发现关联 pull request 或 merge request'),
     'receiving-code-review should try to discover the associated review before asking the user',
   );
   assert.ok(
-    acquisition.includes('Only ask the user after'),
+    acquisition.includes('只有在 repository-context discovery 无法识别 review'),
     'receiving-code-review should ask for missing input only after discovery cannot identify comments',
   );
 });
@@ -210,7 +210,7 @@ test('receiving-code-review acquisition guidance avoids rigid step scripts', () 
     'comment acquisition should be priority guidance rather than a rigid numbered script',
   );
   assert.ok(
-    acquisition.includes('Prefer this order'),
+    acquisition.includes('优先顺序'),
     'comment acquisition should describe a flexible preference order',
   );
 });

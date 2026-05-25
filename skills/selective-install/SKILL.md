@@ -1,19 +1,19 @@
 ---
 name: selective-install
-description: Use when installing, updating, diagnosing, or removing SpecPowers modules — provides profile-based installation, per-module granularity, state tracking, and lifecycle commands (list, doctor, repair, uninstall) across all supported platforms
+description: 安装、更新、诊断或移除 SpecPowers modules 时使用；提供跨所有支持平台的 profile-based installation、per-module granularity、state tracking 和 lifecycle commands（list、doctor、repair、uninstall）。
 ---
 
-# Selective Install
+# 选择性安装（Selective Install）
 
-## Overview
+## 概览
 
-SpecPowers is modular. Not every project needs every skill. The selective install system lets you pick a profile (core, developer, security, full) and optionally add or exclude individual modules. It tracks the locally generated plugin payload so you can diagnose drift, repair broken installs, and cleanly uninstall.
+SpecPowers 是模块化的。不是每个项目都需要每个 skill。Selective install system 允许你选择一个 profile（core、developer、security、full），并按需添加或排除单个 modules。它跟踪本地生成的 plugin payload，帮助你诊断漂移、修复损坏安装，并干净 uninstall。
 
-**Core principle:** Install only what you need. Know exactly what's installed. Keep it healthy.
+**核心原则：** 只安装你需要的内容。清楚知道已安装什么。保持安装健康。
 
 ---
 
-## Installation
+## 安装
 
 ```bash
 # Install with a profile
@@ -26,14 +26,14 @@ node scripts/install.js --platform claude-code --profile developer --add rules-t
 node scripts/install.js --platform claude-code --profile full --exclude rules-rust
 ```
 
-### Supported Platforms
+### 支持的平台（Supported Platforms）
 
 | Platform | Target Directory | Adapter |
 |----------|-----------------|---------|
 | `claude-code` | `.claude/` | `scripts/adapters/claude-code.js` |
 | `codex` | `.codex/` | `scripts/adapters/codex.js` |
 
-### Profiles
+### 安装配置（Profiles）
 
 | Profile | Description | Modules |
 |---------|-------------|---------|
@@ -44,11 +44,11 @@ node scripts/install.js --platform claude-code --profile full --exclude rules-ru
 
 ---
 
-## Lifecycle Commands
+## 生命周期命令（Lifecycle Commands）
 
-### `list` — Show installed modules
+### `list` — 显示已安装 modules
 
-Read the local install state file and display what's currently installed:
+读取本地 install state file，并显示当前已安装内容：
 
 ```
 Installed Modules (profile: developer, platform: claude-code)
@@ -64,14 +64,14 @@ Extra modules: (none)
 Excluded modules: (none)
 ```
 
-### `doctor` — Detect state drift
+### `doctor` — 检测 state drift
 
-Compare the local install state against what's actually on disk. Detect:
+对比本地 install state 和磁盘真实文件。检测：
 
-- **Missing files**: Module listed in state but files not found on disk
-- **Extra files**: SpecPowers files on disk not tracked in state
-- **Version mismatch**: Installed version differs from current SpecPowers version
-- **Corrupted state**: State file missing or unparseable
+- **Missing files**：State 中列出 module，但磁盘找不到文件
+- **Extra files**：磁盘上存在未被 state 跟踪的 SpecPowers 文件
+- **Version mismatch**：已安装版本和当前 SpecPowers version 不一致
+- **Corrupted state**：State file 缺失或无法解析
 
 ```
 Doctor Report
@@ -84,35 +84,35 @@ Doctor Report
 Recommendation: run `repair` to fix 2 issues
 ```
 
-### `repair` — Reinstall missing or corrupted modules
+### `repair` — 重新安装缺失或损坏 modules
 
-Re-copy module files from the SpecPowers source to the platform target directory. Only touches modules that are listed in the install state. Does not add or remove modules.
+从 SpecPowers source 重新复制 module files 到 platform target directory。只触碰 install state 中列出的 modules。不添加或移除 modules。
 
-### `uninstall` — Remove SpecPowers-managed files
+### `uninstall` — 移除 SpecPowers 管理的文件
 
-Remove only files that SpecPowers installed (tracked in install state). If a file has been modified by the user since installation, prompt for confirmation before deleting.
+只移除 SpecPowers 安装过、且在 install state 中跟踪的文件。如果某个文件安装后被用户修改过，删除前必须请求确认。
 
-After uninstall, the local state file is cleared but preserved (so `doctor` can report "no modules installed" rather than "state file missing").
+Uninstall 后会清空但保留本地 state file，这样 `doctor` 可以报告 "no modules installed"，而不是 "state file missing"。
 
 ---
 
-## Red Flags
+## 红旗（Red Flags）
 
 | Red Flag | Why It's Bad | What To Do Instead |
 |----------|-------------|-------------------|
-| Installing `full` profile on a single-language project | Bloats context with irrelevant language rules | Use `developer` + `--add rules-<language>` for your language |
-| Manually copying skill files instead of using install script | Local state file won't track them; `doctor` will report drift | Always use `install.js` or `--add` flag |
-| Deleting files from the platform directory by hand | Local state drift — `doctor` will flag missing files | Use `uninstall` command |
-| Ignoring `doctor` warnings | Drift accumulates; repairs get harder | Run `doctor` periodically, fix issues early |
-| Skipping `--platform` flag | Install script won't know where to put files | Always specify the target platform |
+| 在单语言项目安装 `full` profile | 会用无关语言规则膨胀上下文 | 使用 `developer` + `--add rules-<language>` 安装项目语言 |
+| 手动复制 skill files 而不是使用 install script | Local state file 不会跟踪它们；`doctor` 会报告 drift | 始终使用 `install.js` 或 `--add` flag |
+| 手动删除 platform directory 中的文件 | 造成 local state drift，`doctor` 会标记 missing files | 使用 `uninstall` command |
+| 忽略 `doctor` warnings | Drift 会累积，后续 repair 更困难 | 定期运行 `doctor`，尽早修复 |
+| 跳过 `--platform` flag | Install script 不知道文件应放到哪里 | 始终指定 target platform |
 
 ---
 
-## Iron Laws
+## 铁律（Iron Laws）
 
-1. **State is truth** — The install state file is the single source of truth for what's installed. All lifecycle commands read from it.
-2. **Dependencies are non-negotiable** — If module A depends on module B, installing A always installs B. No exceptions.
-3. **Exclude does not break dependencies** — You can exclude a module from a profile, but if another installed module depends on it, the exclude is silently ignored.
-4. **One platform per install** — Each install targets exactly one platform. To install for multiple platforms, run the script once per platform.
-5. **Repair never adds** — The `repair` command only reinstalls modules already in the state. It never adds new modules.
-6. **Uninstall is conservative** — Modified files require explicit confirmation. Untracked files are never touched.
+1. **State is truth** — Install state file 是已安装内容的单一事实来源。所有 lifecycle commands 都从它读取。
+2. **Dependencies are non-negotiable** — 如果 module A 依赖 module B，安装 A 总是会安装 B。没有例外。
+3. **Exclude does not break dependencies** — 你可以从 profile 中排除 module，但如果另一个已安装 module 依赖它，该 exclude 会被静默忽略。
+4. **One platform per install** — 每次 install 只面向一个 platform。要安装多个 platforms，分别运行脚本。
+5. **Repair never adds** — `repair` command 只重新安装 state 中已有 modules。它不会添加新 modules。
+6. **Uninstall is conservative** — 修改过的文件需要明确确认。未跟踪文件永远不会被触碰。

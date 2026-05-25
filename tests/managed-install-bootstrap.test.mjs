@@ -354,11 +354,11 @@ describe('Managed Install Bootstrap Integration', () => {
         'utf-8'
       );
       assert.ok(
-        content.includes('must not write files'),
+        content.includes('不得 write files'),
         'SKILL.md should make runtime no-write behavior explicit'
       );
       assert.ok(
-        content.includes('Do not call `scripts/install.js`'),
+        content.includes('不要从此 skill 调用 `scripts/install.js`'),
         'SKILL.md should tell runtime routing not to invoke installers implicitly'
       );
     });
@@ -373,7 +373,7 @@ describe('Managed Install Bootstrap Integration', () => {
         'SKILL.md should still name the bootstrap helper'
       );
       assert.ok(
-        content.includes('not an active runtime hook'),
+        content.includes('不是 active runtime hook'),
         'SKILL.md should clarify that bootstrap is not wired as a runtime hook'
       );
     });
