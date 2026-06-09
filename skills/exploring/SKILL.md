@@ -1,239 +1,267 @@
 ---
 name: exploring
-description: "当请求含糊、不完整、有战略歧义，或在决定构建什么之前需要项目上下文时使用。"
+description: 当用户请求模糊、不完整、策略上尚未明确，或在决定要构建什么之前需要补充项目上下文时使用。
 ---
 
 # 探索想法（Exploring Ideas）
 
-通过简短协作对话，把不清楚的想法变成共享、可行动的理解。使用最少必要探索：足以避免错误假设，但不要多到变成 design 阶段。
+将不清晰的想法转化为双方都认可、可执行的理解。探索应尽量短：只收集足以避免错误假设的信息，不把探索阶段扩展成设计阶段。
 
-**开始时只宣布一次：**“我正在使用 exploring skill 理解我们要构建什么。”
+**开始时只说明一次：**“我会使用 exploring skill，先确认我们要构建什么。”
 
-## 硬门槛（Hard Gate）
+## 核心边界
 
-在 `exploring` 期间，agent MUST NOT：
+在 `exploring` 阶段，代理**不得**：
 
-- 创建或编辑 project artifacts，例如 `proposal.md`、specs、design docs、task lists、tickets 或 implementation files；
-- 调用 implementation、design、task-planning 或 coding skills；
+- 创建或编辑项目产物，例如 `proposal.md`、规格说明、设计文档、任务清单、工单或实现文件；
+- 调用实现、设计、任务规划或编码类 skill；
 - 在需求仍在发现阶段时开始构建；
-- 把 implementation research 当成单独可见 workflow stage。
+- 将实现调研包装成一个单独、可见的工作流阶段。
 
-唯一可见输出是对话：问题、摘要、trade-offs、recommendations 和 alignment checks。
+此阶段唯一可见输出应是对话内容：问题、摘要、取舍、建议和对齐检查。
 
-只有在用户确认已探索方向后，终止转换才是 `proposing`。
+只有在用户确认探索方向后，才能从 `exploring` 进入 `proposing`。
 
-## 使用时机（When To Use）
+## 适用场景
 
-当以下任一情况成立时，使用 `exploring`：
+当出现以下任一情况时，使用 `exploring`：
 
-- 用户描述了目标，但没有描述具体 outcome。
-- Requirements、constraints、users、success criteria 或 scope 缺失。
-- 请求可能包含多个独立 features 或 subsystems。
-- 正确 approach 取决于既有 codebase patterns、dependencies、integrations 或 prior art。
-- 用户请求 solution，但存在多个有效 solution shapes。
+- 用户描述了目标，但没有说明具体交付结果；
+- 需求、约束、目标用户、成功标准或范围缺失；
+- 请求可能包含多个相互独立的功能或子系统；
+- 正确方案依赖现有代码模式、依赖关系、集成方式或既有实现；
+- 用户要求一个解决方案，但存在多种合理的方案形态。
 
-不要对已经具体且有边界的 implementation requests 过度使用此 skill。如果请求的变更具体且有界，转交给合适的下一个 skill。
+## 不适用场景
 
-## 操作循环（Operating Loop）
+不要把 `exploring` 用在已经明确、具体且边界清晰的实现请求上。此时应直接交给合适的后续 skill。
 
-1. **检查可用上下文**
-   - 检查现有 files、docs、recent commits、project structure 和已有 specs。
-   - 识别这是 greenfield 还是 brownfield work。
-   - 检查现有 behavior specifications，尤其是 `specs/` 或 `specs/specs/` 等已知 spec directories。
+如果请求很小但仍存在会影响行为的未知信息，使用一次轻量探索即可，不要启动完整探索流程。
 
-2. **先评估 scope，再问细节**
-   - 判断请求是一个 feature、一个 workflow，还是多个独立 subsystems。
-   - 如果请求太宽，先拆解，再问产品细节。
+## 执行流程
 
-3. **一次澄清一件事**
-   - 每条消息只问一个问题。
-   - 当 multiple-choice questions 能降低用户负担时优先使用。
-   - 聚焦 purpose、users、constraints、exclusions、success criteria 和可接受 trade-offs。
-   - 不要询问可用上下文已经回答的问题。
+### 1. 检查可用上下文
 
-4. **只有当研究会改变决策时才研究**
-   - 先搜索当前代码库。
-   - 只有当 codebase context 不足，且外部证据会实质影响 recommendation 时，才查相关外部来源。
-   - 保持研究有界，并把它综合进 exploration conversation。
+- 查看已有文件、文档、最近提交、项目结构和现有规格说明。
+- 判断这是新项目（greenfield）还是既有项目改造（brownfield）。
+- 优先检查已存在的行为规格，尤其是 `specs/`、`specs/specs/` 等目录。
 
-5. **呈现选项**
-   - 上下文足够后，提出 2-3 个可行 approaches。
-   - 以推荐 approach 开头。
-   - 对每个 option，总结 trade-offs、risk、complexity，以及它和既有 patterns 的契合度。
+### 2. 先判定范围，再问细节
 
-6. **确认对齐**
-   - 重述已达成一致的问题、scope、non-goals、constraints 和推荐方向。
-   - 在请求继续前，呈现下面的 Alignment Checkpoint。
-   - 询问是否进入 `proposing`。
+- 判断请求属于单一功能、单一工作流、复合功能，还是多个独立子系统。
+- 如果请求过大，先拆分，再询问产品细节。
 
-7. **转换**
-   - 只有用户确认后，才调用 `proposing`。
-   - 不要从 `exploring` 调用 implementation skills。
+### 3. 一次只澄清一个关键问题
 
-## Alignment Checkpoint（对齐检查点）
+- 每条消息只问一个问题。
+- 能降低用户负担时，优先使用选择题。
+- 问题应围绕目标、用户、约束、排除项、成功标准和可接受取舍。
+- 不要询问上下文中已经回答过的问题。
 
-离开 `exploring` 前，呈现一份用户可审查的 alignment checkpoint，包含：
+### 4. 只有在会改变决策时才调研
 
-- **problem statement:** 正在追求的具体问题或结果；
-- **target users:** 谁使用或受益于该变更；
-- **primary workflow:** 变更前、变更中、变更后发生什么；
-- **inputs and outputs:** 相关的重要信息、动作、artifacts 或可见结果；
-- **in-scope behavior:** 第一版变更覆盖什么；
-- **out-of-scope behavior:** 明确不覆盖什么；
-- **constraints:** 技术、产品、安全、兼容性、日程或运营限制；
-- **failure modes:** 预期 invalid states、errors、blocked paths 或 unavailable dependencies；
-- **open questions:** 剩余 decisions，分为 blocking 和 non-blocking。
+- 先搜索当前代码库。
+- 代码库信息不足，且外部证据会实质影响建议时，才查外部来源。
+- 调研必须有边界，并将证据压缩成探索对话中的取舍和建议。
 
-影响行为的 open questions 会阻塞转换。如果任何 open question 会改变用户可见行为、scope boundaries、permissions、failure outcomes 或 success criteria，提出一个聚焦澄清问题或说明 blocker。在 blocker 解决前，或用户明确缩小 scope 排除它前，不要创建 `proposal.md`。
+### 5. 给出可选方案
 
-## Workflow Handoff Confidence Loop（工作流移交信心循环）
+当上下文足够时，提出 2–3 个可行方案：
 
-当 subagents 可用时，在 `exploring → proposing` handoff 前使用 `../confidence-loop/SKILL.md` 中的 Workflow Handoff Confidence Loop，并使用 `../confidence-loop/workflow-handoff-reviewer-prompt.md`。
+- 先给推荐方案；
+- 每个方案说明取舍、风险、复杂度，以及与现有模式的匹配度；
+- 优先推荐最小且有价值的第一阶段切片。
 
-Review package 必须包含 alignment checkpoint、已确认用户回答、open questions、scope boundaries、constraints 和 intended proposal direction。
+### 6. 对齐确认
 
-当仍有 Critical 或 Important findings、`NEEDS_USER_DECISION` 或 Unresolved Confidence Gaps 时，不要进入 `proposing`。
+在请求进入下一阶段前，重述：
 
-## Scope 评估（Scope Assessment）
+- 已确认的问题；
+- 范围与非目标；
+- 约束与风险；
+- 推荐方向；
+- 仍未关闭的问题。
 
-详细澄清前，对请求分类：
+随后展示“对齐检查点”，并询问是否进入 `proposing`。
 
-| Scope | Signal | Action |
+### 7. 阶段转换
+
+- 只有用户确认后，才能调用 `proposing`。
+- 不得从 `exploring` 直接调用实现类 skill。
+
+## 对齐检查点
+
+离开 `exploring` 前，必须给出用户可审核的对齐检查点，包含：
+
+- **问题陈述：**正在解决的具体问题或目标结果；
+- **目标用户：**谁会使用或受益；
+- **主流程：**变更前、变更中、变更后分别发生什么；
+- **输入与输出：**关键数据、操作、产物或可见结果；
+- **范围内行为：**第一版变更会覆盖什么；
+- **范围外行为：**第一版明确不覆盖什么；
+- **约束：**技术、产品、安全、兼容性、排期或运维限制；
+- **失败模式：**预期的非法状态、错误、阻塞路径或不可用依赖；
+- **开放问题：**剩余决策，区分阻塞问题与非阻塞问题。
+
+任何会影响用户可见行为、范围边界、权限、失败结果或成功标准的开放问题，都会阻塞阶段转换。此时应提出一个聚焦的澄清问题，或明确说明阻塞点。
+
+在阻塞问题解决之前，不得创建 `proposal.md`。除非用户明确将相关行为排除在第一版范围之外。
+
+## 工作流交接信心循环
+
+当环境支持子代理时，在 `exploring → proposing` 交接前，使用 `../confidence-loop/SKILL.md` 中的 Workflow Handoff Confidence Loop，并结合 `../confidence-loop/workflow-handoff-reviewer-prompt.md` 进行审查。
+
+审查包必须包含：
+
+- 对齐检查点；
+- 已确认的用户回答；
+- 开放问题；
+- 范围边界；
+- 约束；
+- 计划进入 proposal 的方向。
+
+如果仍存在 Critical 或 Important 发现、`NEEDS_USER_DECISION`、未解决的信心缺口，不得进入 `proposing`。
+
+## 范围评估
+
+详细澄清前，先进行范围分类：
+
+| 范围 | 信号 | 行动 |
 |---|---|---|
-| Single feature | 一个用户目标、一个主 workflow、边界清楚 | 继续正常 exploration |
-| Compound feature | 一个目标包含多个依赖部分 | 澄清依赖和最小 first slice |
-| Multiple subsystems | auth、billing、analytics、chat、storage、admin、integrations 等独立 domains | 停止细节追问，先拆解 |
-| Platform/product | 宽泛产品愿景或多个 user roles/workflows | 定义 phases，并选择第一个 sub-project |
+| 单一功能 | 一个用户目标、一个主流程、边界清楚 | 继续正常探索 |
+| 复合功能 | 一个目标，但包含多个相互依赖的部分 | 澄清依赖关系与最小第一版切片 |
+| 多个子系统 | 涉及认证、计费、分析、聊天、存储、后台、集成等独立领域 | 停止细节追问，先拆分 |
+| 平台/产品级 | 宽泛产品愿景，涉及多个角色或工作流 | 定义阶段，并选择第一个子项目 |
 
-如果需要拆解，直接说明：
+如果需要拆分，应直接说明：
 
-> "This looks like several independent features. Let's break it into sub-projects before refining details."
+> “这看起来包含多个独立功能。我们先拆成子项目，再细化需求。”
 
-然后帮助识别：
+然后帮助用户明确：
 
-- 独立部分；
-- 它们如何彼此依赖；
-- 最小有价值 first slice；
-- 哪个 sub-project 应先进入 spec cycle。
+- 独立部分分别是什么；
+- 它们之间如何依赖；
+- 最小但有价值的第一版是什么；
+- 哪个子项目应先进入规格/提案周期。
 
-当 workflow 支持该结构时，每个 sub-project 都应有自己的 `specs/changes/<name>/` cycle。
+当工作流支持 `specs/changes/<name>/` 结构时，每个子项目都应有独立的变更周期。
 
-## 提问指南（Questioning Guidelines）
+## 提问准则
 
-好的 exploration questions 要具体且面向决策。
+好的探索问题应具体、面向决策。
 
-优先：
+推荐问法：
 
-> "Should this be optimized for speed of delivery, long-term extensibility, or lowest operational risk?"
+> “这次更优先速度交付、长期可扩展性，还是最低运维风险？”
 
-避免：
+避免问法：
 
-> "Tell me more about what you want."
+> “你想要什么？再多说一点。”
 
-用问题发现：
+应通过问题发现：
 
-- **Outcome:** 工作完成后应当成为什么状态；
-- **User:** 谁使用或受益；
-- **Workflow:** feature 之前、期间、之后发生什么；
-- **Constraints:** technology、security、performance、budget、schedule、compliance；
-- **Success criteria:** 可观察验收条件；
-- **Non-goals:** 明确保持在 scope 外的内容。
+- **目标结果：**完成后应成立的事实；
+- **用户：**谁使用或受益；
+- **流程：**功能前、中、后分别发生什么；
+- **约束：**技术、安全、性能、预算、时间、合规要求；
+- **成功标准：**可观察、可验收的条件；
+- **非目标：**明确不纳入范围的内容。
 
-## Exploring 中的实现研究（Implementation Research Inside Exploring）
+## 探索阶段中的实现调研
 
-Implementation research 只允许用于提升 exploration 质量。它不会改变可见阶段。
+实现调研只允许用于提高探索质量，不改变当前可见阶段。
 
-### 何时研究
+### 可以调研的情况
 
-- 在 adopting existing solution 与 building custom code 之间选择；
-- 比较 dependencies、integrations 或 architectural patterns；
-- 检查当前代码库是否已有相似 behavior；
-- 评估 risk、compatibility、migration cost 或 maintenance burden；
-- 验证会实质影响推荐 approach 的假设。
+- 需要在采用现有方案与自研之间做选择；
+- 需要比较依赖、集成方式或架构模式；
+- 需要确认当前代码库中是否已有相似行为；
+- 需要评估风险、兼容性、迁移成本或维护负担；
+- 需要验证会实质影响推荐方向的假设。
 
-### 何时跳过研究
+### 应跳过调研的情况
 
-- 请求可以通过正常提问澄清；
-- 既有项目 patterns 已经清楚决定方向；
-- 结果不会改变 recommendation；
-- 问题属于 design 或 implementation，而不是 exploration。
+- 普通澄清问题即可推进；
+- 现有项目模式已经清楚决定方向；
+- 调研结果不会改变建议；
+- 问题属于设计或实现阶段，而非探索阶段。
 
-### 研究顺序
+### 调研顺序
 
-1. 先搜索当前代码库。
-2. 再检查内部 docs/specs。
-3. 仅在需要时使用外部来源。
-4. 返回简洁证据，并将其转化为 trade-offs。
+1. 先搜索当前代码库；
+2. 再检查内部文档和规格；
+3. 只有必要时才查外部来源；
+4. 将证据总结为简短取舍，而不是展开研究报告。
 
-### 平台派发（Platform dispatch）
+### 平台分发
 
-委派研究时使用填好的 `./implementation-researcher-prompt.md` template。这是有界 research 的可选 subagent delegation。
+如需委托子代理做有限调研，使用填好的 `./implementation-researcher-prompt.md` 模板。
 
-- Claude Code：使用 `Agent` tool 和 general-purpose agent。旧环境中 `Task` 可能作为 backward-compatible alias 存在。
-- **Codex：** 使用 `spawn_agent(message=...)`。
+- Claude Code：使用 `Agent` 工具和 general-purpose agent。旧环境中 `Task` 可能作为兼容别名存在。
+- **Codex：**使用 `spawn_agent(message=...)`。
 
-主 Agent 仍负责 synthesis、recommendation 和 user alignment。
+主代理仍负责综合、推荐和与用户对齐。
 
-## 完成标准（Completion Criteria）
+## 完成标准
 
-只有全部条件满足时，exploration 才完成：
+只有以下条件全部满足，探索才算完成：
 
-- Problem statement 清楚。
-- User 和 primary workflow 足够清楚，可以据此 proposing。
-- Inputs、outputs、in-scope behavior、out-of-scope behavior、constraints 和 failure modes 已说明。
-- Scope 和 non-goals 明确。
-- Major constraints 和 risks 已知，或被有意延后。
-- 影响行为的 open questions 已解决，或用户已明确把它们排除在 first change 之外。
-- 已呈现带 alternatives 的 recommended approach。
-- 用户已同意进入 `proposing`。
+- 问题陈述清楚；
+- 目标用户和主流程足够清楚，可以据此写 proposal；
+- 输入、输出、范围内行为、范围外行为、约束和失败模式已经说明；
+- 范围与非目标明确；
+- 主要约束和风险已知，或已明确延后处理；
+- 会影响行为的开放问题已经解决，或用户明确将其排除在第一版之外；
+- 已提出推荐方案和替代方案；
+- 用户同意进入 `proposing`。
 
-## 红旗（Red Flags）
+## 停止信号与纠偏动作
 
-如果出现以下想法，停止并回到 exploration：
+如果出现以下想法，立即停止并回到探索：
 
-| Thought | Corrective action |
+| 想法 | 正确动作 |
 |---|---|
-| "I already know what they want." | 询问或验证缺失假设。 |
-| "I'll explore while implementing." | 不要实现；先澄清。 |
-| "The scope is probably fine." | 先分类 scope，再问细节。 |
-| "This is too simple to explore." | 使用更短 exploration，而不是零 exploration。 |
-| "The user will correct me later." | 现在就让假设可见。 |
-| "One more question would be annoying." | 只问最高价值的下一个问题。 |
-| "Research would be interesting." | 只有研究会改变决策时才研究。 |
+| “我已经知道用户想要什么。” | 询问或验证缺失假设。 |
+| “我边实现边探索。” | 不实现；先澄清。 |
+| “范围应该没问题。” | 先分类范围，再问细节。 |
+| “这个太简单，不需要探索。” | 若仍有关键未知，做轻量探索；若已经明确，交给后续 skill。 |
+| “用户之后会纠正我。” | 现在就把假设显式说出来。 |
+| “再问一个问题会烦。” | 只问最高价值的下一个问题。 |
+| “调研一下挺有意思。” | 只有调研会改变决策时才做。 |
 
-## 常见合理化（Common Rationalizations）
+## 常见误判
 
-| Excuse | Reality |
+| 借口 | 现实 |
 |---|---|
-| "The user said just build it." | 这只说明紧迫性，不说明 requirements。 |
-| "I'll figure out details as I go." | 细节就是 requirements；猜测会造成返工。 |
-| "Asking questions wastes time." | 构建错误东西更浪费时间。 |
-| "This resembles another project." | 相似性有用，但差异定义工作。 |
+| “用户说直接做。” | 这说明紧急程度，不代表需求完整。 |
+| “细节可以边做边定。” | 细节就是需求；猜测会制造返工。 |
+| “问问题浪费时间。” | 做错方向更浪费时间。 |
+| “这和另一个项目很像。” | 相似性有参考价值，但差异决定工作内容。 |
 
-## 移交到 Proposing（Handoff To Proposing）
+## 交接到 Proposing
 
 准备好后，在对话中总结：
 
-- agreed problem；
-- target users/workflow；
-- scope 和 non-goals；
-- constraints 和 risks；
-- recommended approach；
-- 可以在 proposing 中安全解决的 open questions。
+- 已达成一致的问题；
+- 目标用户与主流程；
+- 范围与非目标；
+- 约束与风险；
+- 推荐方案；
+- 可在 proposing 阶段安全解决的开放问题。
 
 然后询问：
 
-> "I have a clear understanding of what we're building. Ready to create a proposal. Shall I proceed?"
+> “我已经清楚我们要构建什么。接下来可以创建 proposal，是否继续？”
 
-确认后，调用 `proposing`，不要调用 implementation skills。
+用户确认后，调用 `proposing`，且不得调用实现类 skill。
 
-## 关键原则（Key Principles）
+## 关键原则
 
-- Scope before details。
-- 一次一个问题。
-- 有帮助时使用 multiple choice。
-- 优先最小有价值 first slice。
-- 让假设明确可见。
-- 承诺前先探索 alternatives。
-- 只有证据会改变决策时才研究。
-- `exploring` 期间不创建 artifacts。
+- 先定范围，再问细节。
+- 一次只问一个问题。
+- 能用选择题，就不要让用户开放式补充。
+- 优先寻找最小但有价值的第一版。
+- 明确说出假设。
+- 提交方向前先比较方案。
+- 只有证据会改变决策时才调研。
+- `exploring` 阶段不创建项目产物。
