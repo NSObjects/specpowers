@@ -1,239 +1,239 @@
 ---
 name: spec-driven-development
-summary: 按 task 执行已批准的 specification plan，包含 TDD、spec traceability、分阶段 review 和用户控制的 commits。
-description: "当已批准 task plan 存在，且用户希望开始或恢复 implementation 时使用。"
+summary: 按已批准的规格计划逐项执行任务，强制 TDD、规格可追溯、分阶段审查，并由用户控制提交。
+description: "当已有已批准的任务计划，且用户希望开始或继续实现时使用。"
 ---
 
-# Spec-Driven Development（规格驱动开发）
+# 规格驱动开发（Spec-Driven Development）
 
-用 test-first discipline、到 Spec 的明确 traceability，以及严格 review gates 执行已批准 implementation plan。
+基于已批准的实现计划执行开发：先测试、后实现；每个改动都可追溯到 Spec；每个任务必须通过明确的审查门禁。
 
 **面向用户的启动说明：**
-> 我正在使用 spec-driven-development skill 来实现已批准的 plan。
+> 我将使用 spec-driven-development skill 来执行已批准的实现计划。
 
-**角色：** Engineering controller。你协调 implementation、verification 和 reporting。你可以直接写 code，也可以 dispatch subagents，但最终结果仍由你负责。
+**角色：** 工程控制器。你负责协调实现、验证和汇报。你可以直接写代码，也可以派发子代理，但最终结果由你负责。
 
-## Non-Negotiable Gates（不可协商关卡）
+## 不可协商的门禁
 
 <HARD-GATE>
-- Implementation 期间不要更改 Spec、Design、Proposal 或 acceptance criteria。如果它们看起来错误或不完整，停止并向用户说明冲突。
-- Behavior-changing work 不得跳过 TDD。每个 implementation task 都从创建或扩展一个 failing automated test 开始，并映射到 linked Spec scenario。
-- 不要运行 mutating git commands：不运行 `git add`、`git commit`、`git push`、`git reset`、`git checkout`、`git rebase`、`git merge` 或 stash operations。需要时可运行 read-only inspection commands，例如 `git status` 或 `git diff`。
-- Step-by-Step mode 中，除非用户明确要求继续，否则不要进入下一个 task。
+- 实现期间不得修改 Spec、Design、Proposal 或验收标准。若发现它们错误、不完整或互相冲突，立即停止实现，并向用户说明具体冲突。
+- 行为变更类任务不得跳过 TDD。每个实现任务必须先创建或扩展一个会失败的自动化测试，并且该测试要映射到关联的 Spec 场景。
+- 不得运行会改变 Git 状态的命令：禁止 `git add`、`git commit`、`git push`、`git reset`、`git checkout`、`git rebase`、`git merge` 或 stash 操作。必要时可运行只读检查命令，例如 `git status`、`git diff`。
+- Step-by-Step 模式下，未获得用户明确继续指令，不得开始下一个任务。
 </HARD-GATE>
 
-此 skill 中唯一允许对 `tasks.md` 做的编辑，是在某个 task 通过所有 required gates 后，将该 task checkbox 从 `- [ ]` 改成 `- [x]`。
+本 skill 期间，唯一允许对 `tasks.md` 做出的编辑是：在某个任务通过所有门禁后，将该任务复选框从 `- [ ]` 改为 `- [x]`。
 
-## Definitions（定义）
+## 术语
 
-- **Change:** 正在实现的 active spec change，通常位于 `specs/changes/<change-name>/`。
-- **Task:** `tasks.md` 中一个 unchecked item。Task 是 uninterrupted execution 的最小单位。
-- **Feature group:** 共享相同顶层编号的一组 tasks，例如 `1.1`、`1.2`、`1.3` 属于 feature group `1`。如果 tasks 按 headings 而非编号组织，则每个 heading section 视为一个 feature group。
-- **Subtask:** 为 verification-boundary 目的，feature group 内的一个 task。
-- **Linked Spec Scenarios:** Task 明确引用的 GIVEN/WHEN/THEN scenarios。如果 task 没有列出 scenario references，从 Spec 中推断最接近的 scenarios，并在 task report 中说明该推断。
-- **Controller:** 运行此 skill 的 main agent。
-- **Worker:** 执行 task 的 subagent，或 controller 自己。
+- **Change：** 当前正在实现的规格变更，通常位于 `specs/changes/<change-name>/`。
+- **Task：** `tasks.md` 中一个未完成的任务项。任务是最小的不中断执行单元。
+- **Feature group：** 具有相同一级编号的一组任务，例如 `1.1`、`1.2`、`1.3` 属于功能组 `1`。若任务按标题组织，则将每个标题章节视为一个功能组。
+- **Subtask：** 功能组内的一个任务，用于判断里程碑验证边界。
+- **Linked Spec Scenarios：** 任务明确引用的 GIVEN/WHEN/THEN 场景。若任务没有列出场景引用，应从 Spec 推断最接近的场景，并在任务报告中说明该推断。
+- **Controller：** 运行本 skill 的主代理。
+- **Worker：** 子代理，或由 Controller 直接扮演的任务实现者。
 
-## Execution Modes（执行模式）
+## 执行模式
 
-### Step-by-Step Mode — Default（逐步模式，默认）
+### Step-by-Step 模式（默认）
 
-只执行一个 task，完成所有 gates，标记 task checkbox，报告结果，然后暂停。用户手动 review changes 并 commit。只有用户明确说继续后才继续。
+只执行一个任务：完成所有门禁、更新任务复选框、汇报结果，然后停止。用户审查代码并手动提交。只有当用户明确说继续时，才继续下一个任务。
 
-### Fast Mode（快速模式）
+### Fast 模式
 
-连续执行所有 unchecked tasks。每个 task 仍然必须经过 TDD、Stage 1 spec compliance review、Stage 2 code quality review、task checkbox update 和 milestone verification。最后统一报告一次。
+连续执行所有未完成任务。每个任务仍然必须经过 TDD、Stage 1 规格符合性审查、Stage 2 代码质量审查、任务复选框更新和里程碑验证。全部完成后统一汇报。
 
-Fast Mode 只在用户明确要求时使用；否则使用 Step-by-Step Mode。
+只有当用户明确要求 Fast 模式时才使用该模式。其他情况均使用 Step-by-Step 模式。
 
-## Startup Procedure（启动流程）
+## 启动流程
 
-1. 宣告正在使用此 skill。
-2. 识别 active change 和 task file。优先使用用户点名的 change 或 task file；否则检查 `specs/changes/`，只有一个 active change 且无歧义时才选择它。
+1. 宣布正在使用本 skill。
+2. 识别当前 Change 和任务文件。优先使用用户指定的 change 或 task 文件；否则检查 `specs/changes/`，仅当存在唯一明确的活跃 change 时才自动选择。
 3. 至少读取：
    - `tasks.md`
-   - linked Spec scenarios
-   - relevant Design sections
-   - relevant existing code and tests
-4. 确定 execution mode：
-   - 用户明确要求 Fast Mode → Fast Mode
-   - 否则 → Step-by-Step Mode
-   - 执行开始或恢复前，先选择 `Step-by-Step` 或 `Fast`。
-5. 确定 execution mechanism：
-   - 如果平台支持 subagents，使用此 skill directory 中的 prompt templates dispatch workers/reviewers。
-   - 否则使用下方 self-checks inline execute/review，并明确报告 fallback。
-6. 找到第一个 unchecked task。如果没有剩余 unchecked tasks，运行 final completion checks 并报告 implementation complete。
+   - 关联的 Spec 场景
+   - 相关 Design 章节
+   - 相关现有代码和测试
+4. 确定执行模式：
+   - 用户明确要求 Fast 模式 → Fast 模式
+   - 否则 → Step-by-Step 模式
+5. 确定执行机制：
+   - 若平台支持子代理，使用本 skill 目录下的 prompt 模板派发 worker/reviewer
+   - 否则，使用下方自检流程内联执行和审查，并在报告中明确说明 fallback 原因
+6. 找到第一个未完成任务。若没有未完成任务，运行最终完成检查，并汇报实现已完成。
 
-## Subagent Dispatch（Subagent 派发）
+## 子代理派发
 
-平台支持时使用 subagents。每个 task 派发 fresh worker，降低 context contamination。
+平台支持子代理时，应使用子代理。每个任务派发一个新的 worker，以降低上下文污染。
 
-- Implementer worker: `./implementer-prompt.md`
-- Stage 1 reviewer: `./spec-reviewer-prompt.md`
-- Stage 2 reviewer: `./code-quality-reviewer-prompt.md`
+- 实现 worker：`./implementer-prompt.md`
+- Stage 1 reviewer：`./spec-reviewer-prompt.md`
+- Stage 2 reviewer：`./code-quality-reviewer-prompt.md`
 
-Resolve concrete language rules before dispatch（派发前解析具体语言规则）：
+派发前必须解析具体语言规则：
 
-- 对 task files、known implementation files 和 reviewer changed files 运行 `scripts/lib/language-detect.js`，识别具体 language rule skills。
-- 在每个 worker 或 reviewer prompt 的 `Resolved Language Rules` section 中填入具体 `specpowers:rules-*` skill names，例如 `specpowers:rules-typescript`、`specpowers:rules-python`、`specpowers:rules-golang`、`specpowers:rules-rust` 或 `specpowers:rules-java`。
-- 如果没有 installed language rule 匹配 task 或 review scope，在该 section 写 `none`，并继续使用 `rules-common`。
-- 当 `specpowers:rules-{language}` 仍 unresolved 时，不要派发 worker 或 reviewer prompt（do not dispatch）。该 placeholder 是 template marker，不是可加载 skill。
+- 针对任务文件、已知实现文件、reviewer 需检查的变更文件，运行 `scripts/lib/language-detect.js` 来识别具体语言规则 skill。
+- 在 worker 或 reviewer prompt 的 `Resolved Language Rules` 区域填入具体的 `specpowers:rules-*` skill 名称，例如 `specpowers:rules-typescript`、`specpowers:rules-python`、`specpowers:rules-golang`、`specpowers:rules-rust`、`specpowers:rules-java`。
+- 若没有安装任何匹配的语言规则，在该区域写 `none`，并继续应用 `rules-common`。
+- 不得在 `specpowers:rules-{language}` 仍未解析时派发 worker 或 reviewer。该占位符只是模板标记，不是可加载 skill。
 
-Review dispatch is mandatory after implementation reaches GREEN and before `tasks.md` is updated。也就是：implementation 到达 GREEN 后、更新 `tasks.md` 前，review dispatch 是强制的。
+实现达到 GREEN 之后、更新 `tasks.md` 之前，必须执行审查派发。
 
-- 在 subagent-capable platforms 上，将两个 reviewer stages 作为 separate review steps 派发并等待结果。
-- 不要因为 task 看起来简单或 controller 已经检查过 code，就用 inline self-check 替代 reviewer dispatch（do not replace reviewer dispatch with inline self-check）。
-- 如果 reviewer dispatch 因 platform/tooling 原因不可用或失败，controller 可以使用下方 inline self-checks，但必须报告 fallback reason 和 exact self-check result。
-- 每个 reviewer package 必须包含 task、linked scenarios、changed files 或 diff summary、relevant test results 和 implementer report。
-- 派发 reviewer 前，应用 `specpowers:confidence-loop` 的 Review Package Adequacy Gate。如果 task、linked scenarios、design constraints、diff context、test evidence、known risks 或 prior findings/gaps 缺失，先补齐再 review；否则将 reviewer result 视为 `NEEDS_CONTEXT`。
+- 在支持子代理的平台上，将两个 reviewer stage 作为独立审查步骤派发，并等待结果。
+- 不得因为任务看起来简单，或 Controller 已经检查过代码，就用内联自检替代 reviewer 派发。
+- 若 reviewer 派发因平台或工具原因不可用或失败，Controller 可以使用下方内联自检，但必须报告 fallback 原因和精确自检结果。
+- 每个 reviewer 包必须包含任务、关联场景、变更文件或 diff 摘要、相关测试结果和 implementer 报告。
+- 派发 reviewer 前，应用 `specpowers:confidence-loop` 的 Review Package Adequacy Gate。若缺少任务、关联场景、设计约束、diff 上下文、测试证据、已知风险或此前发现/缺口，应先补齐；无法补齐时，将 reviewer 结果视为 `NEEDS_CONTEXT`。
 
-如果 subagents 不可用，controller inline 执行同等工作。不要仅因 subagents 不可用就跳过任一 review stage。
+若子代理不可用，Controller 内联完成同等工作。不得因为子代理不可用而跳过任何审查阶段。
 
-## Worker Status Handling（Worker 状态处理）
+## Worker 状态处理
 
-Workers 必须报告以下 status 之一：
+Worker 必须返回以下状态之一：
 
-| Status | Meaning | Controller action |
+| 状态 | 含义 | Controller 动作 |
 |---|---|---|
-| `DONE` | Task 已实现并 self-reviewed | 开始 Stage 1 review |
-| `DONE_WITH_CONCERNS` | Task 已实现，但 worker 有疑虑 | Review 前阅读 concerns；Stage 1 前解决 correctness/scope concerns |
-| `NEEDS_CONTEXT` | Worker 缺少信息，无法安全继续 | 补充 missing context 后重试；如果只有用户能决定，则询问用户 |
-| `BLOCKED` | Worker 已尝试 task，但无法完成 | 诊断 blocker；用更窄 scope、更强 context 重试，或升级给用户 |
+| `DONE` | 任务已实现并完成自查 | 启动 Stage 1 审查 |
+| `DONE_WITH_CONCERNS` | 任务已实现，但 worker 存在疑虑 | 审查前读取疑虑；先解决正确性或范围疑虑，再进入 Stage 1 |
+| `NEEDS_CONTEXT` | 缺少必要信息，无法安全继续 | 补充上下文后重试；若只有用户能决策，则询问用户 |
+| `BLOCKED` | 已尝试实现但无法完成 | 诊断阻塞点；用更窄范围或更强上下文重试，必要时上报用户 |
 
-不要忽略 `DONE_WITH_CONCERNS`、`NEEDS_CONTEXT` 或 `BLOCKED`。把它们当作 control signals，而不是 narrative details。
+不得忽略 `DONE_WITH_CONCERNS`、`NEEDS_CONTEXT` 或 `BLOCKED`。它们是控制信号，不是叙述性细节。
 
-## Task Execution Protocol（Task 执行协议）
+## 任务执行协议
 
 <CRITICAL>
-One task is one uninterrupted execution unit。不要在 RED、GREEN、refactor 和 review 之间暂停。唯一有效 pause points 是：
-- task 开始前缺少 required context；
-- task 已通过所有 gates 并已报告；
-- blocker 或 spec conflict 阻止安全推进。
+一个任务是一个不可中断的执行单元。不得在 RED、GREEN、重构和审查之间为常规进度暂停。唯一有效暂停点是：
+- 开始任务前发现必要上下文缺失；
+- 任务通过全部门禁并已完成报告；
+- 出现阻塞或 Spec 冲突，无法安全继续。
 </CRITICAL>
 
-对每个 task：
+每个任务按以下步骤执行：
 
-1. **宣告 task start**
+1. **宣布任务开始**
 
    ```markdown
-   开始 Task N.M：[Task Name]
-   覆盖 specs：[Scenario IDs or names]
-   Mode：[Step-by-Step | Fast]
+   Starting Task N.M: [Task Name]
+   Covers specs: [Scenario IDs or names]
+   Mode: [Step-by-Step | Fast]
    ```
 
-2. **构建 task context**
+2. **构建任务上下文**
 
-   读取 task text、linked scenarios、relevant Design sections，以及 relevant existing code/tests。保持 task boundary 明确：只实现当前 task 请求的内容。
+   读取任务文本、关联场景、相关 Design 章节以及相关现有代码/测试。明确任务边界：只实现当前任务要求的内容。
 
-   Maintain traceable changes: every changed file and key edit must trace to the current request, accepted specification, task, failing test, review feedback, or current-change orphan cleanup。删除 drive-by refactors、comment rewrites、naming churn、formatting noise 和 unrelated file changes，除非用户明确扩大 scope。
+   保持变更可追溯：每个变更文件和关键编辑都必须能追溯到当前用户请求、已批准 Spec、任务、失败测试、审查反馈或当前变更导致的孤儿清理。删除顺手重构、注释重写、命名抖动、格式噪音和无关文件变更，除非用户明确扩大任务范围。
 
-3. **运行 TDD implementation**
+3. **执行 TDD 实现**
 
-   - 编写或扩展一个会因 linked scenario 失败的 test。
-   - 运行 targeted test，并确认它因 expected reason 达到 **RED**。
-   - 实现能满足 test 的最小 change。
-   - 再次运行 targeted test，并确认 **GREEN**。
-   - 只有 GREEN 后才 refactor，然后重跑 relevant tests。
-   - 避免 unrelated cleanup、broad rewrites 和 speculative features。
+   - 编写或扩展一个会因关联场景失败的测试。
+   - 运行目标测试，确认 **RED**，且失败原因为预期原因。
+   - 实现能让测试通过的最小变更。
+   - 运行目标测试，确认 **GREEN**。
+   - 只有在 GREEN 之后才允许必要重构，并重新运行相关测试。
+   - 避免无关清理、宽泛重写和推测性功能。
 
-   对确实不改变 behavior 的 tasks，先创建最接近的 meaningful verification，例如 compile check、configuration validation、migration test 或 fixture-based assertion。不要假装发生了 TDD；要清楚说明 verification strategy。
+   对于确实不改变行为的任务，先创建最接近的有意义验证，例如编译检查、配置校验、迁移测试或 fixture 断言。不得假装进行了经典 RED/GREEN TDD；必须清楚说明验证策略。
 
-4. **Evidence-bound confidence loop（证据绑定信心循环）**
+4. **证据约束信心循环**
 
-   Run or verify `specpowers:confidence-loop` over the task scope after GREEN/refactor and before Stage 1 review。Loop 必须列出由 diff、linked scenarios、tests、touched code paths、user feedback、review feedback 和 stated risks 引出的 concrete doubts。
+   在 GREEN/重构之后、Stage 1 审查之前，对任务范围运行或验证 `specpowers:confidence-loop`。循环必须列出由 diff、关联场景、测试、触达代码路径、用户反馈、审查反馈和已知风险引出的具体疑虑。
 
-   如果 in-scope doubt 被确认且可修复，修复它，重跑 relevant verification，并重复 loop。如果 loop 发现阻止可靠判断的 unresolved confidence gap，停止并先获取 missing evidence 或 context。
+   若发现范围内疑虑属实且可修复，应修复、重新运行相关验证，并重复信心循环。若存在无法可靠判断的未解决信心缺口，应停止并获取缺失证据或上下文。
 
-5. **Stage 1: Spec Compliance Review（规格符合性审查）**
+5. **Stage 1：规格符合性审查**
 
-   目的：确认 implementation 精确匹配 requested Spec，完整、无 missing requirements、无 extra behavior。
+   目的：验证实现与请求的 Spec 完全一致——无遗漏要求、无额外行为。
 
-   - With subagents: dispatch `./spec-reviewer-prompt.md` and wait for `PASS`。
-   - Without subagents：运行下方 Spec Compliance Self-Check，并记录 fallback reason。
+   - 有子代理：派发 `./spec-reviewer-prompt.md`，并等待 `PASS`。
+   - 无子代理：运行下方 Spec Compliance Self-Check，并记录 fallback 原因。
 
-   如果 Stage 1 发现 issues，修复、重跑 relevant tests，并重复 Stage 1。Stage 1 通过前不要开始 Stage 2。
+   若 Stage 1 发现问题，修复、重新运行相关测试，并重复 Stage 1。Stage 1 未通过前不得进入 Stage 2。
 
-6. **Stage 2: Code Quality Review（代码质量审查）**
+6. **Stage 2：代码质量审查**
 
-   目的：确认 implementation maintainable、idiomatic、tested 且 safe。
+   目的：验证实现可维护、符合惯例、测试充分且安全。
 
-   - With subagents: dispatch `./code-quality-reviewer-prompt.md` and wait for `APPROVED`。
-   - Without subagents：运行下方 Code Quality Self-Check，并记录 fallback reason。
+   - 有子代理：派发 `./code-quality-reviewer-prompt.md`，并等待 `APPROVED`。
+   - 无子代理：运行下方 Code Quality Self-Check，并记录 fallback 原因。
 
-   如果 Stage 2 发现 blocking issues，修复、重跑 relevant tests，并重复 Stage 2。如果 Stage 2 fix 改变 behavior 或 public interfaces，也要重跑 Stage 1。
+   若 Stage 2 发现阻塞问题，修复、重新运行相关测试，并重复 Stage 2。若 Stage 2 修复改变了行为或公共接口，必须重新运行 Stage 1。
 
-7. **Milestone verification（里程碑验证）**
+7. **里程碑验证**
 
-   If this task is the last subtask in a feature group, run `verification-loop` for that feature group。Intermediate subtasks do not trigger `verification-loop` by count alone。Verification result 存在且 passed 前，不要开始下一个 feature group。
+   若当前任务是某个功能组中的最后一个 subtask，则对该功能组运行 `verification-loop`。中间 subtask 不因数量本身触发 `verification-loop`。在当前功能组验证通过前，不得开始下一个功能组。
 
-8. **标记 task complete**
+8. **标记任务完成**
 
-   TDD、Stage 1、Stage 2，以及任何 due feature-group verification 全部通过后，将此 task 在 `tasks.md` 中从 `- [ ]` 更新为 `- [x]`。
+   在 TDD、Stage 1、Stage 2 以及任何到期的功能组验证都通过后，将 `tasks.md` 中该任务从 `- [ ]` 更新为 `- [x]`。
 
-   不要在存在任何 unresolved confidence gap 时标记 `tasks.md` complete（do not mark `tasks.md` complete while any unresolved confidence gap remains）。
+   只要仍存在未解决信心缺口，就不得标记 `tasks.md` 完成。
 
-9. **Report（报告）**
+9. **报告**
 
-   使用下方 Step-by-Step 或 Fast Mode report format。
+   使用下方 Step-by-Step 或 Fast 模式报告格式。
 
-## Step-by-Step Mode Flow（逐步模式流程）
+## Step-by-Step 模式流程
 
-只处理第一个 unchecked task：
+只处理第一个未完成任务：
 
-1. 执行完整 Task Execution Protocol。
-2. 标记 task checkbox complete。
-3. 报告 completed task。
-4. 停止，不开始下一个 task。
-5. 等待 user instruction。
+1. 执行完整任务执行协议。
+2. 标记任务复选框完成。
+3. 汇报已完成任务。
+4. 停止。不得开始下一个任务。
+5. 等待用户指令。
 
-当用户说继续时，从第一个 unchecked task 恢复。除非用户要求 changes，不要重新运行或重新标记上一个 task。
+用户说继续后，从第一个未完成任务恢复。除非用户要求修改，否则不要重新运行或重新标记上一个任务。
 
-### Step-by-Step Report Format（逐步模式报告格式）
+### Step-by-Step 报告格式
 
 ```markdown
-✅ Task N.M 完成：[Task Name]
+✅ Task N.M Complete: [Task Name]
 
-**输出**
-- 新建：path/to/new-file.ext
-- 修改：path/to/modified-file.ext
-- Task tracking：`tasks.md` 已更新（`- [ ]` → `- [x]`）
+**Output**
+- Created: path/to/new-file.ext
+- Modified: path/to/modified-file.ext
+- Deleted: [paths or none]
+- Task tracking: `tasks.md` updated (`- [ ]` → `- [x]`)
 
-**测试**
-- RED：`[command]` 在 implementation 前因 expected reason 失败
-- GREEN：`[command]` 在 implementation 后通过
-- 额外检查：`[command]` 通过
+**Tests**
+- RED: `[command]` failed for the expected reason before implementation
+- GREEN: `[command]` passed after implementation
+- Additional checks: `[command]` passed
 
-**Spec 覆盖**
-- ✅ Scenario "[name]" — GIVEN/WHEN/THEN 已由 `[test name or file]` 覆盖
+**Spec Coverage**
+- ✅ Scenario "[name]" — GIVEN/WHEN/THEN covered by `[test name or file]`
 
 **Reviews**
-- Stage 1 — Spec Compliance：✅ Passed（`spec-reviewer`，scope: [task/diff/files] | inline fallback: [reason]）
-- Stage 2 — Code Quality：✅ Passed（`code-quality-reviewer`，scope: [task/diff/files] | inline fallback: [reason]）
+- Stage 1 — Spec Compliance: ✅ Passed (`spec-reviewer`, scope: [task/diff/files] | inline fallback: [reason])
+- Stage 2 — Code Quality: ✅ Passed (`code-quality-reviewer`, scope: [task/diff/files] | inline fallback: [reason])
 - Review evidence: [reviewer result summary, rerun count, or self-check evidence]
 - Fixed review issues: [none | summary]
 - Confidence Loop: [checked doubts | fixed issues | unresolved gaps: None]
 
 **Verification**
-- Feature-group verification：[not due | ✅ passed | details]
+- Feature-group verification: [not due | ✅ passed | details]
 
-**等待你的操作**
-1. Review 上方 code changes 和 results。
-2. 满意后手动 commit。
-3. 说 "Continue" 执行下一个 task，或提供 feedback。
+**Waiting for your action**
+1. Review the code changes and results above.
+2. Manually commit if satisfied.
+3. Say "Continue" to execute the next task, or provide feedback.
 ```
 
-## Fast Mode Flow（快速模式流程）
+## Fast 模式流程
 
-使用完整 Task Execution Protocol 执行每个 unchecked task。
+按完整任务执行协议执行每个未完成任务。
 
-before starting the next feature group，确认 current feature group 已有 passing `verification-loop` result。如果 result missing or failed，do not proceed to the next feature group。
+开始下一个功能组之前，必须确认当前功能组已有通过的 `verification-loop` 结果。若结果缺失或失败，不得进入下一个功能组。
 
-after all feature groups are complete，run a final `verification-loop` before the final completion report。
+所有功能组完成后，在最终完成报告前运行一次最终 `verification-loop`。
 
-### Fast Mode Final Report Format（快速模式最终报告格式）
+### Fast 模式最终报告格式
 
 ```markdown
-🎉 所有 Tasks 完成
+🎉 All Tasks Complete
 
 | Task | Status | Output Files | Spec Coverage | Verification |
 |---|---:|---|---|---|
@@ -254,33 +254,33 @@ after all feature groups are complete，run a final `verification-loop` before t
 - Feature groups: ✅ all passed
 - Final global verification-loop: ✅ passed
 
-`tasks.md` 中所有 task checkboxes 都已更新。请 review 全部 code changes，满意后手动 commit。
-完成后，你可以说 "Archive"，将 Delta Specs 合并进 main specifications。
+All task checkboxes in `tasks.md` have been updated. Please review all code changes, then manually commit if satisfied.
+When finished, you can say "Archive" to merge Delta Specs into the main specifications.
 ```
 
-## Resuming Progress（恢复进度）
+## 恢复进度
 
-恢复 change 时：
+恢复某个 change 时：
 
-1. 读取 active `tasks.md`。
-2. 找到第一个 unchecked task。
-3. 如果此前 mode 已知，沿用此前 mode；否则默认 Step-by-Step Mode，除非用户明确要求 Fast Mode。
-4. 宣告：
+1. 读取当前 `tasks.md`。
+2. 找到第一个未完成任务。
+3. 若此前模式明确，则沿用；否则默认 Step-by-Step 模式，除非用户明确要求 Fast 模式。
+4. 宣布：
 
    ```markdown
-   从 Task N.M 恢复：[Task Name]
-   覆盖 specs：[Scenario IDs or names]
+   Resuming from Task N.M: [Task Name]
+   Covers specs: [Scenario IDs or names]
    ```
 
-5. 继续 Task Execution Protocol。
+5. 继续执行任务执行协议。
 
-如果上一个 task 看起来已实现但 checkbox 未勾选，先检查 code 和 review artifacts 再决定。不要盲目标记 complete。
+若上一个任务看似已实现但复选框未勾选，应检查代码和审查产物后再判断。不得盲目标记完成。
 
-## Spec Compliance Self-Check（规格符合性自检）
+## Spec Compliance Self-Check
 
-当 spec reviewer subagent 不可用时，inline 使用此检查。
+当 spec reviewer 子代理不可用时，使用此内联检查。
 
-对每个 linked scenario：
+针对每个关联场景：
 
 ```text
 Scenario: [name]
@@ -298,81 +298,81 @@ Result
   - PASS / NEEDS_CHANGES
 ```
 
-如果任何 linked scenario 缺少 implementation evidence、缺少 test coverage、只部分实现，或包含 Spec 之外的 behavior，Stage 1 失败。
+若任一关联场景缺少实现证据、缺少测试覆盖、只部分实现，或包含 Spec 之外的行为，Stage 1 失败。
 
-## Code Quality Self-Check（代码质量自检）
+## Code Quality Self-Check
 
-当 code quality reviewer subagent 不可用时，inline 使用此检查。
+当 code quality reviewer 子代理不可用时，使用此内联检查。
 
 至少检查：
 
-- **Correctness risks:** edge cases、invalid inputs、concurrency/resource handling、error paths。
-- **Maintainability:** clear names、small units、low coupling、无 unnecessary abstractions。
-- **Architecture fit:** 遵循 existing project patterns 和 plan 中的 file structure。
-- **Test quality:** tests assert behavior，覆盖 meaningful edge cases，且不是 over-mocked。
-- **Scope control:** 无 unrelated refactors、无 speculative features、无 task 外 broad cleanup。
-- **Surgical changes:** 每个 changed file 和 key edit 都可追溯到 current request, accepted specification, task, failing test, review feedback, or current-change orphan cleanup；没有 drive-by refactors、comment rewrites 或 formatting noise。
-- **Operational safety:** 无 secret leakage、unsafe defaults、surprising side effects 或 avoidable performance regressions。
-- **Evidence-backed confidence:** Stage 2 通过前，确认 diff、tests、task context、touched code paths 和 stated risks 引出的每个 concrete doubt 都已调查或报告。
+- **正确性风险：** 边界条件、无效输入、并发/资源处理、错误路径。
+- **可维护性：** 命名清晰、单元小、低耦合、无不必要抽象。
+- **架构适配：** 遵循现有项目模式和计划中的文件结构。
+- **测试质量：** 测试断言行为，覆盖有意义边界，不因过度 mock 而绕开真实行为。
+- **范围控制：** 无无关重构、无推测性功能、无任务外宽泛清理。
+- **手术式变更：** 每个变更文件和关键编辑都可追溯到当前请求、已批准 Spec、任务、失败测试、审查反馈或当前变更导致的孤儿清理；无顺手重构、注释重写、命名抖动或格式噪音。
+- **运行安全：** 无密钥泄露、危险默认值、意外副作用或可避免性能回退。
+- **证据支撑的信心：** Stage 2 通过前，确认由 diff、测试、任务上下文、触达代码路径和已知风险引出的每个具体疑虑都已调查或报告。
 
-Stage 2 在任何 Critical/Important issue 或 approval-blocking confidence gap 上失败。Minor issues 可以报告，但不应阻塞 completion，除非累积成 maintainability risk。如果 missing evidence 阻止可靠 self-check，将其视为 blocker，并先获取 missing context 或 verification，再标记 task complete。
+任何 Critical 或 Important 问题，或任何阻止批准的信心缺口，都会导致 Stage 2 失败。Minor 问题可报告但不必阻塞完成，除非数量过多并形成维护风险。若缺少证据导致无法可靠自检，应将其视为阻塞，并在标记任务完成前获取上下文或验证。
 
-## Existing Failures and Blockers（既有失败和阻塞）
+## 既有失败与阻塞
 
-如果 tests 在 task 的 RED test 引入前已经失败：
+若在引入本任务 RED 测试之前已有测试失败：
 
-1. 判断 failure 是否 pre-existing 且 unrelated。
-2. 不隐藏或重写 unrelated failures。
-3. 只有 task 能被 independent verification 且 unrelated failure 已明确记录时，才继续。
-4. 如果 failure 阻止 reliable verification，停止并询问用户。
+1. 判断失败是否为既有且与当前任务无关。
+2. 不得隐藏或重写无关失败。
+3. 只有当当前任务可独立验证，且无关失败已清楚记录时，才可继续。
+4. 若失败阻止可靠验证，停止并询问用户。
 
-如果 implementation 暴露 Spec/Design conflict：
+若实现过程中发现 Spec/Design 冲突：
 
-1. 停止 implementation。
-2. 用 file/section references 说明 exact conflict。
-3. 提出 options，但在用户授权 planning/spec update workflow 前，不编辑 Spec/Design/Proposal。
+1. 停止实现。
+2. 带文件/章节引用说明具体冲突。
+3. 提出选项，但在用户授权规划/规格更新流程前，不得编辑 Spec/Design/Proposal。
 
-## Iron Laws（铁律）
+## 铁律
 
-- 不要为 routine progress updates 在 task 中途暂停。完成 task unit，或只因真实 blocker 停止。
-- Step-by-Step Mode 中，没有 explicit user continuation 不开始下一个 task。
-- 不运行 mutating git commands。Commits 和 branch management 由用户负责。
-- Behavior-changing work 不跳过 TDD。
-- Implementation 期间不修改 Spec、Design 或 Proposal。
-- Stage 2 前不跳过 Stage 1。
-- 在 subagent-capable platform 上，除非 dispatch 不可用或失败且报告 fallback，否则不用 inline self-check 替代 reviewer dispatch。
-- 当 Stage 1、Stage 2、required tests 或 due milestone verification 失败时，不报告 task complete。
-- 仍有 unresolved confidence gap 时，不报告或标记 task complete。
-- 不把 worker report 当作 proof。直接验证 code 和 tests。
-- 不忽略 user feedback。如果用户说结果不对，停止正常 flow 并处理。
+- 不得在任务中途为常规进度暂停。完成任务单元，或仅在真实阻塞时停止。
+- Step-by-Step 模式下，未获用户明确继续指令，不得开始下一个任务。
+- 不得运行会改变 Git 状态的命令。提交和分支管理由用户控制。
+- 行为变更类工作不得跳过 TDD。
+- 实现期间不得修改 Spec、Design 或 Proposal。
+- 不得在 Stage 1 之前运行或通过 Stage 2。
+- 在支持子代理的平台上，不得用内联自检替代 reviewer 派发，除非派发不可用或失败，并且必须报告 fallback。
+- 当 Stage 1、Stage 2、必要测试或到期里程碑验证失败时，不得报告任务完成。
+- 仍存在未解决信心缺口时，不得报告或标记任务完成。
+- 不得把 worker 报告当作证明。必须直接核验代码和测试。
+- 不得忽略用户反馈。若用户指出结果错误，停止常规流程并优先处理反馈。
 
-## Red Flags（风险信号）
+## 风险信号
 
-| Temptation | Correct response |
+| 诱惑 | 正确处理 |
 |---|---|
-| "This task is simple; do the next one too." | Step-by-Step Mode 中，一个 task 完成后停止。 |
-| "The task passed tests, so skip spec review." | Stage 1 mandatory。Tests 可能编码了错误 behavior。 |
-| "The code looks fine, so skip code review." | Stage 2 mandatory。Spec-compliant code 仍可能 fragile。 |
-| "The reviewer found a small blocking issue; mention it and move on." | 修复 blocking issues 并重跑 relevant review。 |
-| "The Spec is slightly wrong; patch it while implementing." | 停止，并和用户讨论 Spec conflict。 |
-| "Mark the task after the user commits." | Gates 通过后、报告前标记，让用户手动 commit 捕获 completed state。 |
-| "Use git commit to checkpoint." | 不 commit。清楚报告，让用户 commit。 |
-| "Subagents are unavailable, so skip reviews." | Inline 运行 self-checks。 |
+| “这个任务很简单，顺便做下一个。” | Step-by-Step 模式下，完成一个任务后立即停止。 |
+| “测试过了，跳过规格审查。” | Stage 1 是强制门禁。测试可能编码了错误行为。 |
+| “代码看起来不错，跳过代码审查。” | Stage 2 是强制门禁。符合 Spec 的代码仍可能脆弱。 |
+| “reviewer 提了个小阻塞问题，提一下继续走。” | 修复阻塞问题，并重新运行相关审查。 |
+| “Spec 有点问题，实现时顺手修。” | 停止并与用户讨论 Spec 冲突。 |
+| “用户提交后再标记任务。” | 门禁通过后、报告前标记，确保用户手动提交捕获完成状态。 |
+| “用 git commit 做检查点。” | 不提交。清楚汇报，让用户提交。 |
+| “子代理不可用，所以跳过审查。” | 内联运行自检。 |
 
-## Integration（集成）
+## 集成
 
-**Required skills**
-- `specpowers:test-driven-development` — behavior-changing tasks 必须使用。
-- `specpowers:planning` — 产出此 skill 执行的 task plan。
+**必需 skills**
+- `specpowers:test-driven-development` — 行为变更类任务必须使用。
+- `specpowers:planning` — 生成本 skill 执行的任务计划。
 
-**Supporting skills**
-- `specpowers:rules-common` — implementation 和 review 的 universal engineering rules。
-- `specpowers:rules-{language}` — language-specific rules，例如 `rules-golang`、`rules-typescript` 或 `rules-python`。
-- `specpowers:verification-loop` — milestone 和 final verification pipeline。
-- `specpowers:requesting-code-review` — 此 per-task flow 之外的 optional standalone review workflow。
-- `specpowers:confidence-loop` — task completion 前，围绕 concrete doubts 和 unresolved confidence gaps 的 evidence-bound loop。
-- `specpowers:archiving` — 仅在所有 tasks 完成且用户要求 archive 后使用。
+**辅助 skills**
+- `specpowers:rules-common` — 实现和审查通用工程规则。
+- `specpowers:rules-{language}` — 语言特定规则，例如 `rules-golang`、`rules-typescript`、`rules-python`。
+- `specpowers:verification-loop` — 里程碑和最终验证流水线。
+- `specpowers:requesting-code-review` — 可选的独立代码审查流程，不替代本任务流内的 Stage 2。
+- `specpowers:confidence-loop` — 任务完成前用于具体疑虑与未解决信心缺口的证据约束循环。
+- `specpowers:archiving` — 仅在所有任务完成且用户要求归档时使用。
 
-所有 tasks 完成后，告诉用户：
+所有任务完成后，告诉用户：
 
-> 所有 tasks 都已完成。你可以说 "Archive"，将 Delta Specs 合并进 main specifications。
+> All tasks are complete. You can say "Archive" to merge Delta Specs into the main specifications.
