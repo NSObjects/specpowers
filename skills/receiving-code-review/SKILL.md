@@ -1,211 +1,247 @@
 ---
 name: receiving-code-review
-description: 回复或实现 code review feedback 前使用。澄清歧义，对照真实代码库验证 claims，在反馈错误或不必要时 push back，并避免表演式赞同。
+description: 用于处理 PR/MR 代码评审评论。先从用户粘贴内容、PR/MR 链接、评审 ID，或 GitHub、GitLab、云效 Codeup 等远端代码托管平台中获取真实评审评论；再结合当前代码库、测试和既有决策验证每条评论是否成立，并决定修复、澄清、反驳、延后或交由用户决策。
 ---
 
-# 接收代码审查（Code Review Reception）
+# PR/MR 评审评论处理
 
-当需要处理 code review feedback，并决定是回复、澄清、push back 还是实现时，使用此 skill。
+当需要查看、分析或处理 PR/MR 的代码评审评论时，使用此 skill。
 
-## 核心规则（Core Rule）
+这些评论可能来自用户直接粘贴的内容，也可能来自远端代码托管平台，例如 GitHub、GitLab、云效 Codeup、Gitee、Bitbucket 或内部代码评审系统。
 
-Code review feedback 是需要评估的技术 claim，不是必须服从的命令。
+当评论没有直接出现在对话中时，应优先通过已配置的 MCP、平台集成、代码托管集成、CLI/API、仓库上下文，或其他可用评审来源获取评论。
 
-先理解它。再对照当前代码库验证。然后回复或实现。
+本 skill 的目标不是盲目接受评审意见，而是：
 
-## Feedback Input Boundary（反馈输入边界）
+1. 获取真实的 PR/MR 评审评论。
+2. 将每条评论解析成具体的技术要求。
+3. 结合当前代码库、测试、平台约束和既有决策验证评论是否成立。
+4. 判断每条评论应该修复、澄清、反驳、延后，还是交由用户做产品/架构决策。
+5. 对需要修复的评论实施最小且正确的修改，并运行相关验证。
+6. 最终清楚报告每条评论的处理结果、修改位置和验证方式。
 
-评估 review feedback 前，先确保真实 comments 已经可用。
+## 核心原则
 
-- 如果用户粘贴了 review comments，直接使用这些 comments。
-- 如果用户提供了 review link、merge request ID、pull request ID 或等价 review identifier，先用配置好的 review source 拉取 comments，再评估。
-- 如果用户没有粘贴 comments 或 identifier，先使用当前 repository context 和配置好的 review source 尝试找到 active review，再请用户提供 comments。
-- 如果配置好的 review source 不可用、缺少权限，或无法为该 review system 拉取 comments，向用户请求继续所需的 missing comments、link、review identifier、platform 或 permissions。
-- 不要发明、推断或模拟 review comments。缺失 review input 是 blocker，不是猜测许可。
+代码评审评论是一项需要评估的技术主张，不是必须服从的命令。
 
-## Review Comment Acquisition（获取 Review Comments）
+先获取真实评论。  
+再理解评论要求。  
+然后结合当前代码库验证。  
+最后再决定回复、修复、澄清或反驳。
 
-当 review comments 尚未粘贴到对话中时，把获取动作视为 source lookup，而不是固定脚本。优先顺序：
+不要为了显得配合而直接修改代码。  
+不要在未验证前假设评审者一定正确。  
+不要在缺少评论内容时编造、推断或模拟评审意见。
 
-- 从最具体信号开始：pasted comments、review link、merge request ID、pull request ID、repository remote 或用户提供的 platform context。
-- 当只有当前 repository context 可用时，使用 active branch、upstream branch（如存在）、repository remote 和既有 platform context，先发现关联 pull request 或 merge request，再请求粘贴 comments。
-- 当 review source 有 native repository 或 code-host integration 时，用它收集 pull request 或 merge request review comments、conversation comments 和 inline threads。
-- 否则使用该 host 的 configured MCP 或 platform integration 收集同一组 review comments。
-- 收集所选 integration 可访问的 review-level comments 以及 inline/threaded discussions。平台暴露 pagination 时要跟随分页。
-- 只有在 repository-context discovery 无法识别 review、可用 review source 无法拉取 comments，或缺少必需 source、tool、permission 或 identifier 后，才询问用户。
-- 如果缺少 source、tool、permission 或 identifier，只询问缺失项并等待。不要带着猜测反馈继续。
+## 适用场景
 
-## Default Workflow（默认工作流）
+在以下场景中使用此 skill：
 
-对每个 review item：
+- 用户要求查看某个 PR/MR 的评审评论。
+- 用户提供了 PR 链接、MR 链接、评审链接、PR ID、MR ID 或等效评审标识。
+- 用户要求“处理评审意见”“修一下 code review comments”“看下 reviewer 的评论是否要改”。
+- 用户只给出了当前仓库或分支上下文，希望自动定位关联 PR/MR。
+- 用户粘贴了一组评审评论，要求判断是否需要修改代码。
+- 用户要求根据远端平台中的评审意见完成修复。
+- 用户要求回复 reviewer、resolve discussion、处理 inline comments 或重新提交评审。
 
-1. **Read** — 反应前读取所有 feedback。
-2. **Parse** — 把 comment 解析成具体 technical requirement。
-3. **Clarify** — 实现前澄清不清楚的 requirements。
-4. **Verify** — 对照 code、tests、platform/version constraints 和 prior decisions 验证 claim。
-5. **Classify** — 对 item 分类：
-   - `valid` → 实现最小正确 fix 并测试。
-   - `unclear` → 提出具体澄清问题。
-   - `wrong/harmful` → 用证据 push back。
-   - `unnecessary` → 提出 YAGNI question。
-   - `architectural/product` → 改变方向前让用户参与决策。
-6. **Report** — 报告改了什么、在哪里改、如何验证。
+## 反馈输入边界
+
+在评估评审评论之前，必须确保真实评论内容已经可用。
+
+- 如果用户已经粘贴了评审评论，直接使用这些评论。
+- 如果用户提供了 PR/MR 链接、评审链接、PR ID、MR ID 或等效标识，应先通过已配置的评审来源获取评论，再进行评估。
+- 如果用户没有粘贴评论，也没有提供标识，应先根据当前仓库上下文和已配置评审来源，尝试查找正在进行的 PR/MR。
+- 如果当前仓库上下文可以定位远端仓库、当前分支、上游分支或默认分支，应优先尝试发现关联 PR/MR。
+- 如果已配置的评审来源不可用、权限不足，或无法访问该平台评论，应要求用户补充继续所需的缺失信息。
+- 缺失信息可能包括：评论内容、PR/MR 链接、评审 ID、平台名称、仓库信息、访问权限或具体分支。
+- 不要编造、推断或模拟评审评论。缺少真实评审输入是阻塞点，不是猜测理由。
+
+## 评审评论获取
+
+当评审评论没有直接粘贴到对话中时，应把获取评论视为一次远端评审来源查询，而不是执行固定脚本。
+
+优先按以下顺序处理：
+
+1. **使用用户提供的最具体信号**
+
+   优先使用以下信息：
+
+   - 用户粘贴的评审评论。
+   - PR 链接。
+   - MR 链接。
+   - 评审链接。
+   - PR ID。
+   - MR ID。
+   - 代码托管平台名称。
+   - 仓库远程地址。
+   - 当前分支或目标分支信息。
+
+2. **通过平台集成获取评论**
+
+   如果存在 GitHub、GitLab、云效 Codeup、Gitee、Bitbucket 或内部代码平台的原生集成，应使用该集成获取：
+
+   - PR/MR 总体评论。
+   - reviewer 的 review comments。
+   - 普通 conversation comments。
+   - inline comments。
+   - threaded discussions。
+   - unresolved discussions。
+   - change request comments。
+   - reviewer summary。
+   - bot 或 CI 产生的评审反馈，如果它们属于代码评审流程的一部分。
+
+3. **通过 MCP 或其他工具获取评论**
+
+   如果没有原生平台集成，但存在已配置的 MCP、CLI、API、脚本或专用工具，应使用这些工具获取同样范围的评论。
+
+   可用来源包括但不限于：
+
+   - GitHub MCP。
+   - GitLab MCP。
+   - 云效/Codeup MCP 或平台 API。
+   - 代码托管平台 CLI。
+   - 企业内部评审系统集成。
+   - 已配置的仓库或评审查询工具。
+   - 专门封装“获取 PR/MR 评论”能力的其他 skill 或工具链。
+
+4. **通过仓库上下文发现关联 PR/MR**
+
+   当用户只提供当前代码仓库上下文时，应尝试使用：
+
+   - 当前分支。
+   - upstream 分支。
+   - origin 远程地址。
+   - 默认分支。
+   - 最近提交。
+   - 本地 git metadata。
+   - 平台上下文。
+
+   来发现当前分支关联的 PR/MR。
+
+   只有在无法定位关联 PR/MR 时，才向用户询问链接、ID 或平台信息。
+
+5. **处理分页和线程**
+
+   如果平台返回分页结果，应继续翻页，直到收集完当前权限范围内可访问的评论。
+
+   如果平台存在评论线程，应保留线程上下文，不要只读取最后一条评论。评估一条 inline comment 时，要理解它所在的完整 discussion。
+
+6. **无法获取时停止并说明缺口**
+
+   如果缺少平台、权限、链接、ID、仓库信息或工具能力，只询问缺失的那一项。
+
+   不要在没有真实评论的情况下继续分析。
+
+## 需要收集的评论范围
+
+处理 PR/MR 评审时，应尽可能收集以下内容：
+
+- review-level comments。
+- inline code comments。
+- conversation comments。
+- unresolved discussions。
+- resolved discussions，如果它们仍可能影响当前修改。
+- reviewer requested changes。
+- reviewer approval comments。
+- CI、lint、security scan、coverage bot 等自动评论。
+- 与代码评审直接相关的产品、架构、测试或兼容性讨论。
+- 最新 diff 上的评论。
+- 因代码更新而 outdated 的评论，若平台仍显示其上下文且可能影响当前实现，也应评估。
+
+不要只处理顶层评论而忽略 inline comments。  
+不要只处理 unresolved comments 而忽略 reviewer 明确要求变更但已被平台自动折叠的评论。  
+不要把自动 bot 评论全部视为噪音；如果它指出构建、测试、安全、格式或覆盖率问题，也应纳入判断。
+
+## 默认工作流
+
+对于每一条评审评论：
+
+1. **读取**
+
+   先读完所有评论，再开始修改代码。
+
+   避免看到第一条评论就立即动手，因为后续评论可能改变实现方向，或者多条评论可能指向同一个根因。
+
+2. **归并**
+
+   将重复评论、同一线程内的连续评论、同一问题的多处表现合并处理。
+
+   不要对同一个问题重复修改多次。
+
+3. **解析**
+
+   将评论转化为具体的技术要求。
+
+   例如：
+
+   - reviewer 说“这里要处理异常”。
+   - 解析为：“当 `foo()` 返回错误时，当前代码应返回可识别错误，并避免继续使用无效结果。”
+
+4. **澄清**
+
+   如果评论要求不明确，并且不明确点会影响实现路径、行为边界、共享代码路径或产品语义，应先请求澄清。
+
+5. **验证**
+
+   根据当前代码库、测试、平台/版本约束、接口契约、历史实现和用户既有决策验证该评论是否成立。
+
+6. **分类**
+
+   将每条评论归类为：
+
+   - `valid`：评论成立，需要修复。
+   - `unclear`：评论不清楚，需要澄清。
+   - `wrong/harmful`：评论错误、有害，或会破坏现有行为。
+   - `unnecessary`：评论提出的是未使用、推测性或过度设计的能力。
+   - `out_of_scope`：问题真实存在，但超出本次 PR/MR 范围。
+   - `architectural/product`：涉及架构、产品、边界、权限、失败模式或成功标准，需要用户决策。
+   - `already_handled`：当前代码或后续提交已经处理。
+   - `duplicate`：与其他评论重复，应合并处理。
+
+7. **处理**
+
+   - `valid`：实施最小且正确的修复，并运行验证。
+   - `unclear`：提出具体澄清问题，不要猜测实现。
+   - `wrong/harmful`：用代码、测试、约束或决策证据进行反驳。
+   - `unnecessary`：提出 YAGNI 问题，避免引入未使用能力。
+   - `out_of_scope`：说明为什么不在当前 PR/MR 中处理，并建议后续处理方式。
+   - `architectural/product`：列出选项、影响和风险，让用户决策。
+   - `already_handled`：说明已在哪个位置处理，必要时补充验证。
+   - `duplicate`：说明该评论已并入哪条问题处理。
+
+8. **报告**
+
+   最终说明：
+
+   - 每条评论的处理结论。
+   - 修改了哪些文件。
+   - 关键行为如何变化。
+   - 使用了哪些验证方式。
+   - 哪些问题仍需用户或 reviewer 决策。
 
 ```text
 FOR each review item:
-  requirement = concrete technical requirement
+  comment =真实评审评论
+  requirement =具体技术要求
 
-  IF requirement is unclear:
-    ask for clarification before implementation
+  IF comment 缺失:
+    停止，获取真实评论
+  ELSE IF requirement 不明确:
+    在实施前请求澄清
   ELSE:
-    verify against current codebase and tests
+    根据当前代码库、测试、接口契约和平台约束验证
 
-    IF suggestion is wrong, harmful, or breaks behavior:
-      push back with evidence
-    ELSE IF suggestion adds unused/speculative behavior:
-      raise YAGNI
-    ELSE IF suggestion conflicts with user decisions:
-      ask the user before proceeding
+    IF 评论成立:
+      实施最小且正确的修改
+      运行相关验证
+    ELSE IF 评论错误、有害或会破坏现有行为:
+      用证据反驳
+    ELSE IF 评论要求未使用或推测性能力:
+      提出 YAGNI 问题
+    ELSE IF 评论超出当前 PR/MR 范围:
+      标记为 out_of_scope，并说明原因
+    ELSE IF 评论涉及产品或架构决策:
+      交由用户决策
     ELSE:
-      implement smallest correct change
-      run relevant verification
-```
-
-## 审查解决循环（Review Resolution Loop）
-
-当处理的 feedback 会在 `specpowers:confidence-loop` Review Confidence Loop 下送回 re-review 时，使用此 loop。
-
-对每个 review item，产出 Resolution Package entry：
-
-- `valid` / `fixed` — 已对照 codebase 验证，用最小正确变更修复，并由相关 verification 覆盖。
-- `wrong/harmful` / `rejected` — 被 code、tests、specs、platform constraints 或 prior user decisions 反驳；包含证据。
-- `out_of_scope` — 真实顾虑，但在请求的 review scope 外，或被 accepted boundary 明确排除。
-- `needs_user_decision` — 只有用户能做的 product、boundary、permission、failure-mode 或 success-criteria decision。
-
-修复后，带 updated diff、prior findings、unresolved confidence gaps、verification evidence 和 Resolution Package 请求 re-review。当 Critical 或 Important issues 或 approval-blocking gaps 仍存在时，不要声称 approval。
-
-## 按来源处理（Source-Specific Handling）
-
-### 来自用户的反馈
-
-- 理解 requirement 后，把它视为可信方向。
-- 只有当 scope、behavior 或 intent 不清楚时才提问。
-- 不要赞美、奉承或表演式赞同。
-- 如果请求和 codebase facts 冲突，改代码前说明技术风险。
-
-### 来自外部 Reviewer 的反馈
-
-实现前检查：
-
-- 这个 claim 在**当前** codebase 中是否为真？
-- 该变更是否会破坏 behavior、tests、API contracts 或 compatibility？
-- 当前实现是否有理由：legacy support、migration state、platform constraint、performance 或 prior decision？
-- 建议是否适用于 required platforms、versions 和 environments？
-- Reviewer 是否拥有完整 context？
-- 它是否和用户的 architectural 或 product decisions 冲突？
-
-外部反馈应被谨慎怀疑，但认真检查。
-
-## 歧义规则（Ambiguity Rule）
-
-如果任何不清楚的 item 可能影响 implementation order 或 shared code paths，改代码前停止并请求澄清。
-
-```text
-User: "Fix items 1-6."
-Known: 1, 2, 3, and 6 are clear. 4 and 5 are unclear.
-
-Wrong: implement 1, 2, 3, and 6 first, then ask about 4 and 5.
-Right: "I understand 1, 2, 3, and 6. I need clarification on 4 and 5 before implementing because the fixes may interact."
-```
-
-当 feedback 使用 “properly”、“clean up” 或 “handle edge cases” 等含糊词，而没有说明 expected behavior 时，请求澄清。
-
-## YAGNI 检查（YAGNI Check）
-
-当 reviewer 要求更宽泛或更“professional”的实现时：
-
-1. 搜索 codebase 中的实际 usage。
-2. 如果未使用，询问是移除、延后，还是有意保留。
-3. 如果已使用，只实现当前 callers 所需 behavior。
-
-```text
-Reviewer: "Implement proper metrics tracking with DB storage, date filters, and CSV export."
-Response: "This endpoint has no callers in the codebase. Should we remove it as unused, or is there external usage I should account for?"
-```
-
-不要因为 review comment 听起来高级，就构建 speculative infrastructure。
-
-## 回复风格（Response Style）
-
-避免表演式赞同和感谢。直接说明技术动作。
-
-Forbidden:
-
-- “You’re absolutely right!”
-- “Great point!”
-- “Excellent feedback!”
-- “Thanks for catching that!”
-- 未验证前说 “Let me implement that now”。
-
-Preferred:
-
-- “Requirement: `<specific requirement>`. I’ll verify it against `<file/test/behavior>`.”
-- “Fixed `<specific issue>` in `<location>`. Verified with `<test/build/lint>`.”
-- “I can’t verify `<claim>` without `<missing information>`. Need `<clarification/source>`.”
-- “This conflicts with `<test/current behavior/user decision>`. Recommended alternative: `<alternative>`.”
-
-## 实现顺序（Implementation Order）
-
-歧义解决后，按此顺序实现：
-
-1. 阻塞 correctness、security、build 或 crash 的问题。
-2. 简单机械 fixes：typos、imports、formatting、naming。
-3. Logic changes。
-4. Refactors。
-5. Optional enhancements。
-
-每个 change：编辑、运行相关 verification、检查 regressions，然后继续。
-
-## Pushback 规则
-
-当建议存在以下情况时 push back：
-
-- 破坏 functionality、tests、compatibility 或 API contracts。
-- 依赖对 stack 或 codebase 的错误假设。
-- 添加 unused behavior 或违反 YAGNI。
-- 忽略 legacy、migration 或 platform constraints。
-- 与用户 decisions 冲突。
-- 需要 product 或 architecture decision，而不仅是 code change。
-
-好的 pushback 会引用 files、tests、current behavior、platform constraints 或 user decisions。它应说明后果，并在可用时提供更安全替代方案。
-
-如果你发现自己在回避必要 pushback，停止并用证据直接说明技术顾虑。不要使用 catchphrases 或无关旁白。
-
-## 纠正方向（Correcting Course）
-
-如果你 push back 后发现反馈其实正确，事实性纠正自己，然后继续。
-
-```text
-Verified against `auth_test.go`; the feedback is correct. My initial read missed the refresh-token path. Implemented the fix and added coverage for that branch.
-```
-
-避免长篇道歉或防御性解释。
-
-## 行内审查回复（Inline Review Replies）
-
-回复 inline review comments 时，优先使用 review system 现有 thread 或 conversation。除非用户要求 top-level summary comment，或平台没有 threaded reply mechanism，否则避免顶层 summary comments。
-
-## 最终检查清单（Final Checklist）
-
-在说工作完成前，确认：
-
-- 每个 feedback item 都已解析成具体 requirement。
-- Ambiguous items 在 implementation 前已澄清。
-- External reviewer claims 已对照当前 codebase 验证。
-- 没有静默覆盖 prior user decision。
-- 每个 implemented change 已测试，或已说明 missing verification。
-- 最终回复说明改了什么以及如何验证。
-
-## 底线（Bottom Line）
-
-先验证。需要时澄清。该 push back 时 push back。只实现已验证的 changes。让代码和 verification 说话。
+      说明当前判断和剩余不确定性
