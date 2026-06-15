@@ -116,7 +116,6 @@ node scripts/install.js --platform claude-code --profile developer --add rules-t
 | `verification-loop` | 构建 → 类型 → Lint → 测试 → 安全 → Diff 的里程碑验证 |
 | `quality-gate` | 编辑后的快速项目检查 |
 | `verification-before-completion` | complete、fixed、passing、approved、commit-ready 或 PR-ready 声明前的最终闸门 |
-| `systematic-debugging` | 面向失败、回归和异常行为的根因分析流程 |
 
 ### 语言规则
 

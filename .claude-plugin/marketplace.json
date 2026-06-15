@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "specpowers",
-      "description": "Spec-driven development workflow: structured artifacts, TDD, systematic debugging, and behavioral shaping for AI coding assistants",
+      "description": "Spec-driven development workflow: structured artifacts, TDD, review gates, and behavioral shaping for AI coding assistants",
       "version": "1.0.0",
       "source": {
         "source": "url",

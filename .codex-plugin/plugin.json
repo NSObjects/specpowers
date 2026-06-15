@@ -1,7 +1,7 @@
 {
   "name": "specpowers",
   "version": "1.0.0",
-  "description": "Spec-driven development workflow: structured artifacts, TDD, systematic debugging, and behavioral shaping for AI coding assistants.",
+  "description": "Spec-driven development workflow: structured artifacts, TDD, review gates, and behavioral shaping for AI coding assistants.",
   "author": {
     "name": "NSObjects",
     "email": "mrqter@gmail.com",

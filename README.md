@@ -116,7 +116,6 @@ Start a new session and say "I want to build X". The agent should begin with `ex
 | `verification-loop` | Build → Types → Lint → Tests → Security → Diff milestone verification |
 | `quality-gate` | Fast project checks after edits |
 | `verification-before-completion` | Final gate before complete, fixed, passing, approved, commit-ready, or PR-ready claims |
-| `systematic-debugging` | Root-cause workflow for failures, regressions, and unexpected behavior |
 
 ### Language Rules
 

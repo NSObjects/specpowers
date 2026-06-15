@@ -72,7 +72,7 @@ For `Agent` tool (or legacy `Task` references), use the platform reference below
 
 多个 skills 适用时，按此顺序加载：
 
-1. **Process skills** — `exploring`、`proposing`、`specifying`、`designing`、`planning`、`debugging`。
+1. **Process skills** — `exploring`、`proposing`、`specifying`、`designing`、`planning`。
 2. **Rules skills** — `rules-common`，然后是适用的 `rules-{language}` modules。
 3. **Implementation skills** — `spec-driven-development`。
 4. **Quality skills** — `verification-loop`、`quality-gate`、`confidence-loop`、`requesting-code-review`。
@@ -100,13 +100,13 @@ exploring → proposing → specifying → designing → planning → spec-drive
 
 `specifying` 对 feature/change work 是 mandatory。不要从 proposal 直接跳到 design 或 implementation。
 
-## Bug Diagnostic Routing（Bug 诊断路由）
+## Failure Input Boundary（失败输入边界）
 
-Bug-like input is not edit authorization。Bug report、error report、test failure、regression、unexpected behavior 或 failure-related why-question 默认路由到 `systematic-debugging` 的 diagnostic discussion mode。
+Bug-like input is not edit authorization。Bug report、error report、test failure、regression、unexpected behavior 或 failure-related why-question 默认先进入 read-only context gathering，除非用户已经提供 accepted task、accepted spec 或 explicit fix authorization。
 
 Design、trade-off、architecture、workflow 或 explanation-only why-questions 不表示 failure。按真实 task type 路由；除非问题与 bug、error、failure、regression、unexpected behavior 或 broken test 相关，否则 do not treat it as a bug diagnostic。
 
-For ordinary bug diagnostics，使用 lightweight path：路由到 `systematic-debugging`，执行 read-only investigation，与用户讨论 evidence 和 root-cause direction，并在编辑文件前等待 explicit fix authorization。
+For ordinary failure investigation，使用 lightweight path：执行 read-only investigation，与用户讨论 evidence 和 root-cause direction，并在编辑文件前等待 explicit fix authorization。
 
 Ordinary read-only diagnostic work does not require `proposing`, `specifying`, `designing`, or `planning`。当 investigation 暴露 behavior change 或 expanded scope，需要新的 user-visible contract 时，才升级到 artifact workflow。
 
@@ -124,7 +124,7 @@ fix authorization is not an artifact-workflow bypass。Bug fix 编辑前，bind 
 | Requirements 已同意，但 technical approach、trade-offs 或 file boundaries 未解决 | `designing` | 保持 design 与 task planning 分离。 |
 | Requirements 和 design 已同意，但没有 executable task list | `planning` | 产出 small test-first tasks，并建立 execution mode。 |
 | Approved `tasks.md` exists and the user wants implementation to begin or resume | `spec-driven-development` | Reuse the current execution mode if already chosen; otherwise ask for `Step-by-Step` or `Fast`. |
-| Bug report、error report、failure、regression、flaky behavior、unexpected test result 或 failure-related why-question | `systematic-debugging` | Enter diagnostic discussion mode；先理解 root cause，再把任何 authorized fix 绑定到 existing spec、observable contract、failing test 或 minimal bug specification。 |
+| Bug report、error report、failure、regression、flaky behavior、unexpected test result 或 failure-related why-question without approved fix scope | `exploring` | 先做 read-only investigation 理解 evidence 和 root-cause direction；任何 authorized fix 仍需绑定到 existing spec、observable contract、failing test 或 minimal bug specification。 |
 | 用户明确要求 standalone review 或 merge-readiness review | `requesting-code-review` | 保持一个 surfaced review conclusion；specialist reviewers 留在内部。 |
 | 用户要求回复或实现 review feedback | `receiving-code-review` | 接受 feedback 前，先对照 code 验证。 |
 | 用户要求 install、repair、diagnose、add、remove 或 change SpecPowers modules | `selective-install` | Runtime routing 不隐式调用 installers。 |
@@ -169,7 +169,7 @@ Installer boundary：
 
 ## Skill Types（技能类型）
 
-- **Rigid:** `debugging`、`specifying`、`verification-loop`、`quality-gate`、`confidence-loop` 和 TDD-oriented skills。严格按 steps 执行。
+- **Rigid:** `specifying`、`verification-loop`、`quality-gate`、`confidence-loop` 和 TDD-oriented skills。严格按 steps 执行。
 - **Flexible:** `exploring`、`designing`、`rules-common` 和 `rules-{language}`。把 principles 应用到 project context。
 - **Utility:** `selective-install`、`dispatching-parallel-agents` 和 support skills。用它们支持 main workflow。
 

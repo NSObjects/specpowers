@@ -1,396 +1,366 @@
 ---
 name: rules-golang
-description: 编写、审查或修改 Go code 时使用；提供 Go-specific coding rules，覆盖并扩展 rules-common 的通用规则。
+description: 编写、审查或修改 Go 代码时使用；提供 Go 语义、API、测试、并发和资源管理规则，覆盖并补充 rules-common。
 language: golang
 ---
 
 # Go Coding Rules（Go 编码规则）
 
-这些规则适用于 Go projects。它们继承 `rules-common` 的全部规则，并在 Go conventions 不同的地方用 `[Overrides common: X.Y]` 标记覆盖条目和原因。
+`rules-golang` 适用于 AI Agent 编写、修改和审查 Go 代码与 Go tests。它继承 `rules-common`，并在 Go 约定、Go 语义或 Go tooling 需要不同判断时覆盖通用规则。
 
-Rules layer 聚焦写作和审查 Go 时需要判断的 guidance。Formatting、static analysis、race detection 和其他 mechanical checks 属于 verification tooling，不属于此 skill。
+本 skill 关注需要判断的工程规则：API shape、错误处理、上下文传播、资源生命周期、并发所有权、测试有效性和 Go 版本兼容性。Formatting、`go test`、`go vet`、static analysis、race detection 和 linting 属于 verification tooling；可以建议或运行，但不要把 tooling 结果伪装成本 skill 已经证明的结论。
 
-新 Go code 的 idiom reference 使用 Effective Go（https://go.dev/doc/effective_go），尤其是 comments、names、errors 和 composition。它是 language guide，不是重写既有项目的许可：pre-existing code 中，local conventions 和当前 task boundary 仍然优先。
-
-## Scope for AI Agents（AI Agent 范围）
-
-`rules-golang` 是用于 writing、modifying 和 reviewing Go code 的 AI Agent rule set。它为 Agent 在当前 task 中生成的 new Go code 和 tests 提供 default constraints for new Go code。
-
-处理 pre-existing Go code 时，先读 surrounding code，并保留 directory layout、package boundaries、naming、layering 和 test organization 的 local conventions。除非当前 request、accepted spec、failing test 或 public API impact 要求，否则这些规则不是 not a license to rewrite existing projects，也不是 not a license to reshape 既有项目、rename working code、reorganize packages 或 move tests 的许可。
-
-## What This Skill Does Not Own（此 Skill 不负责什么）
-
-不要用 `rules-golang` 规定 backend architecture、database or query-safety policy、HTTP framework choice、deployment shape、logging stack、dependency versions、directory topology、naming cleanup 或 test framework preferences。这些事项在真实项目中可能重要，但它们不是 Go language rules。
-
-只有 non-Go concerns 已经出现在 changed code 中并影响当前 task 时，才提出它们。将它们标为 separate review concern，不要呈现为 `rules-golang` violations。
-
-## Go Version Compatibility（Go 版本兼容性）
-
-使用新的 language features、standard library APIs 或 syntax 前，检查 module 的 go directive 和任何 toolchain directive。既有 module policy 是 compatibility constraint，不是建议。
-
-除非 accepted task requires，否则不要 raise the module's Go version、添加 toolchain directive，或要求 newer compiler。确实需要新版 Go 时，将它报告为 separate compatibility decision，并说明 reason、affected files 和 rollback path。
-
-当 newer API 只是便利写法时，优先选择适合当前 go directive 的 local fallback。不要仅因新版 Go 提供更短写法就 modernize code。
-
-## Go Semantic Risk Checklist（Go 语义风险清单）
-
-写作或审查 Go 时，先看 semantic risks before style-only findings。检查 error propagation、error wrapping、context propagation、resource cleanup、goroutine lifecycle、channel or mutex ownership、nil and zero value behavior、typed nil and nil interface behavior、short variable declaration shadowing、slice and map ownership、interface boundaries、generics、low-level runtime contracts 和 test effectiveness。
-
-Style-only findings 是次要项。除非 naming、layout 或 formatting 差异影响 correctness、resource lifetime、concurrency safety、当前 task 的 readability 或 public API behavior，否则不要提升其严重性。
-
-## Go Abstraction Discipline（Go 抽象纪律）
-
-Interfaces、wrappers、helpers、generics 和 dependency indirection 都需要 current evidence。只有 current behavior、caller substitution needs 或 established project patterns 要求 replacement、reuse 或 isolation 时才使用。
-
-不要为了 future extension、testing convenience 或 generic Go style 添加这些结构。先选择 more direct implementation，并将 unsupported extension ideas 作为 out-of-scope observations 报告。
+Effective Go（https://go.dev/doc/effective_go）是新代码的 idiom reference，尤其适用于 comments、names、errors 和 composition。它不是重写既有项目的许可；已有代码中，local conventions 和当前 task boundary 优先。
 
 ---
 
-## 1. Names, Packages, and Documentation（命名、包和文档）
+## 0. Scope, Precedence, and Agent Behavior（范围、优先级与 Agent 行为）
 
-### 1.1 Naming Conventions（命名约定）`[Overrides common: 1.1]`
+### 0.1 Use This Skill When（触发条件）
 
-**Reason:** Go names 读起来像 public APIs，但 existing project conventions 强于 generic style preferences。
+使用本 skill，当任务涉及：
 
-- 对 new exported API，使用适合 surrounding package 的 idiomatic Go names。
-- 除非当前 task 或 public API impact 要求变更，否则保留 pre-existing code 中的 existing naming patterns。
-- 不要仅因 nearby names 和 generic Go preference 不同就 do not perform naming cleanup。
-- Naming-only observations 只有影响 correctness、当前 change 的 readability、tests 或 public API 时才进入 scope；否则作为 out-of-scope observation。
+- 编写、修改、审查 Go production code；
+- 编写、修改、审查 Go tests；
+- 判断 Go API、errors、context、goroutines、channels、mutexes、maps、slices、generics、receivers、resource cleanup 或 module compatibility；
+- 解释 Go 代码中的 correctness、maintainability 或 test-quality risk。
 
-### 1.2 Function Size（函数规模）`[Overrides common: 1.2]`
+不要用本 skill 规定 backend architecture、database/query policy、HTTP framework、deployment shape、logging stack、dependency version strategy、directory topology、团队命名清理或测试框架偏好。非 Go concerns 只有在 changed code 中已经出现并影响当前 task 时才提出，且标为 separate review concern，不要包装成 `rules-golang` violation。
 
-**Reason:** Explicit error handling 会增加垂直空间，但 AI-generated Go code 需要具体的 reviewability limit。
+### 0.2 Precedence（优先级）
 
-- New production functions 默认应保持在 40 lines 内。
-- 更长函数需要 current-task reason，例如 test data、dispatch tables、compatibility logic、clear sequential flow 或 necessary error handling。
-- 不要把长函数拆成 no-information helper；这类 helper 只转发参数、包装一次调用、重命名同一个概念，或让读者为理解一个 behavior 到处跳转。
-- 只有 helper 能减少真实 branching、隔离独立概念，或让 main behavior 更容易 review 时才提取。
-- Error handling 保持靠近可能失败的 call。
+发生冲突时，按以下顺序判断：
 
-### 1.3 File Organization（文件组织）`[Overrides common: 1.3]`
+1. 当前用户请求、accepted spec、failing test、security/correctness requirement；
+2. Public API compatibility 与 backward compatibility；
+3. 当前 repository 的 local conventions、package boundaries、test organization；
+4. `go.mod` 的 `go` directive 和 `toolchain` directive；
+5. 本 skill；
+6. Generic style preference。
 
-**Reason:** Go code 按 package-first 阅读，但老项目和团队差异很大，此规则不能强推一种 layout。
+处理既有 Go code 时，先读 nearby code、nearby tests 和 callers。采用满足任务的最小行为变更。除非当前 request、accepted spec、failing test 或 public API impact 要求，否则不要 reshape packages、rename working identifiers、move files、reorganize tests 或做 comment-only cleanup。
 
-- 遵循被修改代码附近已经使用的 package、file、directory 和 test organization。
-- 不要仅凭此 skill do not force directory layout、package reshaping、file moves 或 test organization changes。
-- 新文件的位置和命名应符合 project conventions 与当前 package 的 local pattern。
-- 无关 package 或 directory concerns 作为 out-of-scope observation 报告，不要在当前 task 中修改。
+### 0.3 Review Output Discipline（审查输出纪律）
 
-### 1.4 Documentation and Comments（文档和注释）
+审查 Go code 时，先报 semantic risks，再报 style-only findings。输出 finding 时说明：affected operation、observable risk、local fix。不要列泛泛 Go pitfall checklist。
 
-- New exported identifiers 需要以 identifier name 开头的 doc comments。
-- Pre-existing exported identifiers 不需要 comment-only cleanup，除非当前 task 改变了它们的 public API、behavior contract 或 compatibility promise。
-- 当 package name 不足以说明目的时，package docs 应解释 purpose 和 constraints。
-- Comments 应解释 invariants、compatibility constraints、resource lifetime、concurrency ownership 或 non-obvious trade-offs；not restate obvious code。
-- Public API docs 保留在 exported boundary，不要埋在 implementation detail 里。
+Severity guidance：
 
----
+- **Blocker / Critical:** data race、goroutine leak、resource leak、unhandled error that changes behavior、panic in library expected path、public API break、Go version incompatibility、incorrect synchronization、incorrect context cancellation、typed nil returned as interface。
+- **Major:** weak error identity、missing cleanup on error path、shadowing that changes observed value、mutable alias across boundary、tests that fail to prove changed behavior。
+- **Minor:** naming、comments、function size、layout 或 formatting；只有当它影响 correctness、API contract、resource lifetime、concurrency safety、current-task readability 或 test diagnostics 时才进入 scope。
+- **Out of scope:** 与当前 changed code 无关的 architecture、directory reshaping、dependency preference、broad cleanup。
 
-## 2. Tests and TDD（测试和 TDD）`[Overrides common: 2.1]`
+### 0.4 Agent Operating Loop（执行流程）
 
-**Reason:** Go tests 在 scenarios 明确、failure output 能指出 broken case 时最容易 review。
-
-### 2.1 Use the Standard `testing` Package（使用标准 `testing` 包）
-
-使用标准 `testing` package。Test functions 形如 `TestXxx(t *testing.T)`。
-
-- 遵循 Go Wiki table-driven tests guidance：https://go.dev/wiki/TableDrivenTests。
-- 对包含多个 inputs、boundary conditions、error paths 或 expected results 的 scenario matrices，默认使用 table-driven tests。
-- 定义 `tests` slice 或 map，遍历每个 case，并用 `t.Run(tt.name, ...)` 或 `t.Run(name, ...)` 运行 named subtests。
-- 每个 case 应包含 readable name、inputs、expected results，以及理解 scenario 所需的 behavior context。
-- Failure messages 应使用 got/want wording 或等价 diagnostic detail。
-- 不要为 single behavior 或 direct/step-by-step test 更清晰的 sequential behavior 强推 table-driven tests；not force。
-- 当 table cases 作为 parallel subtests 运行时，避免 shared mutable state 和 loop variable capture；对 pre-Go 1.22 modules，或 local codebase 已采用该模式时，在 `t.Run` 前使用 `tt := tt`。
-
-### 2.2 Test Coverage Strategy（测试覆盖策略）`[Overrides common: 2.4]`
-
-**Reason:** Go 的 type system 会捕捉部分错误，因此 Agent-written effective tests 必须证明 meaningful behavior，而不是只满足形式测试要求。
-
-- 测试 behavior，不测试 helper internals。
-- 当这些内容与当前 behavior 相关时，覆盖 happy paths、boundary conditions、error paths、resource lifetime 和 concurrency risk。
-- 使用 `t.Run()`，让 failures 标出具体 regression scenario。
-- 只有 cases 不共享 mutable state 时才使用 `t.Parallel()`。
-- 对 temporary resources、environment variables 和需要按 test 恢复的 process-wide test changes，使用 `t.Cleanup()`。
-- Error paths 中，如果 caller-visible contract 承诺 wrapping、sentinel 或 error type，用 `errors.Is` 或 `errors.As` 断言 error identity；只有 text itself is the contract 时才比较 error strings。
-- 相比 `time.Sleep()`，优先 deterministic synchronization：channels、`sync.WaitGroup`、context cancellation，或项目提供的 fake clock。Short sleep 或 deadline 只能作为 last-resort guard，不是主要 synchronization mechanism。
-- Failure messages 应指出 broken 的 input、branch 或 scenario。
-- Shallow tests、mirror implementation tests、weak assertions 和 non-diagnostic failures 都是 low-quality tests，必须改写。
-- 不要 mock the system under test；mocks 只用于无法合理直接 exercise 的 external dependencies。
-- 接受 `*testing.T` 或 `testing.TB` 的 test helper 应在报告 failure 前调用 `t.Helper()`，让 failure location 和 line number 指向 test case，而不是 helper body。
-- 使用 `t.TempDir()` 作为 per-test filesystem scratch space，避免 shared directories。
-- 使用 `t.Setenv` 处理 environment changes；不要把 process-wide state changes 和 `t.Parallel()` 组合。
-- 不要在非 test body 的 goroutine 中调用 `t.Fatal`、`t.Fatalf` 或 `t.FailNow`；通过 channel 或 synchronized result 将 failures 报回 test goroutine。
-
-### 2.3 Test Naming（测试命名）
-
-Table-driven tests 中使用描述性的 subtest names，例如 `t.Run("empty input returns error", ...)`。Test name 应像一句描述 scenario 的话。
+1. Inspect `go.mod` / `toolchain` and nearby conventions before using new language features or APIs。
+2. Identify public API, caller-visible behavior, resource ownership, concurrency ownership and test obligations。
+3. Prefer direct implementation. Add abstraction only with current evidence。
+4. Keep errors and cleanup close to the operation that can fail。
+5. Add or update tests that prove observable behavior, not helper internals。
+6. When reviewing, separate required fixes from optional cleanup。
+7. If verification tooling was not run, say so; do not imply success。
 
 ---
 
-## 3. Errors and APIs（错误和 API）`[Overrides common: 5.6]`
+## 1. Compatibility and Project Shape（兼容性与项目形状）
 
-**Reason:** Go 将 errors 视为普通 values，因此 API shape 和 error text 都影响 maintainability。
+### 1.1 Go Version Compatibility（Go 版本兼容性）
 
-### 3.1 Errors Are Values（错误是值）
+Before using newer syntax, standard-library APIs or language semantics, check the module `go` directive and any `toolchain` directive. Existing module policy is a correctness constraint, not a suggestion.
 
-- 可能失败的 functions 将 `error` 作为最后一个 return value。
-- Call 之后立即检查 errors。
-- Error strings 以小写开头，且不以 punctuation 结尾，除非 domain term 要求。
-- 简单 errors 使用 `errors.New()`；callers 需要 chain 时，用 `fmt.Errorf()` 和 `%w`。
-- 只有 callers 必须 branch 时才引入 sentinel errors。
+- Do not raise the module Go version or add/change a `toolchain` directive unless the accepted task requires it。
+- If a newer Go version is required, report it as a separate compatibility decision with reason, affected files and rollback path。
+- If a newer API is only a convenience, use a local fallback compatible with the current module。
+- For loop variable capture, respect the module Go version and local pattern. In pre-Go 1.22 modules, or when the codebase already does so, rebind loop variables before subtests, goroutines or closures, e.g. `tt := tt`。
 
-### 3.2 Error Wrapping（错误包装）
+### 1.2 Existing Project Shape Wins（既有项目形状优先）`[Overrides common: 1.3]`
 
-- 每层都添加 context，但不要重复 wrapped error 已经说明的内容。
-- 使用 `errors.Is()` 和 `errors.As()` 检查 wrapped errors。
-- 不要通过比较 error strings 驱动 logic。
+- Match nearby package boundaries, file naming, directory layout, layering and test organization。
+- New files should live where this package’s existing pattern suggests。
+- Do not force package reshaping, file moves, directory reorganization or test relocation from this skill alone。
+- Package or directory concerns unrelated to the current task belong in out-of-scope observations。
 
-### 3.3 Panic Sparingly（谨慎使用 panic）
+### 1.3 Names and Documentation（命名与文档）`[Overrides common: 1.1]`
 
-- `panic` 用于不可恢复的 programmer errors 或 impossible states。
-- Libraries 对 expected failures 返回 errors，而不是 panic。
-- `recover` 只用于明确定义的 process 或 goroutine boundaries。
-- 在 boundary recover 时，保留足够诊断 context，并将 expected caller-visible failures 转回 errors。
+- For new exported APIs, use idiomatic names that fit the surrounding package。
+- Preserve existing naming patterns unless the task or public API impact requires change。
+- Exported identifiers introduced or behaviorally changed by the task need doc comments beginning with the identifier name。
+- Existing exported identifiers do not need comment-only cleanup unless their public contract changed。
+- Comments should explain invariants, compatibility constraints, resource lifetime, concurrency ownership or non-obvious trade-offs; do not restate obvious code。
 
-### 3.4 Public API Surface（公开 API 表面）
+### 1.4 Function Size and Helpers（函数规模与 helper）`[Overrides common: 1.2]`
 
-- Exported APIs 保持 narrow；直到另一个 package 真正需要时再 export names。
-- 除非 caller 从 substitution 中获益，否则优先返回 concrete return types。
-- 当 type semantics 允许时，让 zero value useful。
-
-### 3.5 Nil and Interface Values（Nil 和接口值）
-
-- 避免将 typed nil 作为 `error` 或其他 interface 返回；interface value with a concrete type 即使具体 pointer 为 nil，也不是 nil interface。
-- 对返回 `error` 的 function，成功时 return nil explicitly，而不是返回 pointer to a concrete error type 的 nil pointer。
-- 当 nil receivers、nil fields、nil maps 或 nil slices 属于 API contract 时，zero value behavior 必须明确。
-
-### 3.6 Return Values and Shadowing（返回值和遮蔽）
-
-- 将 short variable declaration `:=` 视为 scope decision；确认它没有 shadowing 外层 outer err、result value、context、transaction 或 cancel function，而后续代码还要观察这些值。
-- 只有 named return values 能澄清 result meaning，或 deferred cleanup 必须调整返回 error 时才使用。
-- 除非函数很小且每个 named result value 都显而易见，否则避免 naked return；普通 Agent-written code 要 return explicitly。
+- New production functions should normally stay within 40 lines。
+- Longer functions need a current-task reason: dispatch table, compatibility branch, clear sequential workflow, necessary error handling or test data。
+- Do not extract no-information helpers. A helper is unjustified if it only forwards parameters, wraps one call, renames the same concept or makes readers jump around to understand one behavior。
+- Extract helpers only when they reduce real branching, isolate a separate concept, improve testability of an external seam or make the main behavior easier to review。
+- Keep error handling near the call that can fail。
 
 ---
 
-## 4. Context, Interfaces, and Receivers（Context、接口和 Receiver）
+## 2. Errors and Public APIs（错误与公开 API）`[Overrides common: 5.6]`
 
-### 4.1 `context.Context` Boundaries（`context.Context` 边界）
+### 2.1 Errors Are Values（错误是值）
 
-- 对 request-scoped work，将 `context.Context` 作为第一个参数显式传入。
-- 不要把 `context.Context` 存在 structs 上。
-- 不要传 `nil` contexts；仅在 process boundaries 使用 `context.Background()` 或 `context.TODO()`。
-- 将 cancellation 和 deadlines 传播到 blocking work；当 cancellation 是 observable result 时，返回或包装 `ctx.Err()`。
-- 创建 derived contexts（`context.WithCancel`、`context.WithTimeout` 或 `context.WithDeadline`）后，立即 `defer cancel()`，避免 timer leak，除非 ownership 被有意转移并记录。
-- `context.Value` 只用于必须跨 API boundaries 的 request-scoped metadata，不用于 optional parameters 或 required dependencies。
-- Context values 使用 unexported key type，并在读取 value 的 boundary 检查 type assertions。
+- Functions that can fail return `error` as the last return value。
+- Check errors immediately after calls. Do not use `_ = someFunc()` for a returned error unless the ignored error is explicitly safe and documented locally。
+- Error strings start with lowercase and do not end with punctuation, unless a domain term requires otherwise。
+- Use `errors.New` for static errors。
+- Use `fmt.Errorf("...: %w", err)` when callers need the error chain。
+- Introduce sentinel errors or exported error types only when callers must branch on them。
+- Do not compare `err.Error()` for logic. Use `errors.Is` or `errors.As` when identity or type matters。
 
-### 4.2 Interfaces（接口）`[Overrides common: 5.5]`
+### 2.2 Error Wrapping and Context（错误包装与上下文）
 
-- Interfaces 定义在使用处，而不是实现处。
-- Interfaces 保持小；一两个 methods 通常够用。
-- 当 callers 从 substitution 中获益时 accept interfaces；ownership 清楚时 return concrete types。
-- 多个 callers 或真实 seam 尚未证明需要前，不创建 interface。
-- `any`、`interface{}` 和 `reflect` 只在真实 untyped boundary 使用，例如 decoding、plugin integration、generic adapters 或 compatibility layers。
-- 当 concrete types、small interfaces、type parameter 或 type switch 能让 behavior 更明确时，优先使用它们。
-- Boundary 检查完成后，避免 spreading dynamic typing through typed code（avoid spreading dynamic typing）。
+- Add useful context at each boundary, but do not repeat what the wrapped error already says。
+- Preserve caller-visible identity with `%w` when callers may use `errors.Is` or `errors.As`。
+- If cancellation is the observable result, return or wrap `ctx.Err()`。
+- In tests, assert error identity with `errors.Is` / `errors.As` when identity is the contract. Compare error text only when the text itself is the contract。
 
-### 4.3 Receiver Discipline（Receiver 纪律）
+### 2.3 Panic, Recover, and API Failure（panic、recover 与 API 失败）
 
-- Receiver names 保持短小、一致，并源自 type name。
-- Methods 会 mutate state 或 copying value 成本高时，使用 pointer receivers。
-- 没有具体原因时，不要在同一个 type 上混用 pointer 和 value receivers。
-- Receiver method sets 应让 type 的 mutability 一眼可见。
+- Use `panic` for unrecoverable programmer errors or impossible states, not expected runtime failures。
+- Libraries return errors for expected failures。
+- Use `recover` only at defined process or goroutine boundaries。
+- Boundary recovery must preserve diagnostic context and convert caller-visible expected failures back to errors。
 
----
+### 2.4 Public API Surface（公开 API 表面）
 
-## 5. Concurrency and Resource Cleanup（并发和资源清理）
+- Keep exported APIs narrow. Export only when another package actually needs the name。
+- Prefer returning concrete types unless callers benefit from substitution。
+- Prefer accepting interfaces when callers benefit from substitution。
+- Preserve useful zero value behavior when the type semantics allow it。
+- Document nil receiver, nil field, nil map, nil slice or zero value behavior if it is part of the API contract。
 
-### 5.1 Goroutine Lifecycle（Goroutine 生命周期）
+### 2.5 Nil, Interfaces, and Returns（nil、接口与返回值）
 
-- 启动 goroutine 前，必须知道谁 owns its lifetime。
-- Every goroutine needs a shutdown path and completion strategy。
-- 在 spawn point 记录 cancellation、backpressure 和 error propagation。
-- Channels 能澄清 ownership 时使用 channels；shared state 模型更清楚时使用 mutex。
-
-### 5.2 Channel Discipline（Channel 纪律）
-
-- Sender closes the channel，receiver 不关闭 channel。
-- Sender owns channel close；多个 goroutines 能观察 channel 时，document the owner。
-- nil channel 在 send 和 receive 上都会 blocks forever；只在有意禁用 `select` case 等场景使用。
-- sending on a closed channel 或 closing a closed channel 会 panic。
-- Buffered channels 需要具体 throughput 或 ownership reason。
-- Channel operation 可能无限 block 时，使用带 `context.Done()` 的 `select`。
-
-### 5.3 Shared State Ownership（共享状态所有权）
-
-- 明确是 one goroutine owns state、由 `sync.Mutex` 或 `sync.RWMutex` 保护，还是 channels transfer ownership；不要静默混合这些模型。
-- 第一次使用后，不要 copy values containing `sync.Mutex`、`sync.RWMutex`、`sync.WaitGroup`、`sync.Once` 或 atomic fields。
-- 在 launching goroutine 前调用 `WaitGroup.Add`（before launching）；goroutine 内使用 `defer wg.Done()`；避免 Add inside the goroutine 导致它和 `Wait` 竞争。
-- `sync/atomic` 只用于简单 shared state，并带清楚 ownership comment；compound invariants 重要时优先 locks。
-- Type 包含 synchronization fields 或 shared mutable state 时，使用 pointer receivers 和 pointer parameters。
-- 不要在未定义 ownership 时暴露 internal maps 或 slices；当 callers can mutate result 并造成 data race 或 broken invariant 时，return copies。
-- Returned maps、slices 和 pointer fields 默认视为 mutable alias，除非 API 明确记录 caller owns the value。
-
-### 5.4 Resource Cleanup（资源清理）`[Overrides common: 4.3]`
-
-**Reason:** `defer` 会让 cleanup 可读，但前提是 resource ownership 保持明显。
-
-- 获取 resource 后立即使用 `defer`。
-- Loops 中用 helper function 或 explicit close，避免 cleanup 意外堆积。
-- 记住 defer arguments are evaluated immediately；只有 cleanup 需要 function return 时的 final value 时，才使用 deferred closure。
-- 避免 defer in a loop，除非每次 iteration 有自己的 function boundary，或 deferred calls 数量被有意限制。
-- Timer 和 ticker 的 lifetimes 可能超过一次 receive 或一次 function call 时，要显式拥有。
-- Potentially blocking I/O 要配对 cancellation、deadlines，或二者都用。
-- Close what you open，即使在 error paths 上也一样。
-
-### 5.5 Low-Level Runtime Contracts（低层 Runtime 契约）
-
-Low-level runtime contracts 包括 panic recovery、process exit、`unsafe`、`sync.Once`、atomic operations、timer reuse、stream reads、closed-channel receive、non-blocking select 和 append capacity behavior。只有 touched code depends on that behavior 时才提出这些内容（only when touched code depends on that behavior）。
-
-当这类 contract 重要时，note 要保持 narrow：说明 affected operation、observable risk 和 local fix。不要把此 skill 扩成 full Go runtime pitfall catalogue。
+- Avoid returning typed nil as `error` or another interface. An interface holding a concrete nil pointer is not a nil interface。
+- For functions returning `error`, return plain `nil` on success。
+- Treat `:=` as a scope decision. Check that it does not shadow an outer `err`, result, context, transaction or cancel function later observed by the code。
+- Use named return values only when they clarify result meaning or a deferred cleanup must adjust the returned error。
+- Avoid naked returns except in very small functions where every named result is obvious。
 
 ---
 
-## 6. Composition, Wiring, and Complexity（组合、装配和复杂度）
+## 3. Context, Interfaces, and Receivers（Context、接口与 Receiver）
 
-### 6.1 Value Semantics and Embedding（值语义和嵌入）`[Overrides common: 5.1]`
+### 3.1 `context.Context` Boundaries（Context 边界）
 
-- 当 explicit fields 和 method calls 比 embedding 更能说明 ownership 时，优先使用它们。
-- 只有 promoted methods 被有意作为 type API 的一部分时，才使用 embedding。
-- 当 type semantics 允许时，保留 useful zero value behavior。
-- 通过 constructors、receivers 和 field mutability 让 pointer/value semantics 可见。
-- 不要用 deep embedded graphs 或 anonymous fields 隐藏会惊讶 callers 的 coupling。
+- For request-scoped work, pass `context.Context` explicitly as the first parameter。
+- Do not store `context.Context` in structs。
+- Do not pass nil contexts. Use `context.Background()` or `context.TODO()` only at process boundaries。
+- Propagate cancellation and deadlines into blocking work。
+- After `context.WithCancel`, `context.WithTimeout` or `context.WithDeadline`, call `defer cancel()` immediately unless ownership is intentionally transferred and documented。
+- Use `context.Value` only for request-scoped metadata that must cross API boundaries. Do not use it for optional parameters or required dependencies。
+- Context keys should use an unexported key type, and value extraction should check type assertions at the boundary。
 
-### 6.2 Initialization and Dependencies（初始化和依赖）`[Overrides common: 5.2]`
+### 3.2 Interfaces（接口）`[Overrides common: 5.5]`
 
-- Dependencies 通过 parameters 或 struct fields 传入。
-- Wiring 放在拥有 startup 的 process boundary 或 package boundary。
-- 除非 package 已有该 pattern 且 state 有清楚 lifecycle，否则避免 package-level mutable state。
-- 避免 `init()` side effects 用于 configuration、I/O、goroutines、registration 或 hidden dependency setup。
-- 只有 constructors 能建立 invariants、validate configuration 或说明 dependency ownership 时，才优先显式 constructors。
+- Define interfaces at the consumer, not the producer。
+- Keep interfaces small; one or two methods is usually enough。
+- Do not create interfaces before a real substitution need, multiple callers or established project pattern exists。
+- Return concrete types when ownership is clear and callers do not need substitution。
+- Use `any`, `interface{}` and `reflect` only at real untyped boundaries: decoding, plugin integration, generic adapters or compatibility layers。
+- After boundary validation, do not spread dynamic typing through typed code。
 
-### 6.3 Slices, Maps, Generics, and Complexity（切片、Map、泛型和复杂度）`[Overrides common: 4.2]`
+### 3.3 Receivers（Receiver 纪律）
 
-- 在 loops 中 append 或返回 subslices 时，注意 slice aliasing、capacity growth 和 copying。
-- append returns the updated slice；assign the result，并记住容量不足时它可能 reallocate underlying array。
-- 有合理 capacity estimate 时，pre-allocate slices。
-- Callers 能通过 JSON、equality checks 或 API contracts 观察时，保留 nil versus empty slice or map behavior。
-- 写入 map 前初始化；assignment to entry in nil map 会 panic，尽管 nil map 上的 reads、`len` 和 `range` 有效。
-- Plain maps are not safe for concurrent map writes；shared maps 用 mutex、single goroutine ownership 或 channel ownership transfer 保护。
-- Map iteration order 是 randomized；产生 deterministic output 前先 sort keys。
-- 当 callers 需要 underlying element 时，不要 take the address of the range variable；index into the slice 并使用 `&items[i]`，或有意 copy value。
-- 在 loop 中启动 goroutine 或创建 closure 时，根据 module Go version 或 local pattern 在需要时 copy per iteration。
-- 只有 dynamic value 已知 comparable 时，才使用 interface comparison 或把 interface values 作为 map keys；比较 dynamic value 是 map, slice, or function 的 interface 可能 panic。
-- Generics 只在消除真实 duplication 且保持 type-safe behavior 时使用。
-- 不要用 generics simulate dynamic typing、掩盖 concrete behavior，或创建 future-only extension points。
-- 只有 measurement 显示有意义时，才引入 additional complexity。
+- Receiver names should be short, consistent and derived from the type name。
+- Use pointer receivers when methods mutate state or copying the value is expensive or unsafe。
+- Avoid mixing pointer and value receivers on the same type without a specific reason。
+- Types containing synchronization fields or shared mutable state should use pointer receivers and pointer parameters。
 
-### 6.4 Strings, Numbers, and Time Values（字符串、数字和时间值）
+---
 
-- 明确 byte versus rune semantics；indexing string 读取 bytes，而 range over a string 会将 UTF-8 解码成 runes 和 byte offsets。
-- 除非代码有意处理 bytes 并处理 invalid UTF-8，否则避免对 user-visible text 做 byte slicing。
-- Integer conversion 可能改变 behavior；narrowing、changing signedness 或转换可能 overflow 的 values 前检查 bounds。
-- 普通 business logic 不依赖 overflow；确实需要 wraparound behavior 时显式表达。
-- `time.Duration` values 是 nanoseconds；用 `n * time.Second` 等显式表达式转换 counts，并在 review 中要求 callers multiply by time.Second 或 intended unit，而不是传 raw integers。
+## 4. Concurrency and Resource Lifecycle（并发与资源生命周期）
+
+### 4.1 Goroutine Lifecycle（Goroutine 生命周期）
+
+- Before starting a goroutine, know who owns its lifetime。
+- Every goroutine needs a shutdown path and a completion strategy。
+- At the spawn point, account for cancellation, backpressure and error propagation。
+- Do not let goroutines silently outlive their owner, tests or request scope。
+- Worker goroutine failures in tests must be reported back to the test goroutine; do not call `t.Fatal`, `t.Fatalf` or `t.FailNow` from a non-test goroutine。
+
+### 4.2 Channel Discipline（Channel 纪律）
+
+- The sender closes the channel. Receivers do not close channels they do not own。
+- Document the close owner when multiple goroutines observe a channel。
+- Nil channels block forever on send and receive; use them only intentionally, such as disabling a `select` case。
+- Sending on a closed channel or closing a closed channel panics。
+- Buffered channels need a concrete throughput, ownership or backpressure reason。
+- Potentially blocking channel operations should use `select` with `ctx.Done()` when cancellation matters。
+
+### 4.3 Shared State Ownership（共享状态所有权）
+
+- Choose one ownership model: one goroutine owns the state, a mutex protects the state, or channels transfer ownership. Do not silently mix models。
+- Do not copy values containing `sync.Mutex`, `sync.RWMutex`, `sync.WaitGroup`, `sync.Once`, atomic fields or shared mutable state after first use。
+- Call `WaitGroup.Add` before launching the goroutine. Inside the goroutine, use `defer wg.Done()`。
+- Use `sync/atomic` only for simple shared state with clear ownership. Prefer locks for compound invariants。
+- Plain maps are not safe for concurrent writes. Protect shared maps with a mutex, single goroutine ownership or channel ownership transfer。
+- Do not expose internal maps, slices or pointer fields without defined ownership. Return copies when caller mutation can cause a data race or break invariants。
+
+### 4.4 Resource Cleanup（资源清理）`[Overrides common: 4.3]`
+
+- Close what you open, including on error paths。
+- After acquiring a resource, defer cleanup immediately when the function boundary owns the resource。
+- Avoid `defer` in loops unless each iteration has its own function boundary or the deferred call count is intentionally bounded。
+- In loops, prefer a helper function or explicit close to avoid accidental cleanup accumulation。
+- Remember defer arguments are evaluated immediately. Use a deferred closure only when cleanup needs the final value at function return。
+- Timers and tickers need explicit lifetime ownership. Stop them when they can outlive the operation。
+- Potentially blocking I/O should have cancellation, deadlines or both when request scope matters。
+
+### 4.5 Low-Level Runtime Contracts（低层 Runtime 契约）
+
+Only raise low-level runtime contracts when touched code depends on that behavior. Keep findings narrow: affected operation, observable risk and local fix。
+
+Examples: panic recovery, process exit, `unsafe`, `sync.Once`, atomic ordering, timer reuse, stream reads, closed-channel receive, non-blocking `select`, append capacity behavior, interface comparability, range variable capture。
+
+---
+
+## 5. Values, Data Structures, and Complexity（值、数据结构与复杂度）`[Overrides common: 4.2, 5.1, 5.2]`
+
+### 5.1 Value Semantics and Embedding（值语义与嵌入）
+
+- Prefer explicit fields and method calls when they better reveal ownership。
+- Use embedding only when promoted methods are intentionally part of the type API。
+- Do not hide surprising coupling behind deep embedded graphs or anonymous fields。
+- Use constructors when they establish invariants, validate configuration or clarify dependency ownership。
+- Avoid package-level mutable state unless the package already has that pattern and the lifecycle is clear。
+- Avoid `init()` side effects for configuration, I/O, goroutines, registration or hidden dependency setup unless the package already owns that lifecycle pattern。
+
+### 5.2 Slices and Maps（切片与 Map）
+
+- Assign the result of `append`; it may reallocate the underlying array。
+- Pre-allocate slices when there is a reasonable capacity estimate。
+- Be explicit about nil versus empty slices/maps when JSON output, equality checks or API contracts can observe the difference。
+- Initialize maps before writes. Reads, `len` and `range` on nil maps are valid; assignment to a nil map panics。
+- Map iteration order is randomized. Sort keys before deterministic output。
+- Treat returned maps, slices and pointer fields as mutable aliases unless the API documents caller ownership or returns copies。
+- Do not take the address of a range variable when the caller needs the underlying element. Index into the slice, e.g. `&items[i]`, or intentionally copy the value。
+
+### 5.3 Generics and Dynamic Typing（泛型与动态类型）
+
+- Use generics only when they remove real duplication while preserving type-safe behavior。
+- Do not use generics to simulate dynamic typing, hide concrete behavior or create future-only extension points。
+- Use `any`, type switches or reflection only when they make a real boundary clearer。
+- Compare interface values or use them as map keys only when the dynamic values are known comparable. Interface comparison can panic when the dynamic value is a map, slice or function。
+- Add complexity only when current evidence or measurement justifies it。
+
+### 5.4 Strings, Numbers, and Time（字符串、数字与时间）
+
+- Be explicit about byte versus rune semantics. Indexing a string reads bytes; ranging over a string decodes UTF-8 into runes and byte offsets。
+- Do not byte-slice user-visible text unless the code intentionally handles bytes and invalid UTF-8。
+- Check bounds before integer narrowing, signedness changes or conversions that may overflow。
+- Normal business logic should not depend on overflow. If wraparound is intended, express it clearly。
+- `time.Duration` is nanoseconds. Convert counts with explicit units, e.g. `n * time.Second`, instead of passing raw integers。
+
+---
+
+## 6. Tests and TDD（测试与 TDD）`[Overrides common: 2.1, 2.4]`
+
+### 6.1 Standard Go Tests（标准 Go 测试）
+
+- Use the standard `testing` package unless the existing project clearly uses another pattern。
+- Test functions use `TestXxx(t *testing.T)`。
+- Prefer tests that first expose the behavior gap, then implement the fix。
+- Test observable behavior: return values, errors, state changes, resource cleanup, concurrency outcomes and public contracts. Do not test helper internals。
+
+### 6.2 Table-Driven Tests（表驱动测试）
+
+- For scenario matrices with multiple inputs, boundary conditions, error paths or expected results, table-driven tests are the default。
+- Define a `tests` slice or map, include readable case names, inputs, expected results and scenario-specific context。
+- Use `t.Run(tt.name, ...)` or `t.Run(name, ...)` so failures identify the broken scenario。
+- Use got/want wording or equivalent diagnostic detail。
+- Do not force table-driven tests for one-off sequential behavior when direct steps are clearer。
+- When table cases run as parallel subtests, avoid shared mutable state and loop variable capture. Rebind per-case variables when module version or local pattern requires it。
+
+### 6.3 Test Quality Bar（测试质量线）
+
+- Cover happy paths, boundary conditions, error paths, resource lifetime and concurrency risk when relevant to changed behavior。
+- Failure messages should identify the broken input, branch or scenario。
+- Reject shallow tests, mirror-implementation tests, weak assertions and non-diagnostic failures。
+- Mock only external dependencies that cannot reasonably be exercised directly. Do not mock the system under test。
+- Test helpers accepting `*testing.T` or `testing.TB` must call `t.Helper()` before reporting failures。
+
+### 6.4 Test Resources and Process State（测试资源与进程状态）
+
+- Use `t.TempDir()` for per-test filesystem scratch space。
+- Use `t.Setenv()` for environment changes。
+- Use `t.Cleanup()` for temporary resources and process-wide state restoration。
+- Do not combine process-wide state changes with `t.Parallel()`。
+- Use `t.Parallel()` only when cases do not share mutable state。
+
+### 6.5 Concurrency Tests（并发测试）
+
+- Prefer deterministic synchronization: channels, `sync.WaitGroup`, context cancellation or a project fake clock。
+- `time.Sleep()` is a last-resort guard, not the primary mechanism proving goroutine or channel behavior。
+- Use deadlines to prevent hung tests, but do not make timing the behavior proof unless timing is the contract。
+- Report worker goroutine failures to the test goroutine via channels or synchronized results。
+
+---
+
+## 7. Dependencies and Wiring（依赖与装配）
+
+- Check the current codebase and standard library before adding dependencies。
+- Add a dependency only when it makes current design clearer or provides necessary behavior; do not add one merely to hide complexity。
+- Pass dependencies through parameters or struct fields。
+- Put wiring at the process boundary or package boundary that owns startup。
+- If adding a dependency is necessary, state why it fits this project and what alternatives were considered。
+
+---
+
+## 8. Review Checklist（审查清单）
+
+When reviewing Go code, check in this order:
+
+1. Error propagation, wrapping, identity and ignored errors。
+2. Public API compatibility, exported comments, zero value behavior, concrete-vs-interface choices。
+3. `context.Context` propagation, `ctx.Err()`, `defer cancel()` and `context.Value` boundaries。
+4. Goroutine lifetime, cancellation, channel ownership, mutex ownership, `WaitGroup.Add` placement and error propagation。
+5. Resource cleanup, defer evaluation, loops, timers, tickers and blocking I/O。
+6. Map/slice aliasing, nil map writes, concurrent map writes, copied synchronization values and pointer-field ownership。
+7. Shadowing, typed nil returns, naked returns, range variable address use, closure capture and interface comparability。
+8. Generics, helpers, wrappers and interfaces: each must have current evidence。
+9. Byte/rune behavior, integer conversions, overflow assumptions and `time.Duration` units。
+10. Test effectiveness: named scenarios, got/want diagnostics, meaningful assertions, error identity checks and deterministic concurrency synchronization。
+
+---
+
+## Iron Laws（铁律）
+
+1. **Handle every error.** 不忽略 returned errors；检查、wrap、propagate 或明确说明安全忽略的原因。
+2. **Existing project shape wins.** 除非任务要求，不重塑 packages、directories、tests 或 naming。
+3. **Go version compatibility is correctness.** 尊重 `go.mod` 的 `go` 和 `toolchain` policy。
+4. **Every goroutine has an owner.** 每个 goroutine 都需要 shutdown path、completion strategy 和 error propagation plan。
+5. **Cancellation is owned.** Derived contexts 需要 `defer cancel()`，除非 ownership 被有意转移并记录。
+6. **Libraries return errors for expected failures.** 不在 library expected path 使用 `panic`。
+7. **Interfaces live at the consumer.** 只在真实 substitution seam 处定义小接口。
+8. **No speculative abstraction.** 不为 future extension 创建 interfaces、wrappers、generics 或 no-information helpers。
+9. **Shared state has one ownership model.** 单 goroutine、lock 或 channel ownership transfer 三选一，避免混用。
+10. **Do not copy synchronization state.** 包含 locks、wait groups、once、atomic 或 shared mutable state 的 values 使用 pointer semantics。
+11. **Returned mutable data needs ownership.** Maps、slices 和 pointer fields 要么返回 copies，要么明确 caller ownership。
+12. **Tests must prove behavior.** 使用 named scenarios、meaningful assertions、useful failure output 和 deterministic synchronization。
+13. **Table-driven tests are the default for scenario matrices.** 但不要强迫单一顺序行为表驱动化。
+14. **No hidden startup behavior.** 避免 package-level mutable state 和 `init()` side effects，除非 existing lifecycle pattern 支持。
+15. **Style is secondary.** Style-only findings 只有影响当前 correctness、API、resource/concurrency safety、readability 或 diagnostics 时才升级。
 
 ---
 
 ## Red Flags（风险信号）
 
 | Thought | Reality |
-|---------|---------|
-| "I'll ignore this error for now" | `_ = someFunc()` 很可能成为 bug。每个 error 都要处理。 |
-| "I'll use `panic` for this error" | `panic` 用于 programmer errors，不用于 runtime conditions。返回 error。 |
-| "This goroutine will just run forever" | 每个 goroutine 都需要 shutdown path。 |
-| "This test matrix is too small for table-driven tests" | 如果在比较 multiple scenarios，table-driven tests 能让 cases 明确且可 review。 |
-| "I'll create an interface first" | 需要时再创建。Interfaces 定义在 consumer，而不是 producer。 |
-| "I can stash context on the struct" | Request-scoped state 属于 parameters，不属于 shared object state。 |
-| "Channels are always better than mutexes" | 选择最能说明 ownership 的模型。 |
-| "I'll reshape this package while I'm here" | Existing project shape wins。除非 task 要求，否则不要 move packages、rename identifiers 或 reorganize tests。 |
-| "I'll add a helper just to make the function shorter" | No-information helper 比稍长但可读的 function 更差。只提取真实概念。 |
-| "This shallow test is enough" | Shallow test 如果只是调用代码、mirror implementation 或检查 weak assertion，并不能 prove behavior。 |
-| "I'll hide setup in `init()`" | Hidden `init()` 会让 startup order 和 dependencies 更难 review。优先 explicit wiring。 |
-| "I'll compare `err.Error()` in the test" | 除非 message text 是 behavior under test，否则用 `errors.Is` 或 `errors.As` 检查 error identity。 |
-| "I'll wait with `time.Sleep()`" | 使用真实 synchronization mechanism：channels、`sync.WaitGroup`、context cancellation 或项目 fake clock。 |
-| "I'll skip `cancel()` because the test is short" | Derived contexts 配 `defer cancel()`，释放 timers 和 cancellation resources。 |
-| "I'll just pass this struct by value" | 不要 copy values containing locks、wait groups、once guards、atomic fields 或 shared mutable state。 |
-| "Returning this map is convenient" | Returned map 或 slice 可能是 mutable alias；返回 copies 或记录 caller ownership。 |
-
----
-
-## Iron Laws（铁律）
-
-1. **Handle every error.** 对返回 errors 的 functions，不使用 `_ = someFunc()`；检查、wrap 或 propagate。
-2. **Table-driven tests are the default for Go scenario matrices.** 只有 behavior 真正 stateful 或 sequential 时才选择其他模式。
-3. **Every goroutine has a shutdown path.** Leaked goroutines 是带 latency 的 memory leaks。
-4. **No `panic` in libraries.** Libraries 返回 errors；recovery 属于 top-level boundaries。
-5. **Interfaces live at the consumer.** 在需要 substitution 的地方定义 interfaces。
-6. **不要把 `context.Context` 存在 structs 上。** 显式传入。
-7. **Existing project shape wins.** 不要仅凭此 skill 强推 directory layout、package boundaries、naming cleanup 或 test organization。
-8. **New production functions have a size budget.** 默认保持在 40 lines 内，或说明 current-task exception reason。
-9. **Tests must prove behavior.** Go test 需要 meaningful assertions、named scenarios，以及指出 broken case 的 failure output。
-10. **No hidden startup behavior.** 除非 existing package pattern 和 lifecycle 支持，否则避免 package-level mutable state 和 `init()` side effects。
-11. **Cancellation is owned.** Derived contexts 需要 `defer cancel()`，除非 cancellation ownership 被有意移交并记录。
-12. **Concurrency tests synchronize.** `time.Sleep()` 是 last-resort guard，不是证明 goroutine 或 channel behavior 的主要方式。
-13. **Shared state has one ownership model.** 使用一个 goroutine、lock 或 channel ownership transfer；混用模型容易 data race。
-14. **不要复制 synchronization state。** 包含 locks、wait groups、once guards、atomic fields 或 shared mutable state 的 values 需要 pointer semantics。
-15. **Go version compatibility is part of correctness.** 尊重 module 的 `go` directive，除非 task 要求，否则不改变 `toolchain` policy。
-
----
-
-## Behavioral Shaping（行为塑形）
-
-### When Touching Existing Go Code（修改既有 Go 代码时）
-
-1. 编辑前先 read nearby tests and callers。
-2. 采用满足 task 的 smallest behavior change。
-3. 除非 task 要求，否则 do not move packages、rename identifiers、reorganize tests 或 clean up comments。
-4. 除非 public API contract 改变，否则不要对 pre-existing exported identifiers 做 comment-only cleanup。
-
-### When Starting a New Go File（开始新的 Go 文件时）
-
-1. 匹配 package 的 existing public surface 和 naming conventions。
-2. 引入 exported identifiers 时添加 doc comments。
-3. 让 package boundaries 对下一位读者保持明显。
-
-### When Writing Go Tests（编写 Go 测试时）
-
-1. Start with a failing test，证明 behavior gap。
-2. 对 scenario matrices 使用 table-driven tests；不要用于 one-off sequential behavior。
-3. Name each table case，让失败的 subtest 指出 broken scenario。
-4. Assert observable behavior、returned errors、state changes、resource cleanup 或 concurrency outcomes，而不是 helper internals。
-5. 使用 `t.Parallel()` 前避免 shared mutable state。
-6. 当 loop variable capture 会受 module Go version 或 local pattern 影响时，用 `tt := tt` 重新绑定 table cases。
-7. 对需要 per-test restoration 的 environment variables 和 temporary resources 使用 `t.Cleanup()`。
-8. Contract 暴露 wrapping、sentinels 或 error types 时，用 `errors.Is` 或 `errors.As` 断言 error identity。
-9. `context.WithCancel`、`context.WithTimeout` 和 `context.WithDeadline` 搭配 `defer cancel()`。
-10. 用 channels、`sync.WaitGroup`、context cancellation 或 project fake clock 进行 synchronization，而不是 `time.Sleep()`。
-11. 接收 `*testing.T` 或 `testing.TB` 的 test helpers 在失败前调用 `t.Helper()`。
-12. 使用 `t.TempDir()` 和 `t.Setenv` 管理 per-test resources；test mutates process-wide state 时避免 `t.Parallel()`。
-13. Worker goroutines 的 failures 报回 test goroutine，不在其中直接调用 `t.Fatal`。
-14. 只 mock 无法合理直接 exercise 的 external dependencies。
-
-### When Adding a New Dependency（新增依赖时）
-
-1. 先检查 current codebase 和 standard library。
-2. 评估 dependency 是让 design 更清晰，还是只是隐藏 complexity。
-3. 记录 dependency 为什么适合此 project，而不是把它当成 Go default。
-
-### When Reviewing Go Code（审查 Go 代码时）
-
-1. 检查 unhandled errors 和 weak error strings。
-2. 验证 exported APIs、doc comments、zero value behavior，以及 concrete-versus-interface return choices。
-3. 确认 `context.Context`、`ctx.Err()`、`defer cancel()` 和 `context.Value` usage 匹配 request ownership。
-4. 检查 goroutines、channel or mutex ownership、`WaitGroup.Add` 和 resource cleanup 是否有 leaks 或 races。
-5. 确认 maps、slices、pointer fields 和 sync-containing values 没有暴露 mutable alias 或 copy-lock risks。
-6. 只在影响当前 behavior 时检查 typed nil returns、nil map writes、nil channel use 和 interface comparability。
-7. 将 `any`、`interface{}`、`reflect`、generics、interfaces、wrappers 和 helpers 绑定到 current evidence。
-8. 检查 range variable address use、closure capture、short variable declaration shadowing、naked return 和 changed code 附近的 defer evaluation。
-9. 数据跨 boundary 时检查 byte versus rune behavior、integer conversion、overflow assumptions 和 `time.Duration` units。
-10. 只有 touched code 依赖相关 behavior 时才提出 low-level runtime contracts。
-11. 拒绝 no-information helpers、speculative interfaces 和 hidden startup behavior。
-12. 多个 scenarios 被 exercise 时，寻找 table-driven tests。
-13. 拒绝 shallow tests、mirror implementation tests、weak assertions 和 non-diagnostic failures。
-14. 当 identity 是 contract 时，确认 error assertions 使用 `errors.Is` 或 `errors.As`。
-15. 确认 concurrency tests 使用 deterministic synchronization，而不是 `time.Sleep()`。
-16. 检查 test helpers、temporary resources、environment variables 和 goroutine failure reporting 是否提供 useful diagnostics。
+|---|---|
+| “I’ll ignore this error for now.” | 这通常会变成 bug。处理、传播或记录安全忽略的理由。 |
+| “I’ll use `panic` for this runtime error.” | Expected runtime failures return errors。 |
+| “This goroutine can just run forever.” | Leaked goroutines are delayed memory and latency leaks。 |
+| “I’ll create an interface first.” | Interfaces belong at the consumer and require current substitution evidence。 |
+| “I’ll store `context.Context` on the struct.” | Request-scoped state belongs in parameters。 |
+| “Channels are always better than mutexes.” | Use the model that makes ownership clearest。 |
+| “I’ll reshape this package while I’m here.” | Local project shape wins unless task requires reshaping。 |
+| “I’ll add a helper just to reduce line count.” | No-information helpers reduce reviewability。 |
+| “This shallow test is enough.” | Tests must prove observable behavior and produce useful diagnostics。 |
+| “I’ll compare `err.Error()`.” | Use `errors.Is` / `errors.As` unless text is the contract。 |
+| “I’ll wait with `time.Sleep()`.” | Use deterministic synchronization; sleep is only a guard。 |
+| “Returning this map is convenient.” | Returned maps/slices can be mutable aliases; copy or document ownership。 |

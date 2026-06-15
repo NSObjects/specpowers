@@ -25,15 +25,15 @@
     {
       "id": "foundation",
       "kind": "skills",
-      "description": "Foundation and utility skills (TDD, debugging, code review, verification, install helpers)",
+      "description": "Foundation and utility skills (TDD, code review, verification, real issue debugging, install helpers)",
       "paths": [
         "skills/test-driven-development",
-        "skills/systematic-debugging",
         "skills/dispatching-parallel-agents",
         "skills/requesting-code-review",
         "skills/receiving-code-review",
         "skills/verification-before-completion",
         "skills/confidence-loop",
+        "skills/log-guided-debugging",
         "skills/selective-install"
       ],
       "targets": [
