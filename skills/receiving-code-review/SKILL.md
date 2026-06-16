@@ -1,13 +1,13 @@
 ---
 name: receiving-code-review
-description: 用于处理 PR/MR 代码评审评论。先从用户粘贴内容、PR/MR 链接、评审 ID，或 GitHub、GitLab、云效 Codeup 等远端代码托管平台中获取真实评审评论；再结合当前代码库、测试和既有决策验证每条评论是否成立，并决定修复、澄清、反驳、延后或交由用户决策。
+description: 用于处理 PR/MR 代码评审评论。先从用户粘贴内容、PR/MR 链接、评审 ID，或配置好的 review source 中获取真实评审评论；再结合当前代码库、测试和既有决策验证每条评论是否成立，并决定修复、澄清、反驳、延后或交由用户决策。
 ---
 
 # PR/MR 评审评论处理
 
 当需要查看、分析或处理 PR/MR 的代码评审评论时，使用此 skill。
 
-这些评论可能来自用户直接粘贴的内容，也可能来自远端代码托管平台，例如 GitHub、GitLab、云效 Codeup、Gitee、Bitbucket 或内部代码评审系统。
+这些评论可能来自用户直接粘贴的内容，也可能来自配置好的 review source、native repository 或 code-host integration、MCP 或 platform integration、CLI/API、仓库上下文，或内部代码评审系统。
 
 当评论没有直接出现在对话中时，应优先通过已配置的 MCP、平台集成、代码托管集成、CLI/API、仓库上下文，或其他可用评审来源获取评论。
 
@@ -45,93 +45,31 @@ description: 用于处理 PR/MR 代码评审评论。先从用户粘贴内容、
 - 用户要求根据远端平台中的评审意见完成修复。
 - 用户要求回复 reviewer、resolve discussion、处理 inline comments 或重新提交评审。
 
-## 反馈输入边界
+## Feedback Input Boundary（反馈输入边界）
 
 在评估评审评论之前，必须确保真实评论内容已经可用。
 
 - 如果用户已经粘贴了评审评论，直接使用这些评论。
-- 如果用户提供了 PR/MR 链接、评审链接、PR ID、MR ID 或等效标识，应先通过已配置的评审来源获取评论，再进行评估。
+- 如果用户提供了 PR/MR 链接、评审链接、PR ID、MR ID 或等效标识，应先通过配置好的 review source 获取评论，再进行评估。
 - 如果用户没有粘贴评论，也没有提供标识，应先根据当前仓库上下文和已配置评审来源，尝试查找正在进行的 PR/MR。
 - 如果当前仓库上下文可以定位远端仓库、当前分支、上游分支或默认分支，应优先尝试发现关联 PR/MR。
-- 如果已配置的评审来源不可用、权限不足，或无法访问该平台评论，应要求用户补充继续所需的缺失信息。
+- 如果配置好的 review source 不可用、权限不足，或无法访问相关评论，应向用户请求继续所需的 missing comments、link、review identifier、platform 或 permissions。
 - 缺失信息可能包括：评论内容、PR/MR 链接、评审 ID、平台名称、仓库信息、访问权限或具体分支。
-- 不要编造、推断或模拟评审评论。缺少真实评审输入是阻塞点，不是猜测理由。
+- 不要发明、推断或模拟 review comments。缺少真实评审输入是阻塞点，不是猜测理由。
 
-## 评审评论获取
+## Review Comment Acquisition（评审评论获取）
 
 当评审评论没有直接粘贴到对话中时，应把获取评论视为一次远端评审来源查询，而不是执行固定脚本。
 
-优先按以下顺序处理：
+使用以下优先顺序，但不要把它当成固定脚本：
 
-1. **使用用户提供的最具体信号**
-
-   优先使用以下信息：
-
-   - 用户粘贴的评审评论。
-   - PR 链接。
-   - MR 链接。
-   - 评审链接。
-   - PR ID。
-   - MR ID。
-   - 代码托管平台名称。
-   - 仓库远程地址。
-   - 当前分支或目标分支信息。
-
-2. **通过平台集成获取评论**
-
-   如果存在 GitHub、GitLab、云效 Codeup、Gitee、Bitbucket 或内部代码平台的原生集成，应使用该集成获取：
-
-   - PR/MR 总体评论。
-   - reviewer 的 review comments。
-   - 普通 conversation comments。
-   - inline comments。
-   - threaded discussions。
-   - unresolved discussions。
-   - change request comments。
-   - reviewer summary。
-   - bot 或 CI 产生的评审反馈，如果它们属于代码评审流程的一部分。
-
-3. **通过 MCP 或其他工具获取评论**
-
-   如果没有原生平台集成，但存在已配置的 MCP、CLI、API、脚本或专用工具，应使用这些工具获取同样范围的评论。
-
-   可用来源包括但不限于：
-
-   - GitHub MCP。
-   - GitLab MCP。
-   - 云效/Codeup MCP 或平台 API。
-   - 代码托管平台 CLI。
-   - 企业内部评审系统集成。
-   - 已配置的仓库或评审查询工具。
-   - 专门封装“获取 PR/MR 评论”能力的其他 skill 或工具链。
-
-4. **通过仓库上下文发现关联 PR/MR**
-
-   当用户只提供当前代码仓库上下文时，应尝试使用：
-
-   - 当前分支。
-   - upstream 分支。
-   - origin 远程地址。
-   - 默认分支。
-   - 最近提交。
-   - 本地 git metadata。
-   - 平台上下文。
-
-   来发现当前分支关联的 PR/MR。
-
-   只有在无法定位关联 PR/MR 时，才向用户询问链接、ID 或平台信息。
-
-5. **处理分页和线程**
-
-   如果平台返回分页结果，应继续翻页，直到收集完当前权限范围内可访问的评论。
-
-   如果平台存在评论线程，应保留线程上下文，不要只读取最后一条评论。评估一条 inline comment 时，要理解它所在的完整 discussion。
-
-6. **无法获取时停止并说明缺口**
-
-   如果缺少平台、权限、链接、ID、仓库信息或工具能力，只询问缺失的那一项。
-
-   不要在没有真实评论的情况下继续分析。
+- **用户提供的最具体信号优先。** 先使用用户粘贴的评审评论、PR/MR 链接、评审链接、PR ID、MR ID、review identifier、平台名称、repository remote、active branch 或目标分支信息。
+- **native repository 或 code-host integration 优先于手工猜测。** 如果存在原生集成，应通过它获取 pull request 或 merge request 的总体评论、review comments、conversation comments、inline comments、threaded discussions、unresolved discussions、change request comments、reviewer summary，以及属于代码评审流程的 bot/CI 反馈。
+- **MCP 或 platform integration 可作为等价来源。** 如果没有原生集成，但存在配置好的 MCP、CLI、API、脚本、内部评审系统或专用工具，应通过这些 review source 获取同样范围的评论。
+- **当前 repository context 可以先发现关联 review。** 当用户只提供当前仓库或分支上下文时，使用当前 repository context、active branch、repository remote、upstream 分支、默认分支、最近提交、本地 git metadata 和平台上下文，先发现关联 pull request 或 merge request。
+- **先发现，再询问。** 只有在 repository-context discovery 无法识别 review，或配置好的 review source 无法读取评论时，才向用户请求 missing comments、link、review identifier、platform 或 permissions。
+- **处理分页和线程。** 如果 review source 返回分页结果，应继续翻页直到收集完当前权限范围内可访问的评论；如果存在评论线程，应保留线程上下文，不要只读取最后一条评论。
+- **无法获取时停止并说明缺口。** 如果缺少平台、权限、链接、ID、仓库信息或工具能力，只询问缺失的那一项；不要在没有真实评论的情况下继续分析。
 
 ## 需要收集的评论范围
 
@@ -153,7 +91,7 @@ description: 用于处理 PR/MR 代码评审评论。先从用户粘贴内容、
 不要只处理 unresolved comments 而忽略 reviewer 明确要求变更但已被平台自动折叠的评论。  
 不要把自动 bot 评论全部视为噪音；如果它指出构建、测试、安全、格式或覆盖率问题，也应纳入判断。
 
-## 默认工作流
+## Default Workflow（默认工作流）
 
 对于每一条评审评论：
 
@@ -196,6 +134,7 @@ description: 用于处理 PR/MR 代码评审评论。先从用户粘贴内容、
    - `unnecessary`：评论提出的是未使用、推测性或过度设计的能力。
    - `out_of_scope`：问题真实存在，但超出本次 PR/MR 范围。
    - `architectural/product`：涉及架构、产品、边界、权限、失败模式或成功标准，需要用户决策。
+   - `needs_user_decision`：评论涉及产品、架构、边界、权限、失败模式或成功标准，必须由用户决策。
    - `already_handled`：当前代码或后续提交已经处理。
    - `duplicate`：与其他评论重复，应合并处理。
 
@@ -206,7 +145,7 @@ description: 用于处理 PR/MR 代码评审评论。先从用户粘贴内容、
    - `wrong/harmful`：用代码、测试、约束或决策证据进行反驳。
    - `unnecessary`：提出 YAGNI 问题，避免引入未使用能力。
    - `out_of_scope`：说明为什么不在当前 PR/MR 中处理，并建议后续处理方式。
-   - `architectural/product`：列出选项、影响和风险，让用户决策。
+   - `architectural/product` / `needs_user_decision`：列出选项、影响和风险，让用户决策。
    - `already_handled`：说明已在哪个位置处理，必要时补充验证。
    - `duplicate`：说明该评论已并入哪条问题处理。
 
@@ -245,3 +184,19 @@ FOR each review item:
       交由用户决策
     ELSE:
       说明当前判断和剩余不确定性
+```
+
+## Review Resolution Loop（评审处理闭环）
+
+处理 review feedback 后，需要为 re-review 准备一个可核查的 Resolution Package。该包必须逐条列出原始 review comments、分类、处理决定、修改位置、验证证据和剩余缺口。
+
+每条评论的 Resolution Package 状态只能是：
+
+- `valid`：评论成立，已用最小正确修改处理，并给出验证证据。
+- `wrong/harmful`：评论不成立或会破坏现有行为，已用代码、测试、约束或既有决策证据反驳。
+- `out_of_scope`：问题真实存在，但不属于当前 PR/MR 范围，已说明边界和后续建议。
+- `needs_user_decision`：评论涉及产品、架构、权限、失败模式或成功标准，需要用户决策后才能继续。
+- `already_handled`：当前代码或后续提交已经处理，并给出位置和验证。
+- `duplicate`：已合并到另一条评论处理。
+
+re-review 前应用 Review Confidence Loop：确认所有 `valid` 评论都有对应修改和验证，所有 `wrong/harmful`、`out_of_scope`、`needs_user_decision` 都有证据或明确决策边界，且没有编造、遗漏或跳过真实评论。若仍存在无法判断的 review item，把它作为 unresolved gap 报告，不要声称已完成处理。
