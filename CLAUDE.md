@@ -1,23 +1,44 @@
 # SpecPowers
 
-This project uses spec-driven development with structured artifacts.
+This project uses the small-core SpecPowers architecture.
 
 ## For AI Agents
 
-You have specpowers installed. At session start, the `using-skills` skill is loaded automatically via hooks.
-
-If skills are NOT auto-loaded, read `skills/using-skills/SKILL.md` immediately and follow it.
+At session start, load `skills/using-specpowers/SKILL.md`. If the platform
+auto-loads the skill, follow the loaded version. If it does not, read that file
+before choosing a workflow.
 
 ## Workflow
 
+```text
+using-specpowers -> one primary mode
 ```
-exploring → proposing → specifying → designing → planning → spec-driven-development → archiving
-```
+
+Primary modes:
+
+- `investigate`
+- `define-change`
+- `execute-change`
+- `review-change`
+- `operate-plugin`
+
+Shared skills:
+
+- `claim-gate`
+- `engineering-rules`
 
 ## Key Rules
 
-- **Never skip specifying.** It's the spine of the workflow.
-- **Never touch git.** The user manages all git operations.
-- **TDD is mandatory.** Every task starts with a failing test.
-- **Per-task review gates.** In `spec-driven-development`, both execution modes run Stage 1 spec review and Stage 2 code-quality review after GREEN and before marking the task complete.
-- **Check for active changes** in `specs/changes/` before starting new work.
+- Do not recreate the old multi-stage workflow.
+- Do not add compatibility wrappers for removed skill names.
+- Use the smallest artifact scale that gives enough evidence.
+- User-visible behavior changes need a behavior contract.
+- Completion, fixed, passing, approved, merge-ready, and handoff claims must
+  pass `claim-gate`.
+- Do not mutate git state. The user manages commits, branches, pushes, resets,
+  and stash operations.
+
+## Destructive Cleanup
+
+This repository is allowed to remove old SpecPowers surfaces when they conflict
+with the small-core architecture. Prefer deletion over compatibility glue.

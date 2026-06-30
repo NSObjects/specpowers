@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "specpowers",
-      "description": "Spec-driven development workflow: structured artifacts, TDD, review gates, and behavioral shaping for AI coding assistants",
+      "description": "Small-core workflow routing, proportional change contracts, focused execution, review, and evidence-gated completion for coding agents",
       "version": "1.0.0",
       "source": {
         "source": "url",

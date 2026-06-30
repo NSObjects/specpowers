@@ -1,193 +1,49 @@
 {
-  "version": 1,
+  "version": 2,
   "modules": [
     {
-      "id": "core-workflow",
+      "id": "core",
       "kind": "skills",
-      "description": "Core workflow skills (using-skills through archiving)",
+      "description": "Small-core SpecPowers router and primary workflows",
       "paths": [
-        "skills/using-skills",
-        "skills/exploring",
-        "skills/proposing",
-        "skills/specifying",
-        "skills/designing",
-        "skills/planning",
-        "skills/spec-driven-development",
-        "skills/archiving"
+        "skills/using-specpowers",
+        "skills/investigate",
+        "skills/define-change",
+        "skills/execute-change",
+        "skills/review-change",
+        "skills/claim-gate"
       ],
       "targets": [
-        "claude-code",
-        "codex"
+        "claude-code"
       ],
       "dependencies": [],
       "defaultInstall": true
     },
     {
-      "id": "foundation",
-      "kind": "skills",
-      "description": "Foundation and utility skills (TDD, code review, verification, real issue debugging, install helpers)",
-      "paths": [
-        "skills/test-driven-development",
-        "skills/dispatching-parallel-agents",
-        "skills/requesting-code-review",
-        "skills/receiving-code-review",
-        "skills/verification-before-completion",
-        "skills/confidence-loop",
-        "skills/log-guided-debugging",
-        "skills/selective-install"
-      ],
-      "targets": [
-        "claude-code",
-        "codex"
-      ],
-      "dependencies": [
-        "core-workflow"
-      ],
-      "defaultInstall": true
-    },
-    {
-      "id": "rules-common",
+      "id": "engineering-rules",
       "kind": "rules",
-      "description": "Common coding rules",
+      "description": "Compact engineering rules used during implementation and review",
       "paths": [
-        "skills/rules-common"
+        "skills/engineering-rules"
       ],
       "targets": [
-        "claude-code",
-        "codex"
+        "claude-code"
       ],
       "dependencies": [],
       "defaultInstall": true
     },
     {
-      "id": "rules-typescript",
-      "kind": "rules",
-      "description": "TypeScript language rules",
-      "paths": [
-        "skills/rules-typescript"
-      ],
-      "targets": [
-        "claude-code",
-        "codex"
-      ],
-      "dependencies": [
-        "rules-common"
-      ],
-      "defaultInstall": false
-    },
-    {
-      "id": "rules-python",
-      "kind": "rules",
-      "description": "Python language rules",
-      "paths": [
-        "skills/rules-python"
-      ],
-      "targets": [
-        "claude-code",
-        "codex"
-      ],
-      "dependencies": [
-        "rules-common"
-      ],
-      "defaultInstall": false
-    },
-    {
-      "id": "rules-golang",
-      "kind": "rules",
-      "description": "Go language rules",
-      "paths": [
-        "skills/rules-golang"
-      ],
-      "targets": [
-        "claude-code",
-        "codex"
-      ],
-      "dependencies": [
-        "rules-common"
-      ],
-      "defaultInstall": false
-    },
-    {
-      "id": "rules-rust",
-      "kind": "rules",
-      "description": "Rust language rules",
-      "paths": [
-        "skills/rules-rust"
-      ],
-      "targets": [
-        "claude-code",
-        "codex"
-      ],
-      "dependencies": [
-        "rules-common"
-      ],
-      "defaultInstall": false
-    },
-    {
-      "id": "rules-java",
-      "kind": "rules",
-      "description": "Java language rules",
-      "paths": [
-        "skills/rules-java"
-      ],
-      "targets": [
-        "claude-code",
-        "codex"
-      ],
-      "dependencies": [
-        "rules-common"
-      ],
-      "defaultInstall": false
-    },
-    {
-      "id": "verification-loop",
+      "id": "operate-plugin",
       "kind": "skills",
-      "description": "6-stage verification loop",
+      "description": "SpecPowers plugin installation, repair, packaging, and runtime verification",
       "paths": [
-        "skills/verification-loop"
+        "skills/operate-plugin"
       ],
       "targets": [
-        "claude-code",
-        "codex"
+        "claude-code"
       ],
       "dependencies": [
-        "foundation"
-      ],
-      "defaultInstall": true
-    },
-    {
-      "id": "quality-gate",
-      "kind": "skills",
-      "description": "Quality gate checks",
-      "paths": [
-        "skills/quality-gate"
-      ],
-      "targets": [
-        "claude-code",
-        "codex"
-      ],
-      "dependencies": [
-        "foundation"
-      ],
-      "defaultInstall": true
-    },
-    {
-      "id": "role-agents",
-      "kind": "agents",
-      "description": "Role agent templates (planner, spec-reviewer, code-quality-reviewer, security-reviewer, tdd-guide)",
-      "paths": [
-        "skills/dispatching-parallel-agents/planner-agent-prompt.md",
-        "skills/spec-driven-development/spec-reviewer-prompt.md",
-        "skills/spec-driven-development/code-quality-reviewer-prompt.md",
-        "skills/dispatching-parallel-agents/security-reviewer-prompt.md",
-        "skills/dispatching-parallel-agents/tdd-guide-prompt.md"
-      ],
-      "targets": [
-        "claude-code",
-        "codex"
-      ],
-      "dependencies": [
-        "foundation"
+        "core"
       ],
       "defaultInstall": true
     }

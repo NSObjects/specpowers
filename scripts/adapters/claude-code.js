@@ -9,7 +9,7 @@ const TARGET_DIR = '.claude';
 /**
  * Map a source module path to its Claude Code install location.
  *
- * @param {string} modulePath - Relative source path (e.g. "skills/exploring").
+ * @param {string} modulePath - Relative source path (e.g. "skills/using-specpowers").
  * @returns {string} Platform-specific install path.
  */
 export function getInstallPath(modulePath) {

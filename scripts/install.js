@@ -3,17 +3,16 @@
 /**
  * SpecPowers Install Script
  *
- * Orchestrates selective installation of SpecPowers modules:
+ * Orchestrates managed Claude Code payload generation:
  *   1. Parse CLI args (--profile, --add, --exclude, --platform)
  *   2. Load module catalog and profiles
  *   3. Resolve dependencies
- *   4. Run platform adapter to compute install paths
+ *   4. Run the Claude Code adapter to compute install paths
  *   5. Write install state
  *
  * Usage:
  *   node scripts/install.js --platform claude-code
  *   node scripts/install.js --platform claude-code --profile developer
- *   node scripts/install.js --platform codex --profile full --exclude rules-rust
  */
 
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -24,7 +23,6 @@ import { resolveProfile, resolveModules } from './lib/dependency-resolver.js';
 import {
   getStatePath,
   readPlatformState,
-  readState,
   writePlatformState,
 } from './lib/install-state.js';
 
@@ -78,7 +76,7 @@ function parseArgs(argv) {
 // Platform adapter loader
 // ---------------------------------------------------------------------------
 
-const SUPPORTED_PLATFORMS = ['claude-code', 'codex'];
+const SUPPORTED_PLATFORMS = ['claude-code'];
 
 /**
  * Dynamically import the platform adapter for the given platform name.
@@ -561,52 +559,7 @@ export async function installModules(options) {
 }
 
 // ---------------------------------------------------------------------------
-// Query helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Read install state and return the list of installed module IDs.
- *
- * @param {string} statePath - Absolute path to install-state.json.
- * @returns {string[]} Array of installed module ID strings.
- */
-export function getInstalledModules(statePath) {
-  const state = readState(statePath);
-  return state.modules.map((m) => m.id);
-}
-
-/**
- * Compare installed modules with detected language skills and return the
- * module IDs that are missing (i.e. detected but not yet installed).
- *
- * @param {string[]} installedModuleIds - Currently installed module IDs.
- * @param {string[]} detectedSkills - Skill names returned by detectLanguages()
- *   (e.g. "rules-typescript"). These double as module IDs.
- * @returns {string[]} Module IDs that need to be installed.
- */
-export function getMissingLanguageModules(installedModuleIds, detectedSkills) {
-  const installed = new Set(installedModuleIds);
-  return detectedSkills.filter((skill) => !installed.has(skill));
-}
-
-/**
- * Determine whether a module is eligible for installer-managed language-rule
- * helper flows. Only modules with kind === "rules" and id starting with
- * "rules-" qualify.
- *
- * @param {string} moduleId - Module ID to check.
- * @returns {boolean} true if the module can be installed by a helper flow without user confirmation.
- */
-export function isInstallHelperEligible(moduleId) {
-  const catalog = JSON.parse(
-    readFileSync(resolve(ROOT, 'manifests/install-modules.json'), 'utf-8')
-  );
-  const mod = catalog.modules.find((m) => m.id === moduleId);
-  return mod != null && mod.kind === 'rules' && mod.id.startsWith('rules-');
-}
-
-// ---------------------------------------------------------------------------
-// CLI Main (preserved for backward compatibility)
+// CLI Main
 // ---------------------------------------------------------------------------
 
 async function main() {

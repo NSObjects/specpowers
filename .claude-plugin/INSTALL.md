@@ -1,14 +1,14 @@
 # Installing SpecPowers for Claude Code
 
-Claude Code is supported through the SpecPowers plugin only. The plugin reads
-managed skill payloads from `.claude/skills/`; before installing the plugin,
-generate that directory from the authored `skills/` source tree.
+Claude Code is supported through the SpecPowers plugin. Claude Code reads a
+managed skill payload from `.claude/skills/`, generated from the authored
+`skills/` tree.
 
 ## Prerequisites
 
 - Git
-- Claude Code with plugin support
 - Node.js
+- Claude Code with plugin support
 
 ## Plugin Install
 
@@ -25,23 +25,17 @@ cd ~/.claude/plugins/specpowers
 node scripts/install.js --platform claude-code --profile developer
 ```
 
-This generates `.claude/skills/` from `skills/`. Do not maintain
-`.claude/skills/` by hand.
-
-The install command also writes local state under `manifests/install-state/`.
-That state records the generated plugin payload only; it is a local install
-artifact, not authored source.
+This creates `.claude/skills/using-specpowers/SKILL.md` and the other selected
+skills. Do not maintain `.claude/skills/` by hand.
 
 ### 3. Install the plugin
 
-Use Claude Code's plugin marketplace flow to install this local plugin. The
-plugin metadata points to the generated `.claude/skills/` payload and
-`hooks/hooks.json`.
+Use Claude Code's plugin marketplace flow to install this local plugin.
 
 ### 4. Verify
 
-Start a new session and say "I want to build X". The workflow should begin with
-`exploring`.
+Start a new session. The session-start hook should inject the
+`using-specpowers` router.
 
 ## Updating
 

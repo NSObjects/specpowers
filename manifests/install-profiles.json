@@ -1,49 +1,26 @@
 {
-  "version": 1,
+  "version": 2,
   "profiles": {
     "core": {
-      "description": "最小基线：核心工作流 + 基础技能",
+      "description": "Small-core workflow only",
       "modules": [
-        "core-workflow",
-        "foundation"
+        "core"
       ]
     },
     "developer": {
-      "description": "标准开发：核心 + 规则 + 验证 + 质量 + 代理",
+      "description": "Small-core workflow plus engineering rules and plugin operation",
       "modules": [
-        "core-workflow",
-        "foundation",
-        "rules-common",
-        "verification-loop",
-        "quality-gate",
-        "role-agents"
-      ]
-    },
-    "security": {
-      "description": "安全增强：developer + 安全审查代理",
-      "modules": [
-        "core-workflow",
-        "foundation",
-        "rules-common",
-        "verification-loop",
-        "quality-gate",
-        "role-agents"
+        "core",
+        "engineering-rules",
+        "operate-plugin"
       ]
     },
     "full": {
-      "description": "完整安装：所有模块 + 所有语言规则",
+      "description": "All current SpecPowers modules",
       "modules": [
-        "core-workflow",
-        "foundation",
-        "rules-common",
-        "rules-typescript",
-        "rules-python",
-        "rules-golang",
-        "rules-rust",
-        "rules-java",
-        "verification-loop",
-        "quality-gate",
-        "role-agents"
+        "core",
+        "engineering-rules",
+        "operate-plugin"
       ]
     }
   }
